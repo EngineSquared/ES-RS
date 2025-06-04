@@ -1,6 +1,6 @@
-# Vehicle Demo
+# ES-RS
 
-Demonstration of a vehicle simulation using EngineSquared
+Second game made using EngineSquared.
 
 ## Build
 
@@ -11,7 +11,7 @@ Run:
 xmake
 ```
 
-To run the demo, use
+To run the game, use
 ```bash
 xmake run
 ```
