@@ -1,8 +1,36 @@
 #pragma once
 
+#include "Engine.pch.hpp"
+
 #include "Scene.hpp"
+#include "CreateFloor.hpp"
+#include "CreateVehicle.hpp"
+
+#include "Timer.hpp"
 
 using namespace ES::Plugin;
+
+struct StartupCircuitTimer {
+    Timer timer;
+};
+
+void StartupCircuitTimerUpdate(ES::Engine::Core &core)
+{
+    auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+    core.GetRegistry()
+        .view<StartupCircuitTimer>()
+        .each([&core, &dt](auto e, auto &startupCircuitTimer) {
+            auto &timer = startupCircuitTimer.timer;
+            timer.Update(dt);
+            if (timer.JustCompleted()) {
+                ES::Utils::Log::Info(fmt::format("Circuit timer just completed after {} seconds", timer.elapsed));
+            }
+            if (timer.Completed()) {
+                ES::Utils::Log::Info(fmt::format("Circuit timer completed after {} seconds", timer.elapsed));
+                ES::Engine::Entity(e).Destroy(core);
+            }
+        });
+}
 
 class Game : public ES::Plugin::Scene::Utils::AScene {
 
@@ -17,6 +45,7 @@ protected:
 
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
+        CreateStartChrono(core);
     }
 
     void _onDestroy(ES::Engine::Core &core) final
@@ -25,6 +54,15 @@ protected:
     }
 
 private:
+    void CreateStartChrono(ES::Engine::Core &core)
+    {
+        ES::Engine::Entity chrono = core.CreateEntity();
+
+        chrono.AddComponent<StartupCircuitTimer>(core, Timer(1.f).SetIterations(3));
+
+        core.RegisterSystem<ES::Engine::Scheduler::Update>(StartupCircuitTimerUpdate);
+    }
+
     void AddLights(ES::Engine::Core &core, const std::string &shaderName)
     {
         ES::Engine::Entity ambient_light = core.CreateEntity();
