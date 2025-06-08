@@ -80,7 +80,7 @@ static ES::Engine::Entity CreateVehicleWheel(
     return wheel;
 }
 
-void CreateVehicle(ES::Engine::Core &core)
+ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
 {
     // consts
     glm::vec3 bodyPosition(0.0f, 6.0f, 0.0f);
@@ -202,4 +202,6 @@ void CreateVehicle(ES::Engine::Core &core)
     core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(controllerSystem);
     auto cameraSystem = WheeledVehicleCameraSync(vehicleEntity);
     core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(cameraSystem);
+
+    return vehicleEntity;
 }

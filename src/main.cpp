@@ -6,12 +6,14 @@
 #include "OpenGL.hpp"
 #include "Camera.hpp" // TODO: remove when camera is in OpenGL
 #include "Window.hpp"
+#include "Scene.hpp"
 
 // Demo headers
 #include "shader/LoadNoLightShader.hpp"
 #include "LoadMaterials.hpp"
 #include "CreateFloor.hpp"
 #include "CreateVehicle.hpp"
+#include "Game.hpp"
 
 using namespace ES::Plugin;
 
@@ -19,13 +21,11 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, Scene::Plugin>();
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
-        LoadNoLightShader,
-        [&](ES::Engine::Core &c){ CreateFloor(c); },
-        CreateVehicle
+        LoadNoLightShader
     );
 
     core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
@@ -44,7 +44,11 @@ int main(void)
             c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
             printf("Available controllers:\n");
             ES::Plugin::Input::Utils::PrintAvailableControllers();
-		}
+		},
+        [](ES::Engine::Core &c) {
+            c.GetResource<Scene::Resource::SceneManager>().RegisterScene<Game>("game");
+            c.GetResource<Scene::Resource::SceneManager>().SetNextScene("game");
+        }
     );
 
     core.RunCore();

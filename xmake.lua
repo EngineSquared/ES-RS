@@ -19,6 +19,7 @@ target("VehicleDemo")
 
     add_files("src/**.cpp")
     add_includedirs("$(projectdir)/src/")
+    add_includedirs("$(projectdir)/src/scene")
 
     add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
 

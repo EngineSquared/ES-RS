@@ -2,4 +2,4 @@
 
 #include "Core.hpp"
 
-void CreateVehicle(ES::Engine::Core &core);
+ES::Engine::Entity CreateVehicle(ES::Engine::Core &core);
