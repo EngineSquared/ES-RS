@@ -9,6 +9,7 @@ struct Timer {
     bool repeat = false;
     bool justCompleted = false;
     bool completed = false;
+    bool infinite = false;
 
     explicit Timer(float duration_) : duration(duration_)
     {
@@ -18,6 +19,7 @@ struct Timer {
     void Update(float deltaTime) {
         elapsed += deltaTime;
 
+        if (infinite) return;
         if (justCompleted) justCompleted = false;
         if (completed) return;
         if (elapsed >= duration) {
@@ -55,6 +57,11 @@ struct Timer {
 
     Timer &SetRepeat(bool repeat_) {
         repeat = repeat_;
+        return *this;
+    }
+
+    Timer &SetInfinite(bool infinite_) {
+        infinite = infinite_;
         return *this;
     }
 };

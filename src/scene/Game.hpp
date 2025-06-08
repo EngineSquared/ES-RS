@@ -14,6 +14,45 @@ struct StartupCircuitTimer {
     Timer timer;
 };
 
+struct GameChrono {
+    Timer timer;
+};
+
+void AddChronoDisplay(ES::Engine::Core &core)
+{
+    core.GetResource<ES::Plugin::OpenGL::Resource::FontManager>().Add(
+        entt::hashed_string("tomorrow"),
+        ES::Plugin::OpenGL::Utils::Font("asset/font/Tomorrow-Medium.ttf", 32)
+    );
+
+    auto timeElapsedText = ES::Engine::Entity::Create(core);
+
+    timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, "Time elapsed: 0.0s", glm::vec2(10.0f, 10.0f), 1.0f, ES::Plugin::Colors::Utils::WHITE_COLOR);
+    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, "tomorrow");
+    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "textDefault");
+    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, "chronoText");
+    timeElapsedText.AddComponent<GameChrono>(core, Timer(1.f).SetInfinite(true));
+}
+
+void UpdateTextTime(ES::Engine::Core &core)
+{
+    auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+
+    core.GetRegistry()
+        .view<GameChrono>()
+        .each([&dt](auto, auto &chrono) {
+            chrono.timer.Update(dt);
+        });
+    core.GetRegistry()
+        .view<ES::Plugin::OpenGL::Component::TextHandle, ES::Plugin::UI::Component::Text, GameChrono>()
+        .each([](auto, auto &textHandle, auto &text, auto &chrono) {
+            if (textHandle.name == "chronoText")
+            {
+                text.text = fmt::format("Time elapsed: {:.2f}s", chrono.timer.elapsed);
+            }
+        });
+}
+
 void StartupCircuitTimerUpdate(ES::Engine::Core &core)
 {
     auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
@@ -28,6 +67,7 @@ void StartupCircuitTimerUpdate(ES::Engine::Core &core)
             if (timer.Completed()) {
                 ES::Utils::Log::Info(fmt::format("Circuit timer completed after {} seconds", timer.elapsed));
                 ES::Engine::Entity(e).Destroy(core);
+                core.RegisterSystem<ES::Engine::Scheduler::Update>(UpdateTextTime);
             }
         });
 }
@@ -46,6 +86,7 @@ protected:
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
         CreateStartChrono(core);
+        AddChronoDisplay(core);
     }
 
     void _onDestroy(ES::Engine::Core &core) final
