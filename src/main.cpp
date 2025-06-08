@@ -48,6 +48,14 @@ int main(void)
         [](ES::Engine::Core &c) {
             c.GetResource<Scene::Resource::SceneManager>().RegisterScene<Game>("game");
             c.GetResource<Scene::Resource::SceneManager>().SetNextScene("game");
+        },
+        [](ES::Engine::Core &c) {
+            c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight = glm::vec3(3.0f, 20.0f, 0.0f);
+            c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection = glm::ortho(-50.0f, 50.0f, 50.0f, -50.0f, 1.0f, 50.0f);
+            c.GetResource<OpenGL::Resource::DirectionalLight>().lightView =
+                glm::lookAt(c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight,
+                            glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+            c.GetResource<OpenGL::Resource::DirectionalLight>().lightSpaceMatrix = c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection * c.GetResource<OpenGL::Resource::DirectionalLight>().lightView;
         }
     );
 

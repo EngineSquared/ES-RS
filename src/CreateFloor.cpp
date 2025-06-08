@@ -19,7 +19,7 @@ ES::Engine::Entity CreateFloor(ES::Engine::Core &core)
 		floor_size
 	);
 
-	floor.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "no_light");
+	floor.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "noTextureLightShadow");
     floor.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "floor");
     floor.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "floor");
 

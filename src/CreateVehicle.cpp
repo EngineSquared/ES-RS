@@ -47,7 +47,7 @@ static ES::Engine::Entity CreateVehicleBody(
         JPH::EMotionType::Dynamic,
         ES::Plugin::Physics::Utils::Layers::MOVING);
 
-    vehicleBody.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "no_light");
+    vehicleBody.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "noTextureLightShadow");
     vehicleBody.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "car_body");
     vehicleBody.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "car_body");
     vehicleBody.AddComponent<ES::Plugin::Object::Component::Mesh>(core, CreateBoxMesh(
@@ -73,7 +73,7 @@ static ES::Engine::Entity CreateVehicleWheel(
         16,
         glm::vec3(1.0f, 0.0f, 0.0f)
     ));
-    wheel.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "no_light");
+    wheel.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "noTextureLightShadow");
     wheel.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "car_wheel");
     wheel.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, "car_wheel");
 
@@ -118,12 +118,12 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             CreateCylinderMesh(glm::vec3(wheelRadius, wheelWidth, wheelRadius), 16, glm::vec3(1.0f, 0.0f, 0.0f))
         );
         vehicleBuilder.SetWheelCallbackFn([](ES::Engine::Core &c, ES::Engine::Entity &entity) {
-            entity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(c, "no_light");
+            entity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(c, "noTextureLightShadow");
             entity.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(c, "car_wheel");
             entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(c, "car_wheel");
         });
         vehicleBuilder.SetVehicleCallbackFn([](ES::Engine::Core &c, ES::Engine::Entity &entity) {
-            entity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(c, "no_light");
+            entity.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(c, "noTextureLightShadow");
             entity.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(c, "car_body");
             entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(c, "car_body");
         });
