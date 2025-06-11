@@ -1,0 +1,13 @@
+<template name="time-elapsed" content="content">
+	<head>
+		<link type="text/rcss" href="time-elapsed.rcss"/>
+	</head>
+	<body class="time-elapsed">
+		<handle move_target="#document">
+			<span id="time-title">Time Elapsed: </span>
+			<span id="time-value">0</span>
+			<span id="time-seconds">s</span>
+		</handle>
+		<handle size_target="#document"></handle>
+	</body>
+</template>

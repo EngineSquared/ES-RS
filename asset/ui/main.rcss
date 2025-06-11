@@ -1,0 +1,21 @@
+body
+{
+    font-family: Tomorrow;
+}
+
+#metrics
+{
+	position: absolute;
+	bottom: 0px;
+	right: 0px;
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 10px;
+}
+
+#metrics > div
+{
+	display: block;
+}

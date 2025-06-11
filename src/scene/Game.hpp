@@ -6,6 +6,7 @@
 #include "CreateFloor.hpp"
 #include "CreateVehicle.hpp"
 
+#include "UI.hpp"
 #include "Timer.hpp"
 
 using namespace ES::Plugin;
@@ -18,64 +19,48 @@ struct GameChrono {
     Timer timer;
 };
 
-void AddChronoDisplay(ES::Engine::Core &core)
-{
-    core.GetResource<ES::Plugin::OpenGL::Resource::FontManager>().Add(
-        entt::hashed_string("tomorrow"),
-        ES::Plugin::OpenGL::Utils::Font("asset/font/Tomorrow-Medium.ttf", 32)
-    );
-
-    auto timeElapsedText = ES::Engine::Entity::Create(core);
-
-    timeElapsedText.AddComponent<ES::Plugin::UI::Component::Text>(core, "Time elapsed: 0.0s", glm::vec2(10.0f, 10.0f), 1.0f, ES::Plugin::Colors::Utils::WHITE_COLOR);
-    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::FontHandle>(core, "tomorrow");
-    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "textDefault");
-    timeElapsedText.AddComponent<ES::Plugin::OpenGL::Component::TextHandle>(core, "chronoText");
-    timeElapsedText.AddComponent<GameChrono>(core, Timer(1.f).SetInfinite(true));
-}
-
-void UpdateTextTime(ES::Engine::Core &core)
-{
-    auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
-
-    core.GetRegistry()
-        .view<GameChrono>()
-        .each([&dt](auto, auto &chrono) {
-            chrono.timer.Update(dt);
-        });
-    core.GetRegistry()
-        .view<ES::Plugin::OpenGL::Component::TextHandle, ES::Plugin::UI::Component::Text, GameChrono>()
-        .each([](auto, auto &textHandle, auto &text, auto &chrono) {
-            if (textHandle.name == "chronoText")
-            {
-                text.text = fmt::format("Time elapsed: {:.2f}s", chrono.timer.elapsed);
-            }
-        });
-}
-
-void StartupCircuitTimerUpdate(ES::Engine::Core &core)
-{
-    auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
-    core.GetRegistry()
-        .view<StartupCircuitTimer>()
-        .each([&core, &dt](auto e, auto &startupCircuitTimer) {
-            auto &timer = startupCircuitTimer.timer;
-            timer.Update(dt);
-            if (timer.JustCompleted()) {
-                ES::Utils::Log::Info(fmt::format("Circuit timer just completed after {} seconds", timer.elapsed));
-            }
-            if (timer.Completed()) {
-                ES::Utils::Log::Info(fmt::format("Circuit timer completed after {} seconds", timer.elapsed));
-                ES::Engine::Entity(e).Destroy(core);
-                core.RegisterSystem<ES::Engine::Scheduler::Update>(UpdateTextTime);
-            }
-        });
-}
-
 class Game : public ES::Plugin::Scene::Utils::AScene {
-
 public:
-    Game() : ES::Plugin::Scene::Utils::AScene() {}
+    Game() : _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))}, _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))}, _IsCountingDown(true)
+    {}
+
+    void AddChronoDisplay(ES::Engine::Core &core)
+    {
+        core.RegisterSystem<ES::Engine::Scheduler::Update>(
+            [this](ES::Engine::Core &core) {
+                this->StartupCircuitTimerUpdate(core);
+            }
+        );
+    }
+
+    void UpdateTextTime(ES::Engine::Core &core)
+    {
+        auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+
+        _gameChrono.timer.Update(dt);
+
+        std::ostringstream timeStream;
+        timeStream << std::fixed << std::setprecision(3) << _gameChrono.timer.elapsed;
+
+        core.GetResource<ES::Plugin::UI::Resource::UIResource>().UpdateInnerContent("time-value", timeStream.str());
+    }
+    
+    void StartupCircuitTimerUpdate(ES::Engine::Core &core)
+    {
+        auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+        
+        _startupCircuitChrono.timer.Update(dt);
+        if (_startupCircuitChrono.timer.JustCompleted()) {
+            ES::Utils::Log::Info(fmt::format("Circuit timer just completed after {} seconds", _startupCircuitChrono.timer.elapsed));
+        }
+        if (_startupCircuitChrono.timer.Completed() && _IsCountingDown) {
+            ES::Utils::Log::Info(fmt::format("Circuit timer completed after {} seconds", _startupCircuitChrono.timer.elapsed));
+            core.RegisterSystem<ES::Engine::Scheduler::Update>(
+                [this](ES::Engine::Core &core) { this->UpdateTextTime(core); }
+            );
+            _IsCountingDown = false;
+        }
+    }
 
 protected:
     void _onCreate(ES::Engine::Core &core) final
@@ -85,7 +70,6 @@ protected:
 
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
-        CreateStartChrono(core);
         AddChronoDisplay(core);
     }
 
@@ -95,14 +79,9 @@ protected:
     }
 
 private:
-    void CreateStartChrono(ES::Engine::Core &core)
-    {
-        ES::Engine::Entity chrono = core.CreateEntity();
-
-        chrono.AddComponent<StartupCircuitTimer>(core, Timer(1.f).SetIterations(3));
-
-        core.RegisterSystem<ES::Engine::Scheduler::Update>(StartupCircuitTimerUpdate);
-    }
+    GameChrono _gameChrono;
+    StartupCircuitTimer _startupCircuitChrono;
+    bool _IsCountingDown;
 
     void AddLights(ES::Engine::Core &core, const std::string &shaderName)
     {

@@ -1,0 +1,14 @@
+<template name="lap-counter" content="content">
+	<head>
+		<link type="text/rcss" href="lap-counter.rcss"/>
+	</head>
+	<body class="lap-counter">
+		<handle move_target="#document">
+			<span id="title">Lap: </span>
+			<span id="current-lap">0</span>
+			<span id="divider">/</span>
+			<span id="max-lap">0</span>
+		</handle>
+		<handle size_target="#document"></handle>
+	</body>
+</template>

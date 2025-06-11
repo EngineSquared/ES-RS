@@ -1,0 +1,22 @@
+<rml>
+	<head>
+		<title>ES-RS</title>
+		<link type="text/template" href="speed-o-meter.rml" />
+		<link type="text/template" href="lap-counter.rml" />
+		<link type="text/template" href="time-elapsed.rml" />
+		<link type="text/rcss" href="main.rcss" />
+	</head>
+	<body>
+		<div id="metrics">
+			<div template="speed-o-meter">
+				<template content="speed-o-meter" src="speed-o-meter"></template>
+			</div>
+			<div template="lap-counter">
+				<template content="lap-counter" src="lap-counter"></template>
+			</div>
+		</div>
+		<div template="time-elapsed">
+			<template content="time-elapsed" src="time-elapsed"></template>
+		</div>
+	</body>
+</rml>

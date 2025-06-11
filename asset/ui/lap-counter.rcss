@@ -1,0 +1,5 @@
+#current-lap,#divider,#max-lap
+{
+    font-size: 32px;
+	color:rgb(255, 255, 255)
+}

@@ -7,6 +7,7 @@
 #include "Camera.hpp" // TODO: remove when camera is in OpenGL
 #include "Window.hpp"
 #include "Scene.hpp"
+#include "UI.hpp"
 
 // Demo headers
 #include "shader/LoadNoLightShader.hpp"
@@ -14,6 +15,7 @@
 #include "CreateFloor.hpp"
 #include "CreateVehicle.hpp"
 #include "Game.hpp"
+#include "SpeedOMeter.hpp"
 
 using namespace ES::Plugin;
 
@@ -21,7 +23,7 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, Scene::Plugin>();
+	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin>();
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
@@ -30,6 +32,7 @@ int main(void)
 
     core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
         // VehicleMovement
+        UpdateSpeedOmeter
     );
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
@@ -56,6 +59,10 @@ int main(void)
                 glm::lookAt(c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight,
                             glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
             c.GetResource<OpenGL::Resource::DirectionalLight>().lightSpaceMatrix = c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection * c.GetResource<OpenGL::Resource::DirectionalLight>().lightView;
+        },
+        [](ES::Engine::Core &c) {
+            c.GetResource<UI::Resource::UIResource>().SetFont("asset/font/Tomorrow-Medium.ttf");
+            c.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/main.rml");
         }
     );
 

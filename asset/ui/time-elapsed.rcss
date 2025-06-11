@@ -1,0 +1,10 @@
+#time-elapsed
+{
+    text-align: center;
+}
+
+#time-title,#time-value,#time-seconds
+{
+    font-size: 32px;
+	color:rgb(255, 255, 255)
+}
