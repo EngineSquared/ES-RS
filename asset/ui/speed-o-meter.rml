@@ -3,6 +3,11 @@
 		<link type="text/rcss" href="speed-o-meter.rcss"/>
 	</head>
 	<body class="speed-o-meter">
+		<div id="speed-counter">
+			<div id="speed-counter-wrapper">
+				<div id="speed-counter-pointer"></div>
+			</div>
+		</div>
 		<handle move_target="#document">
 			<span id="value">0</span>
 			<span id="title"> km/h</span>

@@ -32,7 +32,8 @@ int main(void)
 
     core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
         // VehicleMovement
-        UpdateSpeedOmeter
+        UpdateSpeedOmeter,
+        UpdateSpeedOmeterAnimations
     );
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(

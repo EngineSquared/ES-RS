@@ -1,10 +1,52 @@
-#footer
+@spritesheet theme
 {
-    text-align: center;
+	src: ../sprites/speedometer.tga;
+
+	/* For high dpi screens, designates the scaling it is intended to be shown at. */
+	resolution: 1x;
+
+	/**
+		The following specifies a list of sprite names and associated rectangles into the image given above.
+		Any sprite given here can be specified in a decorator. Their names must be globally unique.
+		Rectangles are specified as: x y width height. With the origin assumed to be at the top left corner.
+	*/
+	background-simple: 0px 0px 428px 428px;
+
+	/* huditems are vertically flipped titlebars */
+	pointer: 428px 0px 70px 428px;
+}
+
+#speed-counter {
+    decorator: image("background-simple" cover);
+    position: absolute; /* keep absolute for screen placement */
+    bottom: 110px;
+    right: 20px;
+    width: 218px;
+    height: 218px;
+    z-index: 9;
+}
+
+#speed-counter-wrapper {
+    position: relative;
+    width: 218px;
+    height: 218px;
+    margin: 0;
+    padding: 0;
+}
+
+#speed-counter-pointer {
+    decorator: image("pointer" cover);
+    position: absolute;
+    top: 60px - 44px;   /* center Y - pivot Y */
+    left: 86px - 22.5px; /* center X - pivot X */
+    width: 35px;
+    height: 214px;
+    transform-origin: 22.5px 44px;
+    z-index: 10;
 }
 
 #title,#value
 {
     font-size: 32px;
-	color:rgb(255, 255, 255)
+	color:rgb(255, 255, 255);
 }

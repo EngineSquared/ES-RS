@@ -13,3 +13,29 @@ void UpdateSpeedOmeter(ES::Engine::Core &core)
         }
     );
 }
+
+void UpdateSpeedOmeterAnimations(ES::Engine::Core &core)
+{
+    float rpm = 0.0f;
+    const float minRPM = 0.0f;
+    const float maxRPM = 8000.0f;
+    const float minAngle = 0.0f;
+    const float maxAngle = 300.0f;
+
+    core.GetRegistry().view<ES::Plugin::Physics::Component::WheeledVehicle3D>().each(
+        [&core, &rpm](ES::Plugin::Physics::Component::WheeledVehicle3D &vehicle) {
+            auto controller = reinterpret_cast<JPH::WheeledVehicleController *>(vehicle.vehicleConstraint->GetController());
+            if (controller)
+            {
+                rpm = controller->GetWheelSpeedAtClutch();
+            }
+        }
+    );
+
+    float t = std::clamp((rpm - minRPM) / (maxRPM - minRPM), 0.0f, 1.0f);
+    float angle = minAngle + t * (maxAngle - minAngle);
+
+    core.GetResource<ES::Plugin::UI::Resource::UIResource>().SetTransformProperty("speed-counter-pointer", {
+        {ES::Plugin::UI::Resource::UIResource::TransformType::Rotate, angle},
+    });
+}
