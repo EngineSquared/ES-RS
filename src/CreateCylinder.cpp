@@ -16,7 +16,7 @@ ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 	ES::Plugin::Object::Component::Mesh mesh;
 
 	float radius = size.x;
-	float height = size.y;
+	float height = size.y / 2.0f;
 
 	// Normalize up vector and compute a transform to align Y-axis with "up"
 	glm::vec3 up_normalized = glm::normalize(up);
@@ -137,7 +137,7 @@ ES::Engine::Entity CreateCylinder(
 
 	// Jolt's CylinderShape uses height from center to top, so divide by 2
 	float radius = size.x;
-	float half_height = size.y;
+	float half_height = size.y / 2.0f;
 
 	auto cylinder_shape_settings = std::make_shared<JPH::CylinderShapeSettings>(half_height, radius);
 

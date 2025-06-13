@@ -131,7 +131,7 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
     glm::vec3 bodyPosition(0.0f, 30.0f, 0.0f);
 
     float wheelRadius = 0.689 / 2.0f;
-    float wheelWidth = 0.1f;
+    float wheelWidth = 0.285f;
     float halfVehicleLength = boundingBoxSize.z / 2.0f;
     float halfVehicleWidth = boundingBoxSize.x / 2.0f;
     float halfVehicleHeight = boundingBoxSize.y / 2.0f;
@@ -171,10 +171,10 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(c, "car_body");
         });
         vehicleBuilder.SetOffsetCenterOfMass(glm::vec3(0.0f, -halfVehicleHeight, 0.0f));
-        vehicleBuilder.SetWheelOffset(0, glm::vec3(0.85, 0.667, 1.24));
-        vehicleBuilder.SetWheelOffset(1, glm::vec3(-0.85, 0.667, 1.24));
-        vehicleBuilder.SetWheelOffset(2, glm::vec3(0.85, 0.667, -1.21));
-        vehicleBuilder.SetWheelOffset(3, glm::vec3(-0.85, 0.667, -1.21));
+        vehicleBuilder.SetWheelOffset(0, glm::vec3(0.92, 0.667, 1.24));
+        vehicleBuilder.SetWheelOffset(1, glm::vec3(-0.92, 0.667, 1.24));
+        vehicleBuilder.SetWheelOffset(2, glm::vec3(0.92, 0.667, -1.21));
+        vehicleBuilder.SetWheelOffset(3, glm::vec3(-0.92, 0.667, -1.21));
         vehicleBuilder.EditWheel(0, [&](JPH::WheelSettingsWV &wheel) {
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
