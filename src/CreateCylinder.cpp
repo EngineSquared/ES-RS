@@ -8,6 +8,8 @@
 
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
 
+constexpr float M_PI = 3.14159265358979323846f;
+
 ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 	const glm::vec3 &size,
 	int segments,
@@ -16,110 +18,147 @@ ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 	ES::Plugin::Object::Component::Mesh mesh;
 
 	float radius = size.x;
-	float height = size.y / 2.0f;
+	float height = size.y;
 
 	// Normalize up vector and compute a transform to align Y-axis with "up"
 	glm::vec3 up_normalized = glm::normalize(up);
 	glm::vec3 default_up(0.0f, 1.0f, 0.0f);
 
-	glm::mat4 align = glm::mat4(1.0f);
-	if (!glm::all(glm::equal(up_normalized, default_up))) {
-		glm::vec3 axis = glm::cross(default_up, up_normalized);
-		float angle = acos(glm::dot(default_up, up_normalized));
-		if (glm::length(axis) > 0.0001f)
-			align = glm::rotate(glm::mat4(1.0f), angle, glm::normalize(axis));
-	}
+	// Calculate rotation matrix to align default Y-axis with desired up vector
+    glm::mat3 rotation_matrix(1.0f);
+    if (glm::length(up_normalized - default_up) > 1e-6f) {
+        glm::vec3 axis = glm::cross(default_up, up_normalized);
+        if (glm::length(axis) > 1e-6f) {
+            axis = glm::normalize(axis);
+            float angle = glm::acos(glm::clamp(glm::dot(default_up, up_normalized), -1.0f, 1.0f));
+            rotation_matrix = glm::mat3(glm::rotate(glm::mat4(1.0f), angle, axis));
+        } else if (glm::dot(default_up, up_normalized) < 0) {
+            // 180 degree rotation case
+            rotation_matrix = glm::mat3(-1.0f, 0.0f, 0.0f,
+                                       0.0f, -1.0f, 0.0f,
+                                       0.0f, 0.0f, 1.0f);
+        }
+    }
 
-	// Top and bottom center points before transformation
-	glm::vec3 top_center(0.0f, height, 0.0f);
-	glm::vec3 bottom_center(0.0f, -height, 0.0f);
+    float half_height = height * 0.5f;
 
-	// Generate side vertices
-	for (int i = 0; i < segments; ++i) {
-		float angle = 2.0f * glm::pi<float>() * i / segments;
-		float x = radius * cos(angle);
-		float z = radius * sin(angle);
+    // Generate side vertices first (two rings)
+    uint32_t side_vertex_start = 0;
+    for (int i = 0; i < segments; ++i) {
+        float angle = 2.0f * M_PI * i / segments;
+        float cos_angle = std::cos(angle);
+        float sin_angle = std::sin(angle);
 
-		glm::vec3 top(x, height, z);
-		glm::vec3 bottom(x, -height, z);
-		glm::vec3 normal = glm::normalize(glm::vec3(x, 0.0f, z));
+        // Calculate side normal in local space first, then transform
+        glm::vec3 local_normal(cos_angle, 0.0f, sin_angle);
+        glm::vec3 side_normal = glm::normalize(rotation_matrix * local_normal);
 
-		top = glm::vec3(align * glm::vec4(top, 1.0f));
-		bottom = glm::vec3(align * glm::vec4(bottom, 1.0f));
-		normal = glm::normalize(glm::vec3(align * glm::vec4(normal, 0.0f)));
+        // Top ring vertex
+        glm::vec3 top_local(radius * cos_angle, half_height, radius * sin_angle);
+        glm::vec3 top_pos = rotation_matrix * top_local;
+        mesh.vertices.push_back(top_pos);
+        mesh.normals.push_back(side_normal);
+        mesh.texCoords.push_back(glm::vec2((float)i / segments, 1.0f));
 
-		mesh.vertices.push_back(top);
-		mesh.normals.push_back(normal);
-		mesh.vertices.push_back(bottom);
-		mesh.normals.push_back(normal);
-	}
+        // Bottom ring vertex
+        glm::vec3 bottom_local(radius * cos_angle, -half_height, radius * sin_angle);
+        glm::vec3 bottom_pos = rotation_matrix * bottom_local;
+        mesh.vertices.push_back(bottom_pos);
+        mesh.normals.push_back(side_normal);
+        mesh.texCoords.push_back(glm::vec2((float)i / segments, 0.0f));
+    }
 
-	// Side indices
-	for (int i = 0; i < segments; ++i) {
-		int top1 = i * 2;
-		int bottom1 = top1 + 1;
-		int top2 = (i * 2 + 2) % (segments * 2);
-		int bottom2 = (i * 2 + 3) % (segments * 2);
+    // Generate cap vertices
+    uint32_t top_cap_start = segments * 2;
+    uint32_t bottom_cap_start = top_cap_start + segments + 1;
 
-		mesh.indices.push_back(top1);
-		mesh.indices.push_back(bottom1);
-		mesh.indices.push_back(top2);
-		mesh.indices.push_back(top2);
-		mesh.indices.push_back(bottom1);
-		mesh.indices.push_back(bottom2);
-	}
+    // Top cap center
+    glm::vec3 top_center_pos = rotation_matrix * glm::vec3(0.0f, half_height, 0.0f);
+    glm::vec3 top_normal = glm::normalize(rotation_matrix * glm::vec3(0.0f, 1.0f, 0.0f));
+    mesh.vertices.push_back(top_center_pos);
+    mesh.normals.push_back(top_normal);
+    mesh.texCoords.push_back(glm::vec2(0.5f, 0.5f));
 
-	// Add top cap
-	int top_center_index = mesh.vertices.size();
-	top_center = glm::vec3(align * glm::vec4(top_center, 1.0f));
-	mesh.vertices.push_back(top_center);
-	mesh.normals.push_back(up_normalized);
+    // Top cap edge vertices
+    for (int i = 0; i < segments; ++i) {
+        float angle = 2.0f * M_PI * i / segments;
+        float cos_angle = std::cos(angle);
+        float sin_angle = std::sin(angle);
 
-	std::vector<int> top_ring_indices;
-	for (int i = 0; i < segments; ++i) {
-		float angle = 2.0f * glm::pi<float>() * i / segments;
-		float x = radius * cos(angle);
-		float z = radius * sin(angle);
-		glm::vec3 pos = glm::vec3(x, height, z);
-		pos = glm::vec3(align * glm::vec4(pos, 1.0f));
+        glm::vec3 top_local(radius * cos_angle, half_height, radius * sin_angle);
+        glm::vec3 top_pos = rotation_matrix * top_local;
+        mesh.vertices.push_back(top_pos);
+        mesh.normals.push_back(top_normal);
+        mesh.texCoords.push_back(glm::vec2(0.5f + 0.5f * cos_angle, 0.5f + 0.5f * sin_angle));
+    }
 
-		mesh.vertices.push_back(pos);
-		mesh.normals.push_back(up_normalized);
-		top_ring_indices.push_back(mesh.vertices.size() - 1);
-	}
+    // Bottom cap center
+    glm::vec3 bottom_center_pos = rotation_matrix * glm::vec3(0.0f, -half_height, 0.0f);
+    glm::vec3 bottom_normal = glm::normalize(rotation_matrix * glm::vec3(0.0f, -1.0f, 0.0f));
+    mesh.vertices.push_back(bottom_center_pos);
+    mesh.normals.push_back(bottom_normal);
+    mesh.texCoords.push_back(glm::vec2(0.5f, 0.5f));
 
-	for (int i = 0; i < segments; ++i) {
-		int next = (i + 1) % segments;
-		mesh.indices.push_back(top_center_index);
-		mesh.indices.push_back(top_ring_indices[i]);
-		mesh.indices.push_back(top_ring_indices[next]);
-	}
+    // Bottom cap edge vertices
+    for (int i = 0; i < segments; ++i) {
+        float angle = 2.0f * M_PI * i / segments;
+        float cos_angle = std::cos(angle);
+        float sin_angle = std::sin(angle);
 
-	// Add bottom cap
-	int bottom_center_index = mesh.vertices.size();
-	bottom_center = glm::vec3(align * glm::vec4(bottom_center, 1.0f));
-	mesh.vertices.push_back(bottom_center);
-	mesh.normals.push_back(-up_normalized);
+        glm::vec3 bottom_local(radius * cos_angle, -half_height, radius * sin_angle);
+        glm::vec3 bottom_pos = rotation_matrix * bottom_local;
+        mesh.vertices.push_back(bottom_pos);
+        mesh.normals.push_back(bottom_normal);
+        mesh.texCoords.push_back(glm::vec2(0.5f + 0.5f * cos_angle, 0.5f - 0.5f * sin_angle));
+    }
 
-	std::vector<int> bottom_ring_indices;
-	for (int i = 0; i < segments; ++i) {
-		float angle = 2.0f * glm::pi<float>() * i / segments;
-		float x = radius * cos(angle);
-		float z = radius * sin(angle);
-		glm::vec3 pos = glm::vec3(x, -height, z);
-		pos = glm::vec3(align * glm::vec4(pos, 1.0f));
+    // Generate indices for side faces
+    for (int i = 0; i < segments; ++i) {
+        int next = (i + 1) % segments;
 
-		mesh.vertices.push_back(pos);
-		mesh.normals.push_back(-up_normalized);
-		bottom_ring_indices.push_back(mesh.vertices.size() - 1);
-	}
+        uint32_t top_current = i * 2;
+        uint32_t bottom_current = i * 2 + 1;
+        uint32_t top_next = next * 2;
+        uint32_t bottom_next = next * 2 + 1;
 
-	for (int i = 0; i < segments; ++i) {
-		int next = (i + 1) % segments;
-		mesh.indices.push_back(bottom_center_index);
-		mesh.indices.push_back(bottom_ring_indices[next]);
-		mesh.indices.push_back(bottom_ring_indices[i]);
-	}
+        // First triangle (counter-clockwise when viewed from outside)
+        mesh.indices.push_back(top_current);
+        mesh.indices.push_back(top_next);
+        mesh.indices.push_back(bottom_current);
+
+        // Second triangle
+        mesh.indices.push_back(top_next);
+        mesh.indices.push_back(bottom_next);
+        mesh.indices.push_back(bottom_current);
+    }
+
+    // Generate indices for top cap
+    uint32_t top_center_idx = top_cap_start;
+    for (int i = 0; i < segments; ++i) {
+        int next = (i + 1) % segments;
+
+        uint32_t current_edge = top_cap_start + 1 + i;
+        uint32_t next_edge = top_cap_start + 1 + next;
+
+        // Triangle facing upward (counter-clockwise from above)
+        mesh.indices.push_back(top_center_idx);
+        mesh.indices.push_back(next_edge);
+        mesh.indices.push_back(current_edge);
+    }
+
+    // Generate indices for bottom cap
+    uint32_t bottom_center_idx = bottom_cap_start;
+    for (int i = 0; i < segments; ++i) {
+        int next = (i + 1) % segments;
+
+        uint32_t current_edge = bottom_cap_start + 1 + i;
+        uint32_t next_edge = bottom_cap_start + 1 + next;
+
+        // Triangle facing downward (counter-clockwise when viewed from outside)
+        mesh.indices.push_back(bottom_center_idx);
+        mesh.indices.push_back(current_edge);
+        mesh.indices.push_back(next_edge);
+    }
 
 	return mesh;
 }
