@@ -29,15 +29,10 @@ static ES::Engine::Entity CreateVehicleBody(
     float halfVehicleHeight
 )
 {
-    std::shared_ptr<JPH::ShapeSettings> carShapeSettingsBox = std::make_shared<JPH::BoxShapeSettings>(
+    std::shared_ptr<JPH::ShapeSettings> carShapeSettings = std::make_shared<JPH::BoxShapeSettings>(
         JPH::Vec3(halfVehicleLength, halfVehicleHeight, halfVehicleWidth)
     );
-    carShapeSettingsBox->SetEmbedded();
-    std::shared_ptr<JPH::ShapeSettings> carShapeSettings = std::make_shared<JPH::OffsetCenterOfMassShapeSettings>(
-        JPH::Vec3(0.0f, -halfVehicleHeight, 0.0f),
-        carShapeSettingsBox.get()
-    );
-	carShapeSettings->SetEmbedded();
+    carShapeSettings->SetEmbedded();
 
     ES::Engine::Entity vehicleBody = core.CreateEntity();
     vehicleBody.AddComponent<ES::Plugin::Object::Component::Transform>(core, position);
@@ -80,18 +75,66 @@ static ES::Engine::Entity CreateVehicleWheel(
     return wheel;
 }
 
+static glm::vec3 GetMeshBoundingBoxSize(
+    const ES::Plugin::Object::Component::Mesh &mesh
+) {
+    if (mesh.vertices.empty()) {
+        return glm::vec3(0.0f);
+    }
+
+    glm::vec3 minPoint = mesh.vertices[0];
+    glm::vec3 maxPoint = mesh.vertices[0];
+
+    for (const auto &vertex : mesh.vertices) {
+        minPoint = glm::min(minPoint, vertex);
+        maxPoint = glm::max(maxPoint, vertex);
+    }
+
+    return maxPoint - minPoint;
+}
+
+static void RotateMesh(
+    ES::Plugin::Object::Component::Mesh &mesh,
+    const glm::vec3 &rotationAxis,
+    float angle
+) {
+    glm::mat4 rotationMatrix = glm::rotate(glm::mat4(1.0f), angle, rotationAxis);
+    for (auto &vertex : mesh.vertices) {
+        vertex = glm::vec3(rotationMatrix * glm::vec4(vertex, 1.0f));
+    }
+}
+
 ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
 {
-    // consts
-    glm::vec3 bodyPosition(0.0f, 6.0f, 0.0f);
+    const std::string modelPath = "asset/Porsche_911_GT3_992_reduced.obj";
+    ES::Plugin::Object::Component::Mesh vehicleBodyMesh;
 
-    float wheelRadius = 0.3f;
-    float wheelWidth = 0.1f;
-    float halfVehicleLength = 2.0f;
-    float halfVehicleWidth = 0.9f;
-    float halfVehicleHeight = 0.2f;
-    float wheelOffsetHorizontal = 1.4f;
-    float wheelOffsetVertical = 0.18f;
+    if (!ES::Plugin::Object::Resource::OBJLoader::loadModel(
+        modelPath,
+        vehicleBodyMesh.vertices,
+        vehicleBodyMesh.normals,
+        vehicleBodyMesh.texCoords,
+        vehicleBodyMesh.indices
+    )) {
+        throw std::runtime_error("Failed to load vehicle model from " + modelPath);
+    }
+
+    // Model exported from Blender is wrongly oriented, so we need to rotate it
+    RotateMesh(vehicleBodyMesh, glm::vec3(0.0f, 1.0f, 0.0f), glm::radians(90.0f));
+
+    glm::vec3 boundingBoxSize = GetMeshBoundingBoxSize(vehicleBodyMesh);
+
+    printf("Vehicle body bounding box size: %.2f x %.2f x %.2f\n",
+           boundingBoxSize.x, boundingBoxSize.y, boundingBoxSize.z);
+
+    // consts
+    glm::vec3 bodyPosition(0.0f, 30.0f, 0.0f);
+
+    float wheelRadius = 0.689 / 2.0f;
+    float wheelWidth = 0.285f;
+    float halfVehicleLength = boundingBoxSize.z / 2.0f;
+    float halfVehicleWidth = boundingBoxSize.x / 2.0f;
+    float halfVehicleHeight = boundingBoxSize.y / 2.0f;
     float suspensionMinLength = 0.3f;
     float suspensionMaxLength = 0.5f;
     float maxSteerAngle = 0.52f; // in radians, ~30 degrees
@@ -110,10 +153,10 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
         // In a separate scope to make sure the builder releases the memory properly
         auto vehicleBuilder = ES::Plugin::Physics::Utils::WheeledVehicleBuilder(core);
 
+        // TODO: fix in ESQ, initial position should take into account the vehicle body mesh AND tires
+        // right now it just sets the position of the vehicle body
         vehicleBuilder.SetInitialPosition(bodyPosition);
-        vehicleBuilder.SetBodyMesh(
-            CreateBoxMesh(glm::vec3(halfVehicleWidth, halfVehicleHeight, halfVehicleLength))
-        );
+        vehicleBuilder.SetBodyMesh(vehicleBodyMesh);
         vehicleBuilder.SetWheelMesh(
             CreateCylinderMesh(glm::vec3(wheelRadius, wheelWidth, wheelRadius), 16, glm::vec3(1.0f, 0.0f, 0.0f))
         );
@@ -128,8 +171,11 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(c, "car_body");
         });
         vehicleBuilder.SetOffsetCenterOfMass(glm::vec3(0.0f, -halfVehicleHeight, 0.0f));
+        vehicleBuilder.SetWheelOffset(0, glm::vec3(0.92, 0.667, 1.24));
+        vehicleBuilder.SetWheelOffset(1, glm::vec3(-0.92, 0.667, 1.24));
+        vehicleBuilder.SetWheelOffset(2, glm::vec3(0.92, 0.667, -1.21));
+        vehicleBuilder.SetWheelOffset(3, glm::vec3(-0.92, 0.667, -1.21));
         vehicleBuilder.EditWheel(0, [&](JPH::WheelSettingsWV &wheel) {
-            wheel.mPosition = JPH::Vec3(halfVehicleWidth, -wheelOffsetVertical, wheelOffsetHorizontal);
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
@@ -138,7 +184,6 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             wheel.mMaxHandBrakeTorque = 0.0f; // Front wheels doesn't have handbrake
         });
         vehicleBuilder.EditWheel(1, [&](JPH::WheelSettingsWV &wheel) {
-            wheel.mPosition = JPH::Vec3(-halfVehicleWidth, -wheelOffsetVertical, wheelOffsetHorizontal);
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
@@ -147,7 +192,6 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             wheel.mMaxHandBrakeTorque = 0.0f; // Front wheels doesn't have handbrake
         });
         vehicleBuilder.EditWheel(2, [&](JPH::WheelSettingsWV &wheel) {
-            wheel.mPosition = JPH::Vec3(halfVehicleWidth, -wheelOffsetVertical, -wheelOffsetHorizontal);
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
@@ -155,7 +199,6 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             wheel.mMaxSteerAngle = 0.0f; // Rear wheels doesn't have steering
         });
         vehicleBuilder.EditWheel(3, [&](JPH::WheelSettingsWV &wheel) {
-            wheel.mPosition = JPH::Vec3(-halfVehicleWidth, -wheelOffsetVertical, -wheelOffsetHorizontal);
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
