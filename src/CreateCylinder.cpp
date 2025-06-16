@@ -5,10 +5,9 @@
 
 #include <glm/glm.hpp>
 #include <glm/gtc/quaternion.hpp>
+#include <numbers>
 
 #include <Jolt/Physics/Collision/Shape/CylinderShape.h>
-
-constexpr float M_PI = 3.14159265358979323846f;
 
 ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 	const glm::vec3 &size,
@@ -45,7 +44,7 @@ ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
     // Generate side vertices first (two rings)
     uint32_t side_vertex_start = 0;
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi_v<float> * i / segments;
         float cos_angle = std::cos(angle);
         float sin_angle = std::sin(angle);
 
@@ -81,7 +80,7 @@ ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 
     // Top cap edge vertices
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi_v<float> * i / segments;
         float cos_angle = std::cos(angle);
         float sin_angle = std::sin(angle);
 
@@ -101,7 +100,7 @@ ES::Plugin::Object::Component::Mesh CreateCylinderMesh(
 
     // Bottom cap edge vertices
     for (int i = 0; i < segments; ++i) {
-        float angle = 2.0f * M_PI * i / segments;
+        float angle = 2.0f * std::numbers::pi_v<float> * i / segments;
         float cos_angle = std::cos(angle);
         float sin_angle = std::sin(angle);
 
