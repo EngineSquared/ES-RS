@@ -5,6 +5,7 @@
 #include "Scene.hpp"
 #include "CreateFloor.hpp"
 #include "CreateVehicle.hpp"
+#include "CreateSkyBox.hpp"
 
 #include "Timer.hpp"
 
@@ -81,6 +82,16 @@ protected:
     void _onCreate(ES::Engine::Core &core) final
     {
         CreateFloor(core);
+
+        std::array<std::string, 6> faces = {
+            "asset/skybox/right.jpg",
+            "asset/skybox/left.jpg",
+            "asset/skybox/top.jpg",
+            "asset/skybox/bottom.jpg",
+            "asset/skybox/front.jpg",
+            "asset/skybox/back.jpg"
+        };
+        CreateSkyBox(core, faces);
         CreateVehicle(core);
 
         AddLights(core, "default");
