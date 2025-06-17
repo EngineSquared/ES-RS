@@ -5,6 +5,7 @@
 #include "Scene.hpp"
 #include "CreateFloor.hpp"
 #include "CreateVehicle.hpp"
+#include "SpeedOMeter.hpp"
 
 #include "UI.hpp"
 #include "Timer.hpp"
@@ -19,9 +20,11 @@ struct GameChrono {
     Timer timer;
 };
 
-class Game : public ES::Plugin::Scene::Utils::AScene {
+namespace Game
+{
+class Race : public ES::Plugin::Scene::Utils::AScene {
 public:
-    Game() : _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))}, _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))}, _IsCountingDown(true)
+    Race() : _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))}, _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))}, _IsCountingDown(true)
     {}
 
     void AddChronoDisplay(ES::Engine::Core &core)
@@ -44,7 +47,7 @@ public:
 
         core.GetResource<ES::Plugin::UI::Resource::UIResource>().UpdateInnerContent("time-value", timeStream.str());
     }
-    
+
     void StartupCircuitTimerUpdate(ES::Engine::Core &core)
     {
         auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
@@ -65,6 +68,12 @@ public:
 protected:
     void _onCreate(ES::Engine::Core &core) final
     {
+        core.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/race/game.rml");
+        core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+            // VehicleMovement
+            UpdateSpeedOmeter,
+            UpdateSpeedOmeterAnimations
+        );
         CreateFloor(core);
         CreateVehicle(core);
 
@@ -96,3 +105,4 @@ private:
         light_1.AddComponent<OpenGL::Component::Light>(core, OpenGL::Component::Light::Type::POINT, glm::vec3(1.f, 1.f, 1.f));
     }
 };
+} // namespace Game

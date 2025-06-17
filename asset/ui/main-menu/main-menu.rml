@@ -1,0 +1,9 @@
+<rml>
+	<head>
+		<title>ES-RS</title>
+		<link type="text/rcss" href="main-menu.rcss" />
+	</head>
+	<body>
+		<div id="start-game-btn">Start Game</div>
+	</body>
+</rml>

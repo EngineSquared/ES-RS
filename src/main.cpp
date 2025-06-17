@@ -16,6 +16,7 @@
 #include "CreateVehicle.hpp"
 #include "Game.hpp"
 #include "SpeedOMeter.hpp"
+#include "MainMenu.hpp"
 
 using namespace ES::Plugin;
 
@@ -28,12 +29,6 @@ int main(void)
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
         LoadNoLightShader
-    );
-
-    core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
-        // VehicleMovement
-        UpdateSpeedOmeter,
-        UpdateSpeedOmeterAnimations
     );
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
@@ -50,8 +45,9 @@ int main(void)
             ES::Plugin::Input::Utils::PrintAvailableControllers();
 		},
         [](ES::Engine::Core &c) {
-            c.GetResource<Scene::Resource::SceneManager>().RegisterScene<Game>("game");
-            c.GetResource<Scene::Resource::SceneManager>().SetNextScene("game");
+            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main-menu");
+            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::Race>("race");
+            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main-menu");
         },
         [](ES::Engine::Core &c) {
             c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight = glm::vec3(3.0f, 20.0f, 0.0f);
@@ -63,7 +59,12 @@ int main(void)
         },
         [](ES::Engine::Core &c) {
             c.GetResource<UI::Resource::UIResource>().SetFont("asset/font/Tomorrow-Medium.ttf");
-            c.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/main.rml");
+            c.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/main-menu/main-menu.rml");
+            c.GetResource<UI::Resource::UIResource>().AttachEventHandlers("start-game-btn", "click", [&c](const std::string &event, const std::string &elementId) {
+                if (elementId == "start-game-btn" && event == "click") {
+                    c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("race");
+                }
+            });
         }
     );
 

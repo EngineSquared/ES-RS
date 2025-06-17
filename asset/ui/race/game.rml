@@ -4,7 +4,7 @@
 		<link type="text/template" href="speed-o-meter.rml" />
 		<link type="text/template" href="lap-counter.rml" />
 		<link type="text/template" href="time-elapsed.rml" />
-		<link type="text/rcss" href="main.rcss" />
+		<link type="text/rcss" href="game.rcss" />
 	</head>
 	<body>
 		<div id="metrics">

@@ -1,0 +1,13 @@
+body
+{
+    font-family: Tomorrow;
+}
+
+#start-game-btn
+{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin: auto;
+    background-color: red;
+}
