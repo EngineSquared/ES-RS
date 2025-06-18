@@ -27,7 +27,7 @@ void UpdateSpeedOmeterAnimations(ES::Engine::Core &core)
             auto controller = reinterpret_cast<JPH::WheeledVehicleController *>(vehicle.vehicleConstraint->GetController());
             if (controller)
             {
-                rpm = controller->GetWheelSpeedAtClutch();
+                rpm = controller->GetEngine().GetCurrentRPM();
             }
         }
     );
