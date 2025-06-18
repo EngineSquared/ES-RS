@@ -4,6 +4,6 @@
 		<link type="text/rcss" href="main-menu.rcss" />
 	</head>
 	<body>
-		<div id="start-game-btn">Start Game</div>
+		<img id="start-game-btn" src="../../sprites/StartButton.png"></img>
 	</body>
 </rml>
