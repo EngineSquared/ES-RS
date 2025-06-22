@@ -18,8 +18,6 @@ void LoadTextureShader(ES::Engine::Core &core)
     sp.AddUniform("ModelMatrix");
     sp.AddUniform("NormalMatrix");
 
-    sp.AddUniform("NumberLights");
-    sp.AddSSBO("LightBuffer", 0, sizeof(ES::Plugin::OpenGL::Utils::LightInfo));
     sp.AddUniform("Material.Ka");
     sp.AddUniform("Material.Kd");
     sp.AddUniform("Material.Ks");

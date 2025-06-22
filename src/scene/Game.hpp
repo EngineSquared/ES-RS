@@ -3,7 +3,7 @@
 #include "Engine.pch.hpp"
 
 #include "Scene.hpp"
-#include "CreateFloor.hpp"
+#include "CreateRace.hpp"
 #include "CreateVehicle.hpp"
 
 #include "Timer.hpp"
@@ -80,7 +80,7 @@ public:
 protected:
     void _onCreate(ES::Engine::Core &core) final
     {
-        CreateFloor(core);
+        CreateRace(core);
         CreateVehicle(core);
 
         AddLights(core, "default");
