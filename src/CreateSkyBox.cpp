@@ -198,12 +198,8 @@ static constexpr std::array<glm::vec2, 4> GetFaceUVs() noexcept
  */
 static void AddSkyboxRenderingComponents(ES::Engine::Core &core, ES::Engine::Entity &skybox)
 {
-    skybox.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "default");
-    skybox.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "default");
-
-    // IMPORTANT: Add a tag to identify this as a skybox for special rendering
-    // This allows the rendering system to handle it differently
-    // skybox.AddComponent<ES::Plugin::OpenGL::Component::SkyboxTag>(core);
+    skybox.AddComponent<ES::Plugin::OpenGL::Component::MaterialHandle>(core, "skyboxDefault");
+    skybox.AddComponent<ES::Plugin::OpenGL::Component::ShaderHandle>(core, "skyboxDefault");
 }
 
 ES::Engine::Entity CreateSkyBox(ES::Engine::Core &core, const std::string_view texture_path,
@@ -228,6 +224,7 @@ ES::Engine::Entity CreateSkyBox(ES::Engine::Core &core, const std::string_view t
     {
         cubemap_resource_manager.Add(entt::hashed_string{unique_resource_id.c_str()}, texture_path.data());
         skybox_entity.AddComponent<ES::Plugin::OpenGL::Component::CubeMapHandle>(core, unique_resource_id.c_str());
+        skybox_entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, unique_resource_id.c_str());
 
         AddSkyboxRenderingComponents(core, skybox_entity);
     }
@@ -266,6 +263,7 @@ ES::Engine::Entity CreateSkyBox(ES::Engine::Core &core, const std::array<std::st
     {
         cubemap_resource_manager.Add(entt::hashed_string{unique_resource_id.c_str()}, texture_paths);
         skybox_entity.AddComponent<ES::Plugin::OpenGL::Component::CubeMapHandle>(core, unique_resource_id.c_str());
+        skybox_entity.AddComponent<ES::Plugin::OpenGL::Component::ModelHandle>(core, unique_resource_id.c_str());
 
         AddSkyboxRenderingComponents(core, skybox_entity);
     }
