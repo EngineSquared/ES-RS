@@ -46,60 +46,64 @@ static ES::Plugin::Object::Component::Mesh CreateSkyBoxMesh(const glm::vec3 &siz
 {
     ES::Plugin::Object::Component::Mesh skybox_mesh;
 
-    constexpr size_t total_vertices_per_skybox = 24;
-    constexpr size_t total_indices_per_skybox = 36;
-    skybox_mesh.vertices.reserve(total_vertices_per_skybox);
-    skybox_mesh.normals.reserve(total_vertices_per_skybox);
-    skybox_mesh.indices.reserve(total_indices_per_skybox);
+    const std::array<glm::vec3, 36> skyboxVertices = {
+        {// Back face (Z negative)
+         {-size.x, size.y, -size.z},
+         {-size.x, -size.y, -size.z},
+         {size.x, -size.y, -size.z},
+         {size.x, -size.y, -size.z},
+         {size.x, size.y, -size.z},
+         {-size.x, size.y, -size.z},
 
-    const std::array<glm::vec3, 8> cube_corners = {{
-        {-size.x, -size.y, -size.z}, // front_bottom_left
-        {size.x,  -size.y, -size.z}, // front_bottom_right
-        {-size.x, size.y,  -size.z}, // front_top_left
-        {size.x,  size.y,  -size.z}, // front_top_right
-        {-size.x, -size.y, size.z }, // back_bottom_left
-        {size.x,  -size.y, size.z }, // back_bottom_right
-        {-size.x, size.y,  size.z }, // back_top_left
-        {size.x,  size.y,  size.z }  // back_top_right
-    }};
+         // Left face (X negative)
+         {-size.x, -size.y, size.z},
+         {-size.x, -size.y, -size.z},
+         {-size.x, size.y, -size.z},
+         {-size.x, size.y, -size.z},
+         {-size.x, size.y, size.z},
+         {-size.x, -size.y, size.z},
 
-    struct CubeFace {
-        std::array<uint8_t, 4> corner_indices;
-        glm::vec3 inverted_normal;
-        std::array<uint8_t, 6> triangle_indices;
+         // Right face (X positive)
+         {size.x, -size.y, -size.z},
+         {size.x, -size.y, size.z},
+         {size.x, size.y, size.z},
+         {size.x, size.y, size.z},
+         {size.x, size.y, -size.z},
+         {size.x, -size.y, -size.z},
+
+         // Front face (Z positive)
+         {-size.x, -size.y, size.z},
+         {-size.x, size.y, size.z},
+         {size.x, size.y, size.z},
+         {size.x, size.y, size.z},
+         {size.x, -size.y, size.z},
+         {-size.x, -size.y, size.z},
+
+         // Top face (Y positive)
+         {-size.x, size.y, -size.z},
+         {size.x, size.y, -size.z},
+         {size.x, size.y, size.z},
+         {size.x, size.y, size.z},
+         {-size.x, size.y, size.z},
+         {-size.x, size.y, -size.z},
+
+         // Bottom face (Y negative)
+         {-size.x, -size.y, -size.z},
+         {-size.x, -size.y, size.z},
+         {size.x, -size.y, -size.z},
+         {size.x, -size.y, -size.z},
+         {-size.x, -size.y, size.z},
+         {size.x, -size.y, size.z}}
     };
 
-    constexpr std::array<CubeFace, 6> skybox_faces = {{
-        // Front face
-        {{0, 1, 2, 3}, {0.0f, 0.0f, 1.0f},  {2, 1, 0, 2, 3, 1}},
-        // Back face
-        {{4, 5, 6, 7}, {0.0f, 0.0f, -1.0f}, {0, 1, 2, 1, 3, 2}},
-        // Bottom face
-        {{0, 1, 4, 5}, {0.0f, 1.0f, 0.0f},  {2, 1, 0, 2, 3, 1}},
-        // Top face
-        {{2, 3, 6, 7}, {0.0f, -1.0f, 0.0f}, {0, 1, 2, 1, 3, 2}},
-        // Left face
-        {{0, 2, 4, 6}, {1.0f, 0.0f, 0.0f},  {2, 1, 0, 2, 3, 1}},
-        // Right face
-        {{1, 3, 5, 7}, {-1.0f, 0.0f, 0.0f}, {0, 1, 2, 1, 3, 2}}
-    }};
+    skybox_mesh.vertices.reserve(36);
+    skybox_mesh.indices.reserve(36);
 
-    for (const auto &current_face : skybox_faces)
-    {
-        const auto base_vertex_index = static_cast<uint32_t>(skybox_mesh.vertices.size());
+    for (const auto &vertex : skyboxVertices)
+        skybox_mesh.vertices.emplace_back(vertex);
 
-        for (size_t vertex_index_in_face = 0; const auto corner_index : current_face.corner_indices)
-        {
-            skybox_mesh.vertices.emplace_back(cube_corners[corner_index]);
-            skybox_mesh.normals.emplace_back(current_face.inverted_normal);
-            ++vertex_index_in_face;
-        }
-
-        for (const auto triangle_vertex_index : current_face.triangle_indices)
-        {
-            skybox_mesh.indices.emplace_back(base_vertex_index + triangle_vertex_index);
-        }
-    }
+    for (uint32_t i = 0; i < 36; ++i)
+        skybox_mesh.indices.emplace_back(i);
 
     return skybox_mesh;
 }
@@ -143,29 +147,6 @@ static ES::Engine::Entity CreateSkyBoxEntity(ES::Engine::Core &core, const glm::
     box.AddComponent<ES::Plugin::Object::Component::Mesh>(core, CreateSkyBoxMesh(size));
 
     return box;
-}
-
-/**
- * @brief Generates UV coordinates for a skybox face
- * @internal Helper function for UV generation
- *
- * @code
- * // Internal usage for UV coordinate generation
- * constexpr auto uvs = GetFaceUVs();
- * // uvs[0] = {0.0f, 0.0f} (bottom-left)
- * // uvs[1] = {1.0f, 0.0f} (bottom-right)
- * // uvs[2] = {0.0f, 1.0f} (top-left)
- * // uvs[3] = {1.0f, 1.0f} (top-right)
- * @endcode
- */
-static constexpr std::array<glm::vec2, 4> GetFaceUVs() noexcept
-{
-    return {{
-        {0.0f, 0.0f}, // bottom-left
-        {1.0f, 0.0f}, // bottom-right
-        {0.0f, 1.0f}, // top-left
-        {1.0f, 1.0f}  // top-right
-    }};
 }
 
 /**
