@@ -91,7 +91,7 @@ protected:
             "asset/skybox/front.jpg",
             "asset/skybox/back.jpg"
         };
-        CreateSkyBox(core, faces);
+        ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
         CreateVehicle(core);
 
         AddLights(core, "default");
