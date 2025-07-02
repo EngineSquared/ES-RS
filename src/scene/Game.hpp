@@ -5,6 +5,7 @@
 #include "Scene.hpp"
 #include "CreateRace.hpp"
 #include "CreateVehicle.hpp"
+#include "CreateSkyBox.hpp"
 
 #include "Timer.hpp"
 
@@ -82,6 +83,16 @@ protected:
     {
         CreateRace(core);
         CreateVehicle(core);
+
+        std::array<std::string, 6> faces = {
+            "asset/skybox/right.jpg",
+            "asset/skybox/left.jpg",
+            "asset/skybox/top.jpg",
+            "asset/skybox/bottom.jpg",
+            "asset/skybox/front.jpg",
+            "asset/skybox/back.jpg"
+        };
+        ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
 
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
