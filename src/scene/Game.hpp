@@ -52,7 +52,7 @@ public:
     void StartupCircuitTimerUpdate(ES::Engine::Core &core)
     {
         auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
-        
+
         _startupCircuitChrono.timer.Update(dt);
         if (_startupCircuitChrono.timer.JustCompleted()) {
             ES::Utils::Log::Info(fmt::format("Circuit timer just completed after {} seconds", _startupCircuitChrono.timer.elapsed));
@@ -75,7 +75,6 @@ protected:
             UpdateSpeedOmeter,
             UpdateSpeedOmeterAnimations
         );
-        CreateFloor(core);
         CreateRace(core);
         CreateVehicle(core);
 
