@@ -1,0 +1,403 @@
+# Blender 4.4.3 MTL File: 'course_new_tex.blend'
+# www.blender.org
+
+newmtl BARRELA.003
+Ns 3.921569
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/BARRELA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/CEMZ.tga
+map_Bump C:/Users/dorva/Downloads/toban race/BARRELA_B.tga
+
+newmtl CEMY
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/CEMY.tga
+
+newmtl CMWLA.003
+Ns 5.882356
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/CMWLLA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/CMWLLA_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/CMWLLA_B.tga
+
+newmtl CMWLALOGOC.023
+Ns 5.882356
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/LOGOC.tga
+map_Ks C:/Users/dorva/Downloads/toban race/CMWLLA.tga
+map_Bump C:/Users/dorva/Downloads/toban race/BILLBRDA_B.tga
+
+newmtl CONEA.066
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ks 0.592157 0.592157 0.592157
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/CONE.tga
+
+newmtl FENCEA
+Ns 1.960786
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/FENCEA.tga
+
+newmtl FENCEATOP
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/FENCEATOP.tga
+
+newmtl FENCEB
+Ns 1.960786
+Ka 1.000000 1.000000 1.000000
+Ks 0.533333 0.533333 0.533333
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/FENCEB.tga
+
+newmtl FENCEC.005
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/FENCEC.DDS
+map_Bump C:/Users/dorva/Downloads/toban race/FENCEC_B.tga
+
+newmtl GBLADESE.001
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/GBLADESE.DDS
+
+newmtl GDOOR.006
+Ns 3.921569
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GDOOR.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GDOOR_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/GDOOR_B.tga
+
+newmtl GRASSAX
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRASSAX.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl GRASSB.001
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRASSB.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl GRASSC
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRASSC.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl GRDRA.005
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRDRA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRDRA.tga
+map_Bump C:/Users/dorva/Downloads/toban race/GRDRA_B.tga
+
+newmtl GRDRB
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRDRB.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRDRB.tga
+map_Bump C:/Users/dorva/Downloads/toban race/GRDRA_B.tga
+
+newmtl GRVLA
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRVL.DDS
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_ADD.DDS
+
+newmtl GRXSA
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRASSA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl GVTRANS.006
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRAVTRANS.DDS
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl RDAXB.005
+Ns 7.843135
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADAB.tga
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROAD_B.tga
+
+newmtl RGEDGE
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/RGEDGE.DDS
+
+newmtl RMBLA
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Documents/Epitech/EIP/ES-RS/asset/textures/RMBLA.png
+map_Ks C:/Users/dorva/Downloads/toban race/RMBLA.tga
+map_Bump C:/Users/dorva/Downloads/toban race/RMBLA_B.tga
+
+newmtl RMBLB
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Documents/Epitech/EIP/ES-RS/asset/textures/RMBLB.png
+map_Ks C:/Users/dorva/Downloads/toban race/RMBLB.tga
+map_Bump C:/Users/dorva/Downloads/toban race/RMBLB_B.tga
+
+newmtl ROADA
+Ns 7.843135
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROAD_B.tga
+
+newmtl ROADGFLOOR
+Ns 7.843135
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADGFLOOR.tga
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROADGFLOOR_B.tga
+
+newmtl ROADGRID
+Ns 7.843135
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADGRID.tga
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROAD_B.tga
+
+newmtl ROADPIT
+Ns 5.882356
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADPIT.tga
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROAD_B.tga
+
+newmtl ROADSTRP.002
+Ns 5.882356
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/ROADSTRP.DDS
+map_Ks C:/Users/dorva/Downloads/toban race/ROAD_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/ROAD_B.tga
+
+newmtl RUFGRASS.004
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/GRASSRUF.tga
+map_Ks C:/Users/dorva/Downloads/toban race/GRASS_S.tga
+
+newmtl SIGN100
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ks 0.172549 0.172549 0.172549
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/SIGN_100.tga
+map_Bump C:/Users/dorva/Downloads/toban race/BILLBRDA_B.tga
+
+newmtl SIGN150
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ks 0.172549 0.172549 0.172549
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/SIGN_150.tga
+map_Bump C:/Users/dorva/Downloads/toban race/BILLBRDA_B.tga
+
+newmtl SIGN50
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ks 0.172549 0.172549 0.172549
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/SIGN_50.tga
+map_Bump C:/Users/dorva/Downloads/toban race/BILLBRDA_B.tga
+
+newmtl TCAN.001
+Ns 37.254898
+Ka 1.000000 1.000000 1.000000
+Ks 0.478431 0.478431 0.478431
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/TCAN.tga
+
+newmtl TWALLA
+Ns 27.450987
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/TIRESA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/TIRESA_S.tga
+map_Bump C:/Users/dorva/Downloads/toban race/TIRESA_B.tga
+
+newmtl WALLGA.012
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/WALLGA.DDS
+map_Bump C:/Users/dorva/Downloads/toban race/CEMGEN_B.tga
+
+newmtl WALL_BAIG.003
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/WALL_BAIG.DDS
+
+newmtl WINDA.003
+Ns 17.647060
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd C:/Users/dorva/Downloads/toban race/WINDA.tga
+map_Ks C:/Users/dorva/Downloads/toban race/WINDA_S.DDS
+map_Bump C:/Users/dorva/Downloads/toban race/WINDA_B.tga
+
+newmtl YLOPITLTA
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.000000
+d 1.000000
+illum 1
+map_Kd C:/Users/dorva/Downloads/toban race/YLOLT.tga

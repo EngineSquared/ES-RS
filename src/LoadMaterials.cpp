@@ -16,7 +16,7 @@ void LoadMaterials(ES::Engine::Core &core)
     material.Ks = glm::vec3(0.5f, 0.5f, 0.5f);
     material.Shiness = 64.0f;
 
-	materialManager.Add("floor"_hs, material);
+	materialManager.Add("level"_hs, material);
 
     // car body: red
     material.Ka = glm::vec3(0.8f, 0.0f, 0.0f);

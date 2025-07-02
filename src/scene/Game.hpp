@@ -3,7 +3,7 @@
 #include "Engine.pch.hpp"
 
 #include "Scene.hpp"
-#include "CreateFloor.hpp"
+#include "CreateRace.hpp"
 #include "CreateVehicle.hpp"
 #include "CreateSkyBox.hpp"
 
@@ -81,7 +81,8 @@ public:
 protected:
     void _onCreate(ES::Engine::Core &core) final
     {
-        CreateFloor(core);
+        CreateRace(core);
+        CreateVehicle(core);
 
         std::array<std::string, 6> faces = {
             "asset/skybox/right.jpg",
@@ -92,7 +93,6 @@ protected:
             "asset/skybox/back.jpg"
         };
         ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
-        CreateVehicle(core);
 
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
