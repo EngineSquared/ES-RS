@@ -1,4 +1,5 @@
 add_requires("entt", "gtest", "glm >=1.0.1", "glfw >=3.4", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
+add_requires("rmlui >=6.0", { configs = { transform = true } })
 
 includes("../EngineSquared/xmake.lua")
 
@@ -21,7 +22,7 @@ target("VehicleDemo")
     add_includedirs("$(projectdir)/src/")
     add_includedirs("$(projectdir)/src/scene")
 
-    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
+    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio", "rmlui")
 
     set_rundir("$(projectdir)")
 

@@ -1,0 +1,16 @@
+body
+{
+    font-family: Tomorrow;
+}
+
+#start-game-btn
+{
+    margin: auto;
+    transition: transform 0.6s elastic-out;
+}
+
+#start-game-btn:hover
+{
+    transition: transform 0.6s elastic-out;
+    transform: scale(1.03);
+}
