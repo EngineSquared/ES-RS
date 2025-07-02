@@ -3,9 +3,10 @@
 #include "Engine.pch.hpp"
 
 #include "Scene.hpp"
-#include "CreateFloor.hpp"
+#include "CreateRace.hpp"
 #include "CreateVehicle.hpp"
 #include "SpeedOMeter.hpp"
+#include "CreateSkyBox.hpp"
 
 #include "UI.hpp"
 #include "Timer.hpp"
@@ -75,7 +76,18 @@ protected:
             UpdateSpeedOmeterAnimations
         );
         CreateFloor(core);
+        CreateRace(core);
         CreateVehicle(core);
+
+        std::array<std::string, 6> faces = {
+            "asset/skybox/right.jpg",
+            "asset/skybox/left.jpg",
+            "asset/skybox/top.jpg",
+            "asset/skybox/bottom.jpg",
+            "asset/skybox/front.jpg",
+            "asset/skybox/back.jpg"
+        };
+        ES::Plugin::OpenGL::Utils::CreateSkyBox(core, faces);
 
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");

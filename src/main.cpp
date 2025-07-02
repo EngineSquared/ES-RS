@@ -11,8 +11,9 @@
 
 // Demo headers
 #include "shader/LoadNoLightShader.hpp"
+#include "shader/LoadTextureShader.hpp"
 #include "LoadMaterials.hpp"
-#include "CreateFloor.hpp"
+#include "CreateRace.hpp"
 #include "CreateVehicle.hpp"
 #include "Game.hpp"
 #include "SpeedOMeter.hpp"
@@ -28,7 +29,8 @@ int main(void)
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
-        LoadNoLightShader
+        LoadNoLightShader,
+        LoadTextureShader
     );
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
