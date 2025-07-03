@@ -17,5 +17,11 @@ void WheeledVehicleCameraSync::operator()(ES::Engine::Core &core) const
     auto &vehicleBodyTransform = entity.template GetComponents<ES::Plugin::Object::Component::Transform>(core);
 
     auto &camera = core.GetResource<ES::Plugin::OpenGL::Resource::Camera>();
+    const glm::vec3 cameraOffset(0.0f, 3.0f, -8.0f);
+    static glm::quat smoothedRotation = vehicleBodyTransform.getRotation();
+
+    smoothedRotation = glm::slerp(smoothedRotation, vehicleBodyTransform.getRotation(), 0.01f);
+
     camera.viewer.centerAt(vehicleBodyTransform.position);
+    camera.viewer.rotate(smoothedRotation, cameraOffset);
 }
