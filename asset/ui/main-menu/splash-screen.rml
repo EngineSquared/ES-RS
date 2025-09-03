@@ -1,0 +1,31 @@
+<rml>
+	<head>
+		<title>ES-RS</title>
+		<link type="text/rcss" href="main-menu.rcss" />
+		<link type="text/rcss" href="splash-screen.rcss" />
+	</head>
+	<body>
+        <!-- Placeholders -->
+        <div id="start-game-btn"></div>
+        <div id="quit-game-btn"></div>
+        <!------->
+		<div id="background-img">
+			<div class="bckg-img1"></div>
+			<div class="bckg-img2"></div>
+			<div class="bckg-img3"></div>
+		</div>
+        <div id="splash-title">
+            <h1>Press anywhere to start</h1>
+            <div id="splash-title-jump">Press anywhere to start</div>
+        </div>
+		<div id="gradient-top"></div>
+		<div id="gradient-bottom"></div>
+		<div id="game-title-splash"></div>
+		<div id="flag-footer-div">
+			<div id="flag-footer-image-top"></div>
+			<div id="flag-footer-image-bottom"></div>
+			<h2 id="footer-credits">Made with Engine Squared</h2>
+		</div>
+        <div id="interaction-area"></div>
+	</body>
+</rml>

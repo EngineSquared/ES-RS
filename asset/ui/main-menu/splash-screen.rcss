@@ -1,0 +1,73 @@
+@keyframes splash-title
+{
+    0% {
+		transform: scale(1);
+        opacity: 1;
+	}
+	to {
+		transform: scale(1.1);
+        opacity: 0;
+	}
+}
+
+@keyframes game-title-splash-animator {
+	0%, 10% {
+		opacity: 0;
+        top: 10%;
+	}
+	to {
+		opacity: 1;
+        top: 20%;
+	}
+}
+
+body
+{
+    font-family: airborne;
+}
+
+#interaction-area
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 10;
+}
+
+#game-title-splash
+{
+    decorator: image("../../sprites/title-logo.tga" cover);
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    width: 407px;
+    height: 133px;
+    transform: translateX(-50%);
+    animation: 1s quartic-out 1 game-title-splash-animator;
+}
+
+#splash-title
+{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#splash-title > h1,
+#splash-title > div
+{
+    font-size: 42px;
+}
+
+#splash-title-jump
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform-origin: 50% 50%;
+    animation: 1.2s quartic-out infinite splash-title;
+    font-effect: glow( 2px rgb(255, 255, 255) );
+}
