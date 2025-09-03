@@ -91,6 +91,9 @@ protected:
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
         AddChronoDisplay(core);
+        
+        auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+        soundManager.Play("race-ambient");
     }
 
     void _onDestroy(ES::Engine::Core &core) final

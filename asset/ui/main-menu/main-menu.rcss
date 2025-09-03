@@ -1,16 +1,308 @@
+/* Global definitions */
+
+@keyframes game-title-animator {
+	0%, 10% {
+		opacity: 0;
+        top: 10%;
+	}
+	to {
+		opacity: 1;
+        top: 15%;
+	}
+}
+
+@keyframes title-flag-animator {
+	0% {
+		transform: translateX(-129px)
+	}
+	to {
+		transform: translateX(0px)
+	}
+}
+
+@keyframes title-flag-in {
+	0%, 10% {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes title-gradient-in {
+	0%, 10% {
+		opacity: 0;
+	}
+	to {
+		opacity: .7;
+	}
+}
+
+@keyframes button-fade-in-animator {
+	0% {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+@keyframes button-fade-out-animator {
+	0% {
+		opacity: 0;
+	}
+	to {
+		opacity: 1;
+	}
+}
+
+/* RmlUi doesn't support 'animation-delay' property, this is a workaround */
+@keyframes slide1 {
+    0%       { opacity: 1; }
+    33.333%  { opacity: 1; }
+    40%      { opacity: 0; }
+    93.333%  { opacity: 0; }
+    100%     { opacity: 1; }
+}
+
+@keyframes slide2 {
+    0%       { opacity: 0; }
+    33.333%  { opacity: 0; }
+    40%      { opacity: 1; }
+    66.666%  { opacity: 1; }
+    73.333%  { opacity: 0; }
+    100%     { opacity: 0; }
+}
+
+@keyframes slide3 {
+    0%       { opacity: 0; }
+    66.666%  { opacity: 0; }
+    73.333%  { opacity: 1; }
+    93.333%  { opacity: 1; }
+    100%     { opacity: 0; }
+}
+/* --- */
+
+@keyframes esrs-btn-text {
+	0% {
+		color: rgb(255, 255, 255);
+	}
+    50% {
+        color: rgb(121, 121, 121);
+    }
+	to {
+		color: rgb(255, 255, 255);
+	}
+}
+
 body
 {
-    font-family: Tomorrow;
+    font-family: airborne;
+    background-color: rgb(0, 0, 0);
 }
 
-#start-game-btn
+#esrs-button,
+#esrs-button > .test-wrapper
 {
-    margin: auto;
-    transition: transform 0.6s elastic-out;
+    position: relative;
+    width: 200px;
+    height: 50px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
-#start-game-btn:hover
+#esrs-button > div {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#esrs-button > .idle {
+    decorator: image("../../sprites/button-idle-frame.tga" cover);
+    opacity: 1;
+    transition: opacity 0.1s linear-in-out;
+}
+
+#esrs-button > .idle-pattern,
+#esrs-button > .active-pattern,
+#esrs-button > .test-wrapper
 {
-    transition: transform 0.6s elastic-out;
-    transform: scale(1.03);
+    transform: translateX(0px);
+    transition: transform 0.5s bounce-out;
+}
+
+#esrs-button:hover > .idle-pattern,
+#esrs-button:hover > .active-pattern,
+#esrs-button:hover > .test-wrapper
+{
+    transform: translateX(10px);
+    transition: transform 0.5s elastic-out;
+}
+
+#esrs-button:hover > .idle {
+    opacity: 0;
+    transition: opacity 0.1s linear-in-out;
+}
+
+#esrs-button > .idle-pattern
+{
+    decorator: image("../../sprites/button-idle-pattern.png" cover);
+}
+
+#esrs-button > .active {
+    decorator: image("../../sprites/button-active-frame.tga" cover);
+    opacity: 0;
+    transition: opacity 0.1s linear-in-out;
+}
+
+#esrs-button:hover > .active-pattern
+{
+    decorator: image("../../sprites/button-active-pattern.png" cover);
+}
+
+#esrs-button:hover > .active {
+    opacity: 1;
+    transition: opacity 0.1s linear-in-out;
+}
+
+#esrs-button > .test-wrapper > h1 {
+    position: relative;
+    color: rgb(214, 214, 214);
+    font-size: 32px;
+    margin: 0;
+}
+
+#esrs-button:hover > .test-wrapper > h1 {
+    animation: 0.3s linear infinite esrs-btn-text;
+}
+
+/* End of global definitions */
+
+#start-game-btn {
+    position: absolute;
+    top: 35%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#quit-game-btn {
+    position: absolute;
+    top: 48%;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+#game-title
+{
+    decorator: image("../../sprites/title-logo.tga" cover);
+    position: absolute;
+    top: 15%;
+    left: 50%;
+    width: 347px;
+    height: 113px;
+    transform: translateX(-50%) scale(0.74);
+    animation: 1s quartic-out 1 game-title-animator;
+}
+
+#flag-footer-div
+{
+    position: relative;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    z-index: 1;
+    animation: 1s quartic-out 1 title-flag-in;
+}
+
+#flag-footer-image-top
+{
+    decorator: image("../../sprites/pattern.tga" flip-vertical repeat-x);
+    position: absolute;
+    top: -91px;
+    left: 0;
+    width: 200%;
+    height: 179px;
+    animation: 5s linear-inOut infinite title-flag-animator;
+}
+
+#flag-footer-image-bottom
+{
+    decorator: image("../../sprites/pattern.tga" repeat-x);
+    position: absolute;
+    bottom: -40px;
+    left: 0;
+    width: 200%;
+    height: 179px;
+    animation: 5s linear-inOut infinite title-flag-animator;
+}
+
+#footer-credits
+{
+    position: absolute;
+    bottom: 0px;
+    right: 0;
+    text-align: right;
+    font-size: 24px;
+    margin: 10px;
+}
+
+#gradient-top
+{
+    decorator: image("../../sprites/gradient.tga" cover);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 130px;
+    opacity: .7;
+    animation: 1s quartic-out 1 title-gradient-in;
+}
+
+#gradient-bottom
+{
+    decorator: image("../../sprites/gradient.tga" flip-vertical cover);
+    position: absolute;
+    bottom: 50px;
+    left: 0;
+    width: 100%;
+    height: 150px;
+    opacity: .7;
+    animation: 1s quartic-out 1 title-gradient-in;
+}
+
+#background-img
+{
+    animation: 1s quartic-out 1 game-title-animator;
+    width: 100%;
+    height: 100%;
+}
+
+#background-img > div
+{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+
+#background-img > .bckg-img1
+{
+    decorator: image("../../sprites/background1.png" cover);
+    animation: side1 15s infinite;
+}
+
+#background-img > .bckg-img2
+{
+    decorator: image("../../sprites/background2.png" cover);
+    animation: slide2 15s infinite;
+}
+
+#background-img > .bckg-img3
+{
+    decorator: image("../../sprites/background3.png" cover);
+    animation: slide3 15s infinite;
 }
