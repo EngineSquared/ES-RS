@@ -21,6 +21,10 @@
 #include <Jolt/Physics/Collision/Shape/BoxShape.h>
 #include <Jolt/Physics/Collision/Shape/OffsetCenterOfMassShape.h>
 
+ES::Utils::FunctionContainer::FunctionID movementSystemId = std::numeric_limits<std::size_t>::max();
+ES::Utils::FunctionContainer::FunctionID controllerSystemId = std::numeric_limits<std::size_t>::max();
+ES::Utils::FunctionContainer::FunctionID cameraSystemId = std::numeric_limits<std::size_t>::max();
+
 static ES::Engine::Entity CreateVehicleBody(
     ES::Engine::Core &core,
     const glm::vec3 &position,
@@ -240,11 +244,12 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
 
     // This system is a class, which is why it is added here instead of being integrated into ESQ
     auto movementSystem = WheeledVehicleKeyboardMovement(vehicleEntity);
-    core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(movementSystem);
     auto controllerSystem = WheeledVehicleControllerMovement(vehicleEntity);
-    core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(controllerSystem);
     auto cameraSystem = WheeledVehicleCameraSync(vehicleEntity);
-    core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(cameraSystem);
+
+    movementSystemId = std::get<0>(core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(movementSystem));
+    controllerSystemId = std::get<0>(core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(controllerSystem));
+    cameraSystemId = std::get<0>(core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(cameraSystem));
 
     return vehicleEntity;
 }

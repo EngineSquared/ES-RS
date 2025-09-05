@@ -4,6 +4,7 @@
 
 #include "Scene.hpp"
 #include "CreateRace.hpp"
+#include "LoadCourse.hpp"
 #include "CreateVehicle.hpp"
 #include "SpeedOMeter.hpp"
 #include "CreateSkyBox.hpp"
@@ -11,6 +12,8 @@
 
 #include "UI.hpp"
 #include "Timer.hpp"
+
+#include <limits>
 
 using namespace ES::Plugin;
 
@@ -31,11 +34,12 @@ public:
 
     void AddChronoDisplay(ES::Engine::Core &core)
     {
-        core.RegisterSystem<ES::Engine::Scheduler::Update>(
-            [this](ES::Engine::Core &core) {
-                this->StartupCircuitTimerUpdate(core);
-            }
-        );
+        if (_chronoSystemId == std::numeric_limits<std::size_t>::max())
+            _chronoSystemId = std::get<0>(core.RegisterSystem<ES::Engine::Scheduler::Update>(
+                [this](ES::Engine::Core &core) {
+                    this->StartupCircuitTimerUpdate(core);
+                }
+            ));
     }
 
     void UpdateTextTime(ES::Engine::Core &core)
@@ -102,7 +106,14 @@ protected:
                 auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
                 soundManager.Stop("race-ambient");
                 soundManager.Stop("race-ambient-life");
-                core.ClearEntities();
+                const auto &tmp = std::numeric_limits<std::size_t>::max();
+                if (controllerSystemId != std::numeric_limits<std::size_t>::max())
+                {
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(controllerSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(movementSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(cameraSystemId);
+                }
+                core.RunSystems();
                 core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main-menu");
             }
         });
@@ -154,24 +165,36 @@ protected:
         soundManager.Play("race-ambient");
         soundManager.Play("race-ambient-life");
 
-        core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
-            // VehicleMovement
-            UpdateSpeedOmeter,
-            UpdateSpeedOmeterAnimations,
-            TogglePauseMenu
-        );
+        if (_speedometerSystemId == std::numeric_limits<std::size_t>::max())
+        {
+            std::tie(_speedometerSystemId, _speedometerAnimSystemId, _pauseMenuSystemId) =
+                core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+                    UpdateSpeedOmeter,
+                    UpdateSpeedOmeterAnimations,
+                    TogglePauseMenu
+                );
+        }
     }
 
     void _onDestroy(ES::Engine::Core &core) final
     {
+        auto &cubeMapManager = core.GetResource<OpenGL::Resource::CubeMapManager>();
+
         core.ClearEntities();
+        UnloadCourseTextures(core);
+        const std::string unique_resource_id = "cubemap_faces_right";
+        cubeMapManager.Remove(entt::hashed_string{unique_resource_id.c_str()});
     }
 
 private:
     GameChrono _gameChrono;
     StartupCircuitTimer _startupCircuitChrono;
     bool _IsCountingDown;
-
+    mutable ES::Utils::FunctionContainer::FunctionID _chronoSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _speedometerSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _speedometerAnimSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _pauseMenuSystemId = std::numeric_limits<std::size_t>::max();
+   
     void AddLights(ES::Engine::Core &core, const std::string &shaderName)
     {
         ES::Engine::Entity ambient_light = core.CreateEntity();
