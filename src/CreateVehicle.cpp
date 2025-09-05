@@ -108,6 +108,13 @@ static void RotateMesh(
     }
 }
 
+float RPMToNorm(float rpm, float minRPM, float maxRPM)
+{
+    if (rpm < minRPM) return 0.0f;
+    if (rpm > maxRPM) return 1.0f;
+    return (rpm - minRPM) / (maxRPM - minRPM);
+}
+
 ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
 {
     const std::string modelPath = "asset/Porsche_911_GT3_992_reduced.obj";
@@ -142,14 +149,13 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
     float suspensionMinLength = 0.3f;
     float suspensionMaxLength = 0.5f;
     float maxSteerAngle = 0.52f; // in radians, ~30 degrees
-    bool fourWheelDrive = true;
+    bool fourWheelDrive = false; // GT3 RS is RWD
     float frontBackLimitedSlipRatio = 1.4f;
     float leftRightLimitedSlipRatio = 1.4f;
     bool antiRollBar = true;
 
-    float vehicleMass = 1500.0f;
-    float maxEngineTorque = 500.0f;
-    float clutchStrength = 10.0f;
+    float vehicleMass = 1430.0f; // Actual GT3 RS weight
+    float maxEngineTorque = 520.0f; // GT3 RS naturally aspirated engine
 
     ES::Engine::Entity vehicleEntity;
 
@@ -160,7 +166,10 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
         // TODO: fix in ESQ, initial position should take into account the vehicle body mesh AND tires
         // right now it just sets the position of the vehicle body
         vehicleBuilder.SetInitialPosition(bodyPosition);
-        vehicleBuilder.SetBodyMesh(vehicleBodyMesh);
+        vehicleBuilder.SetMass(vehicleMass);
+        vehicleBuilder.SetBodyMesh(
+            vehicleBodyMesh
+        );
         vehicleBuilder.SetWheelMesh(
             CreateCylinderMesh(glm::vec3(wheelRadius, wheelWidth, wheelRadius), 16, glm::vec3(1.0f, 0.0f, 0.0f))
         );
@@ -179,13 +188,74 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
         vehicleBuilder.SetWheelOffset(1, glm::vec3(-0.92, 0.667, 1.24));
         vehicleBuilder.SetWheelOffset(2, glm::vec3(0.92, 0.667, -1.21));
         vehicleBuilder.SetWheelOffset(3, glm::vec3(-0.92, 0.667, -1.21));
+        vehicleBuilder.SetVehicleControllerSettingsFn([&](JPH::WheeledVehicleControllerSettings &settings) {
+            settings.mEngine.mMaxRPM = 9000.0f;
+            settings.mEngine.mMinRPM = 800.0f;
+            settings.mEngine.mMaxTorque = maxEngineTorque;
+
+            // GT3 RS naturally aspirated engine - more responsive torque curve
+            settings.mEngine.mNormalizedTorque.Clear();
+            settings.mEngine.mNormalizedTorque.AddPoint(0.0f, 0.3f);
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(1000.0f, 800.0f, 9000.0f), 0.7f);  // Idle
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(2000.0f, 800.0f, 9000.0f), 0.8f);   // Early response
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(5000.0f, 800.0f, 9000.0f), 1.0f);  // Building up
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(7000.0f, 800.0f, 9000.0f), 1.0f);   // Peak torque
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(8000.0f, 800.0f, 9000.0f), 0.92f);  // High revs
+            settings.mEngine.mNormalizedTorque.AddPoint(RPMToNorm(8500.0f, 800.0f, 9000.0f), 0.88f);  // High revs
+            settings.mEngine.mNormalizedTorque.AddPoint(1.0f, 0.1f);
+            // Drop RPM almost entirely at redline, otherwise Jolt considers we are slipping and doesn't want to shift
+
+            settings.mEngine.mInertia = 0.28f; // Lower inertia for more responsive engine
+            settings.mEngine.mAngularDamping = 0.05f;
+
+            settings.mTransmission.mSwitchLatency = 0.05f;
+            settings.mTransmission.mSwitchTime = 0.2f;
+            settings.mTransmission.mClutchReleaseTime = 0.03f; // Faster clutch for sportier feel
+            settings.mTransmission.mClutchStrength = 30.0f;
+
+            // GT3 RS 7-speed PDK gearing
+            settings.mTransmission.mGearRatios.clear();
+            settings.mTransmission.mGearRatios.push_back(3.91f);  // 1st
+            settings.mTransmission.mGearRatios.push_back(2.29f);  // 2nd
+            settings.mTransmission.mGearRatios.push_back(1.58f);  // 3rd
+            settings.mTransmission.mGearRatios.push_back(1.18f);  // 4th
+            settings.mTransmission.mGearRatios.push_back(0.94f);  // 5th
+            settings.mTransmission.mGearRatios.push_back(0.79f);  // 6th
+            settings.mTransmission.mGearRatios.push_back(0.62f);  // 7th
+
+            settings.mTransmission.mReverseGearRatios.clear();
+            settings.mTransmission.mReverseGearRatios.push_back(-3.55f); // Reverse
+
+            settings.mTransmission.mShiftUpRPM = 7500.0f;
+            settings.mTransmission.mShiftDownRPM = 2000.0f;
+
+            settings.mDifferentialLimitedSlipRatio = 1.3f; // More reasonable LSD
+            
+        });
         vehicleBuilder.EditWheel(0, [&](JPH::WheelSettingsWV &wheel) {
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
             wheel.mSuspensionMaxLength = suspensionMaxLength;
             wheel.mMaxSteerAngle = maxSteerAngle;
+            wheel.mMaxBrakeTorque = 5000.0f;
             wheel.mMaxHandBrakeTorque = 0.0f; // Front wheels doesn't have handbrake
+
+            // GT3 RS Michelin Cup 2 tire characteristics - front
+            wheel.mLongitudinalFriction.Clear();
+            wheel.mLongitudinalFriction.AddPoint(0.0f, 1.1f);   // Good initial grip
+            wheel.mLongitudinalFriction.AddPoint(0.05f, 1.3f);  // Peak grip at low slip
+            wheel.mLongitudinalFriction.AddPoint(0.15f, 1.2f);  // Maintain grip
+            wheel.mLongitudinalFriction.AddPoint(0.4f, 0.9f);   // Gradual falloff
+            wheel.mLongitudinalFriction.AddPoint(1.0f, 0.85f);   // Gradual falloff
+            wheel.mLongitudinalFriction.AddPoint(100.0f, 0.85f);   // Safety to prevent issues at high speed
+
+            wheel.mLateralFriction.Clear();
+            wheel.mLateralFriction.AddPoint(0.0f, 0.6f);
+            wheel.mLateralFriction.AddPoint(3.0f, 1.3f);
+            wheel.mLateralFriction.AddPoint(20.0f, 1.0f);
+            wheel.mLateralFriction.AddPoint(2000.0f, 1.0f);// Safety to prevent issues at high speed
+
         });
         vehicleBuilder.EditWheel(1, [&](JPH::WheelSettingsWV &wheel) {
             wheel.mRadius = wheelRadius;
@@ -193,32 +263,85 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             wheel.mSuspensionMinLength = suspensionMinLength;
             wheel.mSuspensionMaxLength = suspensionMaxLength;
             wheel.mMaxSteerAngle = maxSteerAngle;
+            wheel.mMaxBrakeTorque = 5000.0f;
             wheel.mMaxHandBrakeTorque = 0.0f; // Front wheels doesn't have handbrake
+
+            // GT3 RS Michelin Cup 2 tire characteristics - front
+            wheel.mLongitudinalFriction.Clear();
+            wheel.mLongitudinalFriction.AddPoint(0.0f, 1.1f);   // Good initial grip
+            wheel.mLongitudinalFriction.AddPoint(0.05f, 1.3f);  // Peak grip at low slip
+            wheel.mLongitudinalFriction.AddPoint(0.15f, 1.2f);  // Maintain grip
+            wheel.mLongitudinalFriction.AddPoint(0.4f, 0.9f);   // Gradual falloff
+            wheel.mLongitudinalFriction.AddPoint(1.0f, 0.85f);   // Gradual falloff
+            wheel.mLongitudinalFriction.AddPoint(100.0f, 0.85f);   // Safety to prevent issues at high speed
+
+            wheel.mLateralFriction.Clear();
+            wheel.mLateralFriction.AddPoint(0.0f, 0.6f);
+            wheel.mLateralFriction.AddPoint(3.0f, 1.3f);
+            wheel.mLateralFriction.AddPoint(20.0f, 1.0f);
+            wheel.mLateralFriction.AddPoint(2000.0f, 1.0f);// Safety to prevent issues at high speed
+
         });
         vehicleBuilder.EditWheel(2, [&](JPH::WheelSettingsWV &wheel) {
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
             wheel.mSuspensionMaxLength = suspensionMaxLength;
+            wheel.mMaxBrakeTorque = 3200.0f;
+            wheel.mMaxHandBrakeTorque = 5000.0f;
             wheel.mMaxSteerAngle = 0.0f; // Rear wheels doesn't have steering
+
+            // GT3 RS Michelin Cup 2 tire characteristics - rear (slightly more grip for RWD)
+            wheel.mLongitudinalFriction.Clear();
+            wheel.mLongitudinalFriction.AddPoint(0.0f, 1.15f);  // Slightly better initial grip
+            wheel.mLongitudinalFriction.AddPoint(0.05f, 1.4f);  // Higher peak for power delivery
+            wheel.mLongitudinalFriction.AddPoint(0.15f, 1.25f); // Good mid-range grip
+            wheel.mLongitudinalFriction.AddPoint(0.4f, 0.95f);  // Controlled falloff
+            wheel.mLongitudinalFriction.AddPoint(1.0f, 0.92f);
+            wheel.mLongitudinalFriction.AddPoint(100.0f, 0.85f);   // Safety to prevent issues at high speed
+        
+            wheel.mLateralFriction.Clear();
+            wheel.mLateralFriction.AddPoint(0.0f, 0.6f);
+            wheel.mLateralFriction.AddPoint(3.0f, 1.3f);
+            wheel.mLateralFriction.AddPoint(20.0f, 1.0f);
+            wheel.mLateralFriction.AddPoint(2000.0f, 1.0f);// Safety to prevent issues at high speed
         });
         vehicleBuilder.EditWheel(3, [&](JPH::WheelSettingsWV &wheel) {
             wheel.mRadius = wheelRadius;
             wheel.mWidth = wheelWidth;
             wheel.mSuspensionMinLength = suspensionMinLength;
             wheel.mSuspensionMaxLength = suspensionMaxLength;
+            wheel.mMaxBrakeTorque = 3200.0f;
+            wheel.mMaxHandBrakeTorque = 5000.0f;
             wheel.mMaxSteerAngle = 0.0f; // Rear wheels doesn't have steering
+
+            // GT3 RS Michelin Cup 2 tire characteristics - rear (slightly more grip for RWD)
+            wheel.mLongitudinalFriction.Clear();
+            wheel.mLongitudinalFriction.AddPoint(0.0f, 1.15f);  // Slightly better initial grip
+            wheel.mLongitudinalFriction.AddPoint(0.05f, 1.4f);  // Higher peak for power delivery
+            wheel.mLongitudinalFriction.AddPoint(0.15f, 1.25f); // Good mid-range grip
+            wheel.mLongitudinalFriction.AddPoint(0.4f, 0.95f);  // Controlled falloff
+            wheel.mLongitudinalFriction.AddPoint(1.0f, 0.92f);
+            wheel.mLongitudinalFriction.AddPoint(100.0f, 0.85f);   // Safety to prevent issues at high speed
+
+            wheel.mLateralFriction.Clear();
+            wheel.mLateralFriction.AddPoint(0.0f, 0.6f);
+            wheel.mLateralFriction.AddPoint(3.0f, 1.3f);
+            wheel.mLateralFriction.AddPoint(20.0f, 1.0f);
+
+            wheel.mLateralFriction.AddPoint(2000.0f, 1.0f);// Safety to prevent issues at high speed
         });
 
         vehicleBuilder.CreateDifferential().EditDifferential(0, [&](JPH::VehicleDifferentialSettings &differential) {
-            differential.mLeftWheel = 0;
-            differential.mRightWheel = 1;
+            differential.mLeftWheel = 2; // Rear left wheel (RWD setup)
+            differential.mRightWheel = 3; // Rear right wheel (RWD setup)
             differential.mLimitedSlipRatio = leftRightLimitedSlipRatio;
-            if (fourWheelDrive) {
-                differential.mEngineTorqueRatio = 0.5f;
-            }
+            differential.mEngineTorqueRatio = 1.0f; // All torque to rear (RWD)
+            differential.mDifferentialRatio = 3.3f;
         });
 
+        // Remove front differential for RWD setup
+        /*
         if (fourWheelDrive) {
             vehicleBuilder.CreateDifferential().EditDifferential(1, [&](JPH::VehicleDifferentialSettings &differential) {
                 differential.mLeftWheel = 2;
@@ -227,6 +350,7 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
                 differential.mEngineTorqueRatio = 0.5f;
             });
         }
+        */
 
         if (antiRollBar) {
             vehicleBuilder.CreateAntiRollBar().EditAntiRollBar(0, [&](JPH::VehicleAntiRollBar &antiRollBar) {
@@ -238,6 +362,8 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
                 antiRollBar.mRightWheel = 3;
             });
         }
+
+        
 
         vehicleEntity = vehicleBuilder.Build();
     }

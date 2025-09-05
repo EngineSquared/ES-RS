@@ -96,7 +96,17 @@ void LoadCourseCollision(ES::Engine::Core &core, const glm::vec3 &size)
 
     auto meshShapeSettings = std::make_shared<JPH::MeshShapeSettings>(vertexList, triangleList);
 
-    entity.AddComponent<ES::Plugin::Physics::Component::RigidBody3D>(core, meshShapeSettings, JPH::EMotionType::Static, ES::Plugin::Physics::Utils::Layers::NON_MOVING);
+    // Friction change for floor
+    entity.AddComponent<ES::Plugin::Physics::Component::RigidBody3D>(core, 
+        meshShapeSettings, 
+        JPH::EMotionType::Static, 
+        ES::Plugin::Physics::Utils::Layers::NON_MOVING, 
+        false, 
+        [](JPH::BodyCreationSettings &bodySettings) {
+            bodySettings.mFriction = 1.0f;
+            bodySettings.mRestitution = 0.03f;
+        }
+    );
     ES::Utils::Log::Info("Loaded course collision");
 }
 
