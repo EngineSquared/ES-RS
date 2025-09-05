@@ -1,0 +1,60 @@
+<template name="speed-counter" content="content">
+	<head>
+		<link type="text/rcss" href="speed-counter.rcss"/>
+	</head>
+	<body class="speed-counter">
+        <div id="speed-counter-box">
+            <div id="speed-counter-metrics">
+                <span id="value">0</span>
+                <span id="title">km/h</span>
+            </div>
+            <div id="gear-metrics">
+                <span id="gear-current">0</span>
+                <span id="title">AT</span>
+            </div>
+        </div>
+        <div id="rpm-led">
+            <div id="sc-01"></div>
+            <div id="sc-02"></div>
+            <div id="sc-03"></div>
+            <div id="sc-04"></div>
+            <div id="sc-05"></div>
+            <div id="sc-06"></div>
+            <div id="sc-07"></div>
+            <div id="sc-08"></div>
+            <div id="sc-09"></div>
+            <div id="sc-10"></div>
+            <div id="sc-11"></div>
+            <div id="sc-12"></div>
+            <div id="sc-13"></div>
+            <div id="sc-14"></div>
+            <div id="sc-15"></div>
+            <div id="sc-16"></div>
+            <div id="sc-17"></div>
+            <div id="sc-18"></div>
+            <div id="sc-19"></div>
+            <div id="sc-20"></div>
+            <div id="sc-21"></div>
+            <div id="sc-22"></div>
+            <div id="sc-23"></div>
+            <div id="sc-24"></div>
+            <div id="sc-25"></div>
+            <div id="sc-26"></div>
+            <div id="sc-27"></div>
+            <div id="sc-28"></div>
+            <div id="sc-29"></div>
+            <div id="sc-30"></div>
+            <div id="sc-31"></div>
+            <div id="sc-32"></div>
+            <div id="sc-33"></div>
+            <div id="sc-34"></div>
+            <div id="sc-35"></div>
+            <div id="sc-36"></div>
+            <div id="sc-37"></div>
+            <div id="sc-38"></div>
+            <div id="sc-39"></div>
+            <div id="sc-40"></div>
+            <div id="sc-41"></div>
+        </div>
+	</body>
+</template>

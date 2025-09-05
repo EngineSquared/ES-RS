@@ -7,6 +7,7 @@
 #include "CreateVehicle.hpp"
 #include "SpeedOMeter.hpp"
 #include "CreateSkyBox.hpp"
+#include "PauseGame.hpp"
 
 #include "UI.hpp"
 #include "Timer.hpp"
@@ -40,13 +41,22 @@ public:
     void UpdateTextTime(ES::Engine::Core &core)
     {
         auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
-
         _gameChrono.timer.Update(dt);
 
-        std::ostringstream timeStream;
-        timeStream << std::fixed << std::setprecision(3) << _gameChrono.timer.elapsed;
+        double elapsed = _gameChrono.timer.elapsed;
+        int minutes = static_cast<int>(elapsed / 60.0);
+        int seconds = static_cast<int>(elapsed) % 60;
+        int milliseconds = static_cast<int>((elapsed - static_cast<int>(elapsed)) * 1000);
 
-        core.GetResource<ES::Plugin::UI::Resource::UIResource>().UpdateInnerContent("time-value", timeStream.str());
+        std::ostringstream timeStream;
+        timeStream << std::setfill('0')
+                << std::setw(2) << minutes << ":"
+                << std::setw(2) << seconds << ":"
+                << std::setw(3) << milliseconds;
+
+        auto &uiResource = core.GetResource<ES::Plugin::UI::Resource::UIResource>();
+        if (uiResource.GetTitle() == "game")
+            uiResource.UpdateInnerContent("time-value", timeStream.str());
     }
 
     void StartupCircuitTimerUpdate(ES::Engine::Core &core)
@@ -69,12 +79,6 @@ public:
 protected:
     void _onCreate(ES::Engine::Core &core) final
     {
-        core.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/race/game.rml");
-        core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
-            // VehicleMovement
-            UpdateSpeedOmeter,
-            UpdateSpeedOmeterAnimations
-        );
         CreateRace(core);
         CreateVehicle(core);
 
@@ -91,9 +95,71 @@ protected:
         AddLights(core, "default");
         AddLights(core, "noTextureLightShadow");
         AddChronoDisplay(core);
+
+        core.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/race/game.rml");
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("fade-out-mask", "animationend", [&core](const std::string &event, const std::string &elementId) {
+            if (elementId == "fade-out-mask" && event == "animationend") {
+                auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+                soundManager.Stop("race-ambient");
+                soundManager.Stop("race-ambient-life");
+                core.ClearEntities();
+                core.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main-menu");
+            }
+        });
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("resume-btn", "click",
+            [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "resume-btn" && event == "click") {
+                    auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+                    if (soundManager.IsPlaying("button_click"))
+                        soundManager.Stop("button_click");
+                    soundManager.Play("button_click");
+                    core.GetResource<UI::Resource::UIResource>().SetStyleProperty("pause-menu", "visibility", "hidden");
+                }
+            }
+        );
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("resume-btn", "mouseover",
+            [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "resume-btn" && event == "mouseover") {
+                    auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+                    if (soundManager.IsPlaying("button_hover"))
+                        soundManager.Stop("button_hover");
+                    soundManager.Play("button_hover");
+                }
+            }
+        );
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("quit-btn", "click",
+            [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "quit-btn" && event == "click") {
+                    auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+                    if (soundManager.IsPlaying("button_click"))
+                        soundManager.Stop("button_click");
+                    soundManager.Play("button_click");
+                    core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "visibility", "visible");
+                    core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "animation", "0.6s linear-in-out 1 fade-out");
+                }
+            }
+        );
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("quit-btn", "mouseover",
+            [&core](const std::string &event, const std::string &elementId) {
+                if (elementId == "quit-btn" && event == "mouseover") {
+                    auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
+                    if (soundManager.IsPlaying("button_hover"))
+                        soundManager.Stop("button_hover");
+                    soundManager.Play("button_hover");
+                }
+            }
+        );
         
         auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
         soundManager.Play("race-ambient");
+        soundManager.Play("race-ambient-life");
+
+        core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+            // VehicleMovement
+            UpdateSpeedOmeter,
+            UpdateSpeedOmeterAnimations,
+            TogglePauseMenu
+        );
     }
 
     void _onDestroy(ES::Engine::Core &core) final

@@ -1,5 +1,14 @@
-#current-lap,#divider,#max-lap
+#lap-counter-box
+{
+    position: absolute;
+    bottom: 20px;
+    left: 25px;
+}
+
+#lap-counter-box > #title,
+#lap-counter-box > #lap-value
 {
     font-size: 32px;
-	color:rgb(255, 255, 255)
+    color: rgb(214, 214, 214);
+    font-effect: shadow(2px rgb(0, 0, 0));
 }

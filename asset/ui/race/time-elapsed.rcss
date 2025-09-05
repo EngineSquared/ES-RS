@@ -1,10 +1,22 @@
-#time-elapsed
+#timer
+{
+    position: absolute;
+    top: 25px;
+    left: 25px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: flex-start;
+}
+
+#timer > #time-elapsed
 {
     text-align: center;
 }
 
-#time-title,#time-value,#time-seconds
+#timer > #time-value
 {
     font-size: 32px;
-	color:rgb(255, 255, 255)
+	color:rgb(214,214,214);
+    font-effect: shadow(2px rgb(0, 0, 0));
 }

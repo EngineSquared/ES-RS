@@ -1,6 +1,6 @@
 <rml>
 	<head>
-		<title>ES-RS</title>
+		<title>splash-screen</title>
 		<link type="text/rcss" href="main-menu.rcss" />
 		<link type="text/rcss" href="splash-screen.rcss" />
 	</head>

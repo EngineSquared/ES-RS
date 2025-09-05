@@ -1,0 +1,32 @@
+<template name="pause-menu" content="content">
+	<head>
+		<link type="text/rcss" href="pause-menu.rcss"/>
+	</head>
+	<body class="pause-menu">
+        <div id="pause-window">
+            <h1 class="title">Pause</h1>
+            <div id="resume-btn">
+                <button id="esrs-button">
+                    <div class="idle-pattern"></div>
+                    <div class="active-pattern"></div>
+                    <div class="idle"></div>
+                    <div class="active"></div>
+                    <div class="test-wrapper">
+                        <h1 class="text">RESUME</h1>
+                    </div>
+                </button>
+            </div>
+            <div id="quit-btn">
+                <button id="esrs-button">
+                    <div class="idle-pattern"></div>
+                    <div class="active-pattern"></div>
+                    <div class="idle"></div>
+                    <div class="active"></div>
+                    <div class="test-wrapper">
+                        <h1 class="text">QUIT</h1>
+                    </div>
+                </button>
+            </div>
+        </div>
+	</body>
+</template>

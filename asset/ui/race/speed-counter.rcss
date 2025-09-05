@@ -1,0 +1,317 @@
+#speed-counter-box,
+#rpm-led > div
+{
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 500px;
+    height: 121px;
+    transform: translateX(-50%);
+}
+
+#rpm-led > div {
+    opacity: 0;
+    transition: opacity 0.05s linear-in-out;
+}
+
+#speed-counter-box
+{
+    decorator: image("../../sprites/speed-counter.tga" cover);
+    opacity: 0.68;
+}
+
+#sc-01
+{
+    decorator: image("../../sprites/sc-01.tga" cover);
+    opacity: 0;
+}
+
+#sc-02
+{
+    decorator: image("../../sprites/sc-02.tga" cover);
+    opacity: 0;
+}
+
+#sc-03
+{
+    decorator: image("../../sprites/sc-03.tga" cover);
+    opacity: 0;
+}
+
+#sc-04
+{
+    decorator: image("../../sprites/sc-04.tga" cover);
+    opacity: 0;
+}
+
+#sc-05
+{
+    decorator: image("../../sprites/sc-05.tga" cover);
+    opacity: 0;
+}
+
+#sc-06
+{
+    decorator: image("../../sprites/sc-06.tga" cover);
+    opacity: 0;
+}
+
+#sc-07
+{
+    decorator: image("../../sprites/sc-07.tga" cover);
+    opacity: 0;
+}
+
+#sc-08
+{
+    decorator: image("../../sprites/sc-08.tga" cover);
+    opacity: 0;
+}
+
+#sc-09
+{
+    decorator: image("../../sprites/sc-09.tga" cover);
+    opacity: 0;
+}
+
+#sc-10
+{
+    decorator: image("../../sprites/sc-10.tga" cover);
+    opacity: 0;
+}
+
+#sc-11
+{
+    decorator: image("../../sprites/sc-11.tga" cover);
+    opacity: 0;
+}
+
+#sc-12
+{
+    decorator: image("../../sprites/sc-12.tga" cover);
+    opacity: 0;
+}
+
+#sc-13
+{
+    decorator: image("../../sprites/sc-13.tga" cover);
+    opacity: 0;
+}
+
+#sc-14
+{
+    decorator: image("../../sprites/sc-14.tga" cover);
+    opacity: 0;
+}
+
+#sc-15
+{
+    decorator: image("../../sprites/sc-15.tga" cover);
+    opacity: 0;
+}
+
+#sc-16
+{
+    decorator: image("../../sprites/sc-16.tga" cover);
+    opacity: 0;
+}
+
+#sc-17
+{
+    decorator: image("../../sprites/sc-17.tga" cover);
+    opacity: 0;
+}
+
+#sc-18
+{
+    decorator: image("../../sprites/sc-18.tga" cover);
+    opacity: 0;
+}
+
+#sc-19
+{
+    decorator: image("../../sprites/sc-19.tga" cover);
+    opacity: 0;
+}
+
+#sc-20
+{
+    decorator: image("../../sprites/sc-20.tga" cover);
+    opacity: 0;
+}
+
+#sc-21
+{
+    decorator: image("../../sprites/sc-21.tga" cover);
+    opacity: 0;
+}
+
+#sc-22
+{
+    decorator: image("../../sprites/sc-22.tga" cover);
+    opacity: 0;
+}
+
+#sc-23
+{
+    decorator: image("../../sprites/sc-23.tga" cover);
+    opacity: 0;
+}
+
+#sc-24
+{
+    decorator: image("../../sprites/sc-24.tga" cover);
+    opacity: 0;
+}
+
+#sc-25
+{
+    decorator: image("../../sprites/sc-25.tga" cover);
+    opacity: 0;
+}
+
+#sc-26
+{
+    decorator: image("../../sprites/sc-26.tga" cover);
+    opacity: 0;
+}
+
+#sc-27
+{
+    decorator: image("../../sprites/sc-27.tga" cover);
+    opacity: 0;
+}
+
+#sc-28
+{
+    decorator: image("../../sprites/sc-28.tga" cover);
+    opacity: 0;
+}
+
+#sc-29
+{
+    decorator: image("../../sprites/sc-29.tga" cover);
+    opacity: 0;
+}
+
+#sc-30
+{
+    decorator: image("../../sprites/sc-30.tga" cover);
+    opacity: 0;
+}
+
+#sc-31
+{
+    decorator: image("../../sprites/sc-31.tga" cover);
+    opacity: 0;
+}
+
+#sc-32
+{
+    decorator: image("../../sprites/sc-32.tga" cover);
+    opacity: 0;
+}
+
+#sc-33
+{
+    decorator: image("../../sprites/sc-33.tga" cover);
+    opacity: 0;
+}
+
+#sc-34
+{
+    decorator: image("../../sprites/sc-34.tga" cover);
+    opacity: 0;
+}
+
+#sc-35
+{
+    decorator: image("../../sprites/sc-35.tga" cover);
+    opacity: 0;
+}
+
+#sc-36
+{
+    decorator: image("../../sprites/sc-36.tga" cover);
+    opacity: 0;
+}
+
+#sc-37
+{
+    decorator: image("../../sprites/sc-37.tga" cover);
+    opacity: 0;
+}
+
+#sc-38
+{
+    decorator: image("../../sprites/sc-38.tga" cover);
+    opacity: 0;
+}
+
+#sc-39
+{
+    decorator: image("../../sprites/sc-39.tga" cover);
+    opacity: 0;
+}
+
+#sc-40
+{
+    decorator: image("../../sprites/sc-40.tga" cover);
+    opacity: 0;
+}
+
+#sc-41
+{
+    decorator: image("../../sprites/sc-41.tga" cover);
+    opacity: 0;
+}
+
+#speed-counter-metrics > span,
+#gear-metrics > span
+{
+    opacity: 1;
+}
+
+#speed-counter-metrics > #value,
+#gear-metrics > #gear-current
+{
+    font-size: 48px;
+    color: rgb(214,214,214);
+    margin: 0;
+}
+
+#speed-counter-metrics > #title,
+#gear-metrics > #title
+{
+    font-size: 18px;
+    color: rgb(160,160,160);
+    margin: 0;
+}
+
+#speed-counter-metrics
+{
+    position: absolute;
+    right: 5%;
+    bottom: 15px;
+    width: 50%;
+    height: 100%;
+    transform: translateX(-100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-end;
+}
+
+#gear-metrics
+{
+    position: absolute;
+    left: 5%;
+    bottom: 15px;
+    width: 50%;
+    height: 100%;
+    transform: translateX(100%);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+}

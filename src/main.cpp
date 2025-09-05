@@ -66,12 +66,14 @@ int main(void)
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("button_click", "asset/sounds/btn-click.mp3");
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("main-menu", "asset/sounds/main-menu.mp3", true);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient", "asset/sounds/race-amb.mp3", true);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient-life", "asset/sounds/race-amb-life.mp3", true);
         
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("start-menu", 0.2f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_hover", 0.6f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_click", 0.6f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("main-menu", 0.4f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient", 0.2f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient", 0.02f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient-life", 0.3f);
         }
     );
 

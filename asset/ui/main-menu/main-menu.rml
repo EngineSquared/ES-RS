@@ -1,9 +1,11 @@
 <rml>
 	<head>
-		<title>ES-RS</title>
+		<title>main-menu</title>
+		<link type="text/rcss" href="../esrs-btn.rcss" />
 		<link type="text/rcss" href="main-menu.rcss" />
 	</head>
 	<body>
+		<div id="fade-out-mask"></div>
 		<div id="background-img">
 			<div class="bckg-img1"></div>
 			<div class="bckg-img2"></div>

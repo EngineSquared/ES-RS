@@ -13,7 +13,7 @@
 
 @keyframes title-flag-animator {
 	0% {
-		transform: translateX(-129px)
+		transform: translateX(-130px)
 	}
 	to {
 		transform: translateX(0px)
@@ -35,24 +35,6 @@
 	}
 	to {
 		opacity: .7;
-	}
-}
-
-@keyframes button-fade-in-animator {
-	0% {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
-	}
-}
-
-@keyframes button-fade-out-animator {
-	0% {
-		opacity: 0;
-	}
-	to {
-		opacity: 1;
 	}
 }
 
@@ -83,16 +65,9 @@
 }
 /* --- */
 
-@keyframes esrs-btn-text {
-	0% {
-		color: rgb(255, 255, 255);
-	}
-    50% {
-        color: rgb(121, 121, 121);
-    }
-	to {
-		color: rgb(255, 255, 255);
-	}
+@keyframes fade-out {
+    0%       { background-color: transparent; }
+    100%     { background-color: rgb(0, 0, 0); }
 }
 
 body
@@ -101,82 +76,17 @@ body
     background-color: rgb(0, 0, 0);
 }
 
-#esrs-button,
-#esrs-button > .test-wrapper
+#fade-out-mask
 {
-    position: relative;
-    width: 200px;
-    height: 50px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-#esrs-button > div {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-}
-
-#esrs-button > .idle {
-    decorator: image("../../sprites/button-idle-frame.tga" cover);
-    opacity: 1;
-    transition: opacity 0.1s linear-in-out;
-}
-
-#esrs-button > .idle-pattern,
-#esrs-button > .active-pattern,
-#esrs-button > .test-wrapper
-{
-    transform: translateX(0px);
-    transition: transform 0.5s bounce-out;
-}
-
-#esrs-button:hover > .idle-pattern,
-#esrs-button:hover > .active-pattern,
-#esrs-button:hover > .test-wrapper
-{
-    transform: translateX(10px);
-    transition: transform 0.5s elastic-out;
-}
-
-#esrs-button:hover > .idle {
-    opacity: 0;
-    transition: opacity 0.1s linear-in-out;
-}
-
-#esrs-button > .idle-pattern
-{
-    decorator: image("../../sprites/button-idle-pattern.png" cover);
-}
-
-#esrs-button > .active {
-    decorator: image("../../sprites/button-active-frame.tga" cover);
-    opacity: 0;
-    transition: opacity 0.1s linear-in-out;
-}
-
-#esrs-button:hover > .active-pattern
-{
-    decorator: image("../../sprites/button-active-pattern.png" cover);
-}
-
-#esrs-button:hover > .active {
-    opacity: 1;
-    transition: opacity 0.1s linear-in-out;
-}
-
-#esrs-button > .test-wrapper > h1 {
-    position: relative;
-    color: rgb(214, 214, 214);
-    font-size: 32px;
-    margin: 0;
-}
-
-#esrs-button:hover > .test-wrapper > h1 {
-    animation: 0.3s linear infinite esrs-btn-text;
+    background-color: black;
+    visibility: hidden;
+    animation: none;
+    z-index: 99;
 }
 
 /* End of global definitions */
@@ -232,7 +142,7 @@ body
 {
     decorator: image("../../sprites/pattern.tga" repeat-x);
     position: absolute;
-    bottom: -40px;
+    bottom: -91px;
     left: 0;
     width: 200%;
     height: 179px;
@@ -242,7 +152,7 @@ body
 #footer-credits
 {
     position: absolute;
-    bottom: 0px;
+    bottom: 86px;
     right: 0;
     text-align: right;
     font-size: 24px;
@@ -265,10 +175,10 @@ body
 {
     decorator: image("../../sprites/gradient.tga" flip-vertical cover);
     position: absolute;
-    bottom: 50px;
+    bottom: 0;
     left: 0;
     width: 100%;
-    height: 150px;
+    height: 130px;
     opacity: .7;
     animation: 1s quartic-out 1 title-gradient-in;
 }
