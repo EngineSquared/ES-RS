@@ -23,9 +23,9 @@ void UpdateSpeedOmeterAnimations(ES::Engine::Core &core)
 {
     float rpm = 0.0f;
     const float minRPM = 0.0f;
-    const float maxRPM = 8000.0f;
+    const float maxRPM = 5000.0f;
     const float minAngle = 0.0f;
-    const float maxAngle = 300.0f;
+    const float maxAngle = 230.0f;
     int gear = 0;
     const int ledCount = 41;
     const std::string &UITitle = core.GetResource<ES::Plugin::UI::Resource::UIResource>().GetTitle();
