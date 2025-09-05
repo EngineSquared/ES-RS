@@ -29,8 +29,6 @@ protected:
                 core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("start-game-btn", "click", [&core](const std::string &event, const std::string &elementId) {
                     if (elementId == "start-game-btn" && event == "click") {
                         auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
-                        if (soundManager.IsPlaying("button_click"))
-                            soundManager.Stop("button_click");
                         soundManager.Play("button_click");
                         core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "visibility", "visible");
                         core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "animation", "0.6s linear-in-out 1 fade-out");
@@ -55,8 +53,6 @@ protected:
                 core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("quit-game-btn", "click", [&core](const std::string &event, const std::string &elementId) {
                     if (elementId == "quit-game-btn" && event == "click") {
                         auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
-                        if (soundManager.IsPlaying("button_click"))
-                            soundManager.Stop("button_click");
                         soundManager.Play("button_click");
                         core.Stop();
                     }

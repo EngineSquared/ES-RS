@@ -37,30 +37,45 @@ public:
         if (_chronoSystemId == std::numeric_limits<std::size_t>::max())
             _chronoSystemId = std::get<0>(core.RegisterSystem<ES::Engine::Scheduler::Update>(
                 [this](ES::Engine::Core &core) {
-                    this->StartupCircuitTimerUpdate(core);
+                    auto &uiResource = core.GetResource<ES::Plugin::UI::Resource::UIResource>();
+                    if (uiResource.GetTitle() == "game")
+                    {
+                        const auto &visibility = uiResource.GetStyle("pause-menu", "visibility");
+                        if (visibility == "hidden")
+                            this->StartupCircuitTimerUpdate(core);
+                    }
                 }
             ));
     }
 
     void UpdateTextTime(ES::Engine::Core &core)
     {
-        auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
-        _gameChrono.timer.Update(dt);
-
-        double elapsed = _gameChrono.timer.elapsed;
-        int minutes = static_cast<int>(elapsed / 60.0);
-        int seconds = static_cast<int>(elapsed) % 60;
-        int milliseconds = static_cast<int>((elapsed - static_cast<int>(elapsed)) * 1000);
-
-        std::ostringstream timeStream;
-        timeStream << std::setfill('0')
-                << std::setw(2) << minutes << ":"
-                << std::setw(2) << seconds << ":"
-                << std::setw(3) << milliseconds;
-
         auto &uiResource = core.GetResource<ES::Plugin::UI::Resource::UIResource>();
+
         if (uiResource.GetTitle() == "game")
-            uiResource.UpdateInnerContent("time-value", timeStream.str());
+        {
+            const auto &visibility = uiResource.GetStyle("pause-menu", "visibility");
+            if (visibility == "hidden")
+            {
+                auto dt = core.GetScheduler<ES::Engine::Scheduler::Update>().GetDeltaTime();
+                _gameChrono.timer.Update(dt);
+        
+                double elapsed = _gameChrono.timer.elapsed;
+                int minutes = static_cast<int>(elapsed / 60.0);
+                int seconds = static_cast<int>(elapsed) % 60;
+                int milliseconds = static_cast<int>((elapsed - static_cast<int>(elapsed)) * 1000);
+        
+                std::ostringstream timeStream;
+                timeStream << std::setfill('0')
+                        << std::setw(2) << minutes << ":"
+                        << std::setw(2) << seconds << ":"
+                        << std::setw(3) << milliseconds;
+        
+                auto &uiResource = core.GetResource<ES::Plugin::UI::Resource::UIResource>();
+                if (uiResource.GetTitle() == "game")
+                    uiResource.UpdateInnerContent("time-value", timeStream.str());
+            }
+        }
     }
 
     void StartupCircuitTimerUpdate(ES::Engine::Core &core)
@@ -80,11 +95,25 @@ public:
         }
     }
 
+    /* Manually binding to keep track of the FixedUpdate Scheduler systems */
+    void BindPhysicPlugin(ES::Engine::Core &core)
+    {
+        if (_syncRigidBodiesToTransformsSystemId == std::numeric_limits<std::size_t>::max())
+            std::tie(_syncRigidBodiesToTransformsSystemId, _syncPhysicUpdateSystemId,
+                _syncTransformsToRigidBodiesSystemId, _syncSoftBodiesDataSystemId,
+                _syncWheeledVehicleWheelsSystemId) = core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+                ES::Plugin::Physics::System::SyncRigidBodiesToTransforms, ES::Plugin::Physics::System::PhysicsUpdate,
+                ES::Plugin::Physics::System::SyncTransformsToRigidBodies, ES::Plugin::Physics::System::SyncSoftBodiesData,
+                ES::Plugin::Physics::System::SyncWheeledVehicleWheels);
+    }
+
 protected:
     void _onCreate(ES::Engine::Core &core) final
     {
+        BindPhysicPlugin(core);
         CreateRace(core);
         CreateVehicle(core);
+        _gameChrono.timer.elapsed = 0.0f;
 
         std::array<std::string, 6> faces = {
             "asset/skybox/right.jpg",
@@ -101,7 +130,7 @@ protected:
         AddChronoDisplay(core);
 
         core.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/race/game.rml");
-        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("fade-out-mask", "animationend", [&core](const std::string &event, const std::string &elementId) {
+        core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("fade-out-mask", "animationend", [&core, this](const std::string &event, const std::string &elementId) {
             if (elementId == "fade-out-mask" && event == "animationend") {
                 auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
                 soundManager.Stop("race-ambient");
@@ -121,8 +150,6 @@ protected:
             [&core](const std::string &event, const std::string &elementId) {
                 if (elementId == "resume-btn" && event == "click") {
                     auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
-                    if (soundManager.IsPlaying("button_click"))
-                        soundManager.Stop("button_click");
                     soundManager.Play("button_click");
                     core.GetResource<UI::Resource::UIResource>().SetStyleProperty("pause-menu", "visibility", "hidden");
                 }
@@ -139,14 +166,21 @@ protected:
             }
         );
         core.GetResource<UI::Resource::UIResource>().AttachEventHandlers("quit-btn", "click",
-            [&core](const std::string &event, const std::string &elementId) {
+            [&core, this](const std::string &event, const std::string &elementId) {
                 if (elementId == "quit-btn" && event == "click") {
                     auto &soundManager = core.GetResource<ES::Plugin::Sound::Resource::SoundManager>();
-                    if (soundManager.IsPlaying("button_click"))
-                        soundManager.Stop("button_click");
                     soundManager.Play("button_click");
                     core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "visibility", "visible");
                     core.GetResource<UI::Resource::UIResource>().SetStyleProperty("fade-out-mask", "animation", "0.6s linear-in-out 1 fade-out");
+                    // Enable back the systems to prevent duplicate disabling
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(controllerSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(movementSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncRigidBodiesToTransformsSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncPhysicUpdateSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncTransformsToRigidBodiesSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncSoftBodiesDataSystemId);
+                    core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncWheeledVehicleWheelsSystemId);
+                    core.RunSystems();
                 }
             }
         );
@@ -173,7 +207,38 @@ protected:
                     UpdateSpeedOmeterAnimations,
                     TogglePauseMenu
                 );
-        }
+                core.RegisterSystem<ES::Engine::Scheduler::FixedTimeUpdate>(
+                    [this](ES::Engine::Core &core) {
+                        auto &uiResource = core.GetResource<ES::Plugin::UI::Resource::UIResource>();
+                        auto &systems = core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().GetSystems();
+
+                        if (uiResource.GetTitle() == "game")
+                        {
+                            if (!_gamePaused && uiResource.GetStyle("pause-menu", "visibility") == "visible") {
+                                _gamePaused = true;
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(controllerSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(movementSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncRigidBodiesToTransformsSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncPhysicUpdateSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncTransformsToRigidBodiesSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncSoftBodiesDataSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncWheeledVehicleWheelsSystemId);
+                                core.RunSystems();
+                            } else if (_gamePaused && uiResource.GetStyle("pause-menu", "visibility") == "hidden") {
+                                _gamePaused = false;
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(controllerSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(movementSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncRigidBodiesToTransformsSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncPhysicUpdateSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncTransformsToRigidBodiesSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncSoftBodiesDataSystemId);
+                                core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Enable(_syncWheeledVehicleWheelsSystemId);
+                                core.RunSystems();
+                            }
+                        }
+                    }
+                );
+            };
     }
 
     void _onDestroy(ES::Engine::Core &core) final
@@ -184,6 +249,12 @@ protected:
         UnloadCourseTextures(core);
         const std::string unique_resource_id = "cubemap_faces_right";
         cubeMapManager.Remove(entt::hashed_string{unique_resource_id.c_str()});
+
+        core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncRigidBodiesToTransformsSystemId);
+        core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncPhysicUpdateSystemId);
+        core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncTransformsToRigidBodiesSystemId);
+        core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncSoftBodiesDataSystemId);
+        core.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().Disable(_syncWheeledVehicleWheelsSystemId);
     }
 
 private:
@@ -194,6 +265,13 @@ private:
     ES::Utils::FunctionContainer::FunctionID _speedometerSystemId = std::numeric_limits<std::size_t>::max();
     ES::Utils::FunctionContainer::FunctionID _speedometerAnimSystemId = std::numeric_limits<std::size_t>::max();
     ES::Utils::FunctionContainer::FunctionID _pauseMenuSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _syncRigidBodiesToTransformsSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _syncPhysicUpdateSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _syncTransformsToRigidBodiesSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _syncSoftBodiesDataSystemId = std::numeric_limits<std::size_t>::max();
+    ES::Utils::FunctionContainer::FunctionID _syncWheeledVehicleWheelsSystemId = std::numeric_limits<std::size_t>::max();
+
+    bool _gamePaused = false;
    
     void AddLights(ES::Engine::Core &core, const std::string &shaderName)
     {

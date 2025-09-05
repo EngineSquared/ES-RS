@@ -26,7 +26,18 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin, Sound::Plugin>();
+	core.AddPlugins<Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin, Sound::Plugin>();
+
+    /* Binding the PhysicPlugin here to keep track of the FixedUpdate systems */
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitJoltPhysics);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitPhysicsManager);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkRigidBodiesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkSoftBodiesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkWheeledVehiclesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(ES::Plugin::Physics::System::ShutdownJoltPhysics);
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
@@ -67,6 +78,7 @@ int main(void)
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("main-menu", "asset/sounds/main-menu.mp3", true);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient", "asset/sounds/race-amb.mp3", true);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient-life", "asset/sounds/race-amb-life.mp3", true);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("pause-menu", "asset/sounds/pause-menu.mp3");
         
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("start-menu", 0.2f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_hover", 0.6f);
@@ -74,6 +86,7 @@ int main(void)
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("main-menu", 0.4f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient", 0.02f);
             c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient-life", 0.3f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("pause-menu", 0.3f);
         }
     );
 

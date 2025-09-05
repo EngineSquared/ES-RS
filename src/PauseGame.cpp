@@ -20,6 +20,9 @@ void TogglePauseMenu(ES::Engine::Core &core)
             if (visibility == "hidden") {
                 uiResource.SetStyleProperty("pause-menu", "animation", "0.2s quadratic-out 1 slide-in");
                 uiResource.SetStyleProperty("pause-menu", "visibility", "visible");
+                if (soundManager.IsPlaying("pause-menu"))
+                    soundManager.Stop("pause-menu");
+                soundManager.Play("pause-menu");
             } else if (visibility == "visible") {
                 uiResource.SetStyleProperty("pause-menu", "visibility", "hidden");
             }
