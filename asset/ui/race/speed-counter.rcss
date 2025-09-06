@@ -281,7 +281,7 @@
 }
 
 #speed-counter-metrics > #title,
-#gear-metrics > #title
+#gear-metrics > #transmission-mode
 {
     font-size: 18px;
     color: rgb(160,160,160);

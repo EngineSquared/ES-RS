@@ -10,7 +10,7 @@
             </div>
             <div id="gear-metrics">
                 <span id="gear-current">0</span>
-                <span id="title">AT</span>
+                <span id="transmission-mode">AT</span>
             </div>
         </div>
         <div id="rpm-led">
