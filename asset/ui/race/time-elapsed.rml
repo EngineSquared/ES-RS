@@ -3,11 +3,8 @@
 		<link type="text/rcss" href="time-elapsed.rcss"/>
 	</head>
 	<body class="time-elapsed">
-		<handle move_target="#document">
-			<span id="time-title">Time Elapsed: </span>
+		<div id="timer">
 			<span id="time-value">0</span>
-			<span id="time-seconds">s</span>
-		</handle>
-		<handle size_target="#document"></handle>
+		</div>
 	</body>
 </template>

@@ -1,22 +1,30 @@
 <rml>
 	<head>
-		<title>ES-RS</title>
+		<title>game</title>
+		<link type="text/rcss" href="../esrs-btn.rcss" />
 		<link type="text/template" href="speed-o-meter.rml" />
+		<link type="text/template" href="speed-counter.rml" />
 		<link type="text/template" href="lap-counter.rml" />
 		<link type="text/template" href="time-elapsed.rml" />
+		<link type="text/template" href="pause-menu.rml" />
 		<link type="text/rcss" href="game.rcss" />
 	</head>
 	<body>
-		<div id="metrics">
-			<div template="speed-o-meter">
-				<template content="speed-o-meter" src="speed-o-meter"></template>
-			</div>
-			<div template="lap-counter">
-				<template content="lap-counter" src="lap-counter"></template>
-			</div>
+		<div id="fade-out-mask"></div>
+		<div id="pause-menu" template="pause-menu">
+			<template content="pause-menu" src="pause-menu"></template>
+		</div>
+		<div template="speed-o-meter">
+			<template content="speed-o-meter" src="speed-o-meter"></template>
+		</div>
+		<div template="lap-counter">
+			<template content="lap-counter" src="lap-counter"></template>
 		</div>
 		<div template="time-elapsed">
 			<template content="time-elapsed" src="time-elapsed"></template>
+		</div>
+		<div template="speed-counter">
+			<template content="speed-counter" src="speed-counter"></template>
 		</div>
 	</body>
 </rml>

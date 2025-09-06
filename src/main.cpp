@@ -8,6 +8,7 @@
 #include "Window.hpp"
 #include "Scene.hpp"
 #include "UI.hpp"
+#include "Sound.hpp"
 
 // Demo headers
 #include "shader/LoadNoLightShader.hpp"
@@ -25,7 +26,18 @@ int main(void)
 {
     ES::Engine::Core core;
 
-	core.AddPlugins<Physics::Plugin, Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin>();
+	core.AddPlugins<Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin, Sound::Plugin>();
+
+    /* Binding the PhysicPlugin here to keep track of the FixedUpdate systems */
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitJoltPhysics);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitPhysicsManager);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkRigidBodiesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkSoftBodiesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
+        ES::Plugin::Physics::System::OnConstructLinkWheeledVehiclesToPhysicsSystem);
+    core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(ES::Plugin::Physics::System::ShutdownJoltPhysics);
 
     core.RegisterSystem<ES::Engine::Scheduler::Startup>(
         LoadMaterials,
@@ -60,13 +72,21 @@ int main(void)
             c.GetResource<OpenGL::Resource::DirectionalLight>().lightSpaceMatrix = c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection * c.GetResource<OpenGL::Resource::DirectionalLight>().lightView;
         },
         [](ES::Engine::Core &c) {
-            c.GetResource<UI::Resource::UIResource>().SetFont("asset/font/Tomorrow-Medium.ttf");
-            c.GetResource<UI::Resource::UIResource>().InitDocument("asset/ui/main-menu/main-menu.rml");
-            c.GetResource<UI::Resource::UIResource>().AttachEventHandlers("start-game-btn", "click", [&c](const std::string &event, const std::string &elementId) {
-                if (elementId == "start-game-btn" && event == "click") {
-                    c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("race");
-                }
-            });
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("start-menu", "asset/sounds/start-menu.mp3");
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("button_hover", "asset/sounds/btn-hover.mp3");
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("button_click", "asset/sounds/btn-click.mp3");
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("main-menu", "asset/sounds/main-menu.mp3", true);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient", "asset/sounds/race-amb.mp3", true);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient-life", "asset/sounds/race-amb-life.mp3", true);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("pause-menu", "asset/sounds/pause-menu.mp3");
+        
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("start-menu", 0.2f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_hover", 0.6f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_click", 0.6f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("main-menu", 0.4f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient", 0.02f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient-life", 0.3f);
+            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("pause-menu", 0.3f);
         }
     );
 

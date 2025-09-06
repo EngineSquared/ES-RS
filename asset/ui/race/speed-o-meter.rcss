@@ -13,13 +13,13 @@
 	background-simple: 0px 0px 428px 428px;
 
 	/* huditems are vertically flipped titlebars */
-	pointer: 428px 0px 70px 428px;
+	pointer: 429px 0px 68px 428px;
 }
 
 #speed-counter {
     decorator: image("background-simple" cover);
     position: absolute; /* keep absolute for screen placement */
-    bottom: 110px;
+    bottom: 20px;
     right: 20px;
     width: 218px;
     height: 218px;
@@ -43,10 +43,4 @@
     height: 214px;
     transform-origin: 22.5px 44px;
     z-index: 10;
-}
-
-#title,#value
-{
-    font-size: 32px;
-	color:rgb(255, 255, 255);
 }
