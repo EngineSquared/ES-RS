@@ -360,7 +360,18 @@ ES::Engine::Entity CreateVehicle(ES::Engine::Core &core)
             wheel.mSuspensionMinLength = suspensionMinLength;
             wheel.mSuspensionMaxLength = suspensionMaxLength;
             wheel.mMaxSteerAngle = maxSteerAngle;
-            wheel.mLateralFriction.AddPoint(2000.0f, 1.0f);// Safety to prevent issues at high speed
+            wheel.mMaxBrakeTorque = frontBrakeTorque;
+            wheel.mMaxHandBrakeTorque = 0.0f; // Front wheels doesn't have handbrake
+
+            wheel.mLongitudinalFriction.Clear();
+            for (const auto &[x, y] : frontLongitudinalFrictionCurve) {
+                wheel.mLongitudinalFriction.AddPoint(x, y);
+            }
+
+            wheel.mLateralFriction.Clear();
+            for (const auto &[x, y] : frontLateralFrictionCurve) {
+                wheel.mLateralFriction.AddPoint(x, y);
+            }
 
         });
         vehicleBuilder.EditWheel(2, [&](JPH::WheelSettingsWV &wheel) {
