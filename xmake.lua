@@ -1,7 +1,6 @@
-add_requires("entt", "gtest", "glm >=1.0.1", "glfw >=3.4", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio")
-add_requires("rmlui >=6.0", { configs = { transform = true } })
+add_repositories("package_repo https://github.com/EngineSquared/xrepo.git")
 
-includes("../EngineSquared/xmake.lua")
+add_requires("enginesquared v0.1.0")
 
 set_project("VehicleDemo")
 set_languages("c++20")
@@ -16,13 +15,11 @@ end
 target("VehicleDemo")
     set_kind("binary")
     set_default(true)
-    add_deps("EngineSquared")
+    add_packages("enginesquared")
 
     add_files("src/**.cpp")
     add_includedirs("$(projectdir)/src/")
     add_includedirs("$(projectdir)/src/scene")
-
-    add_packages("entt", "glm", "glfw", "glew", "spdlog", "fmt", "stb", "joltphysics", "miniaudio", "rmlui")
 
     set_rundir("$(projectdir)")
 

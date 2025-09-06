@@ -1,7 +1,7 @@
 #include "LoadTextureShader.hpp"
-#include "ShaderManager.hpp"
-#include "LightInfo.hpp"
-#include "Camera.hpp" // Remove when camera is in OpenGL
+#include "resource/ShaderManager.hpp"
+#include "utils/LightInfo.hpp"
+#include "resource/Camera.hpp" // Remove when camera is in OpenGL
 
 void LoadTextureShader(ES::Engine::Core &core)
 {

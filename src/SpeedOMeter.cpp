@@ -1,6 +1,6 @@
 #include "SpeedOMeter.hpp"
-#include "PhysicsManager.hpp"
-#include "RigidBody3D.hpp"
+#include "resource/PhysicsManager.hpp"
+#include "component/RigidBody3D.hpp"
 
 void UpdateSpeedOmeter(ES::Engine::Core &core)
 {

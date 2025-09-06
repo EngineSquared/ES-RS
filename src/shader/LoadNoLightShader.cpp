@@ -3,7 +3,7 @@
 #include "LoadNoLightShader.hpp"
 
 #include "OpenGL.hpp"
-#include "Camera.hpp" // TODO: remove when camera is in OpenGL
+#include "resource/Camera.hpp" // TODO: remove when camera is in OpenGL
 
 void LoadNoLightShader(ES::Engine::Core &core)
 {

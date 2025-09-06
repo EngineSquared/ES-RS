@@ -1,6 +1,5 @@
 #include "WheeledVehicleKeyboardMovement.hpp"
 
-#include "WheeledVehicle3D.hpp"
 #include "Logger.hpp"
 #include "JoltPhysics.hpp"
 

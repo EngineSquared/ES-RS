@@ -1,8 +1,8 @@
 #include "PauseGame.hpp"
 #include "Input.hpp"
-#include "UIResource.hpp"
+#include "resource/UIResource.hpp"
 #include "Logger.hpp"
-#include "SoundManager.hpp"
+#include "resource/SoundManager.hpp"
 
 void TogglePauseMenu(ES::Engine::Core &core)
 {

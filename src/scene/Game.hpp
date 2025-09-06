@@ -7,7 +7,7 @@
 #include "LoadCourse.hpp"
 #include "CreateVehicle.hpp"
 #include "SpeedOMeter.hpp"
-#include "CreateSkyBox.hpp"
+#include "utils/CreateSkyBox.hpp"
 #include "PauseGame.hpp"
 
 #include "UI.hpp"

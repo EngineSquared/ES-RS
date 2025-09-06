@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Core.hpp"
-#include "Mesh.hpp"
+#include "core/Core.hpp"
+#include "component/Mesh.hpp"
 
 void LoadCourseModels(ES::Engine::Core &core, const glm::vec3 &position, const glm::quat &rotation, const glm::vec3 &size);
 

@@ -1,10 +1,10 @@
 #include "LoadCourse.hpp"
 
-#include "Entity.hpp"
-#include "Mesh.hpp"
+#include "entity/Entity.hpp"
+#include "component/Mesh.hpp"
 #include "OpenGL.hpp"
 #include "Object.hpp"
-#include "RigidBody3D.hpp"
+#include "component/RigidBody3D.hpp"
 
 #include "JoltPhysics.hpp"
 #include <Jolt/Physics/Collision/Shape/MeshShape.h>

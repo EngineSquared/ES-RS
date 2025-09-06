@@ -4,8 +4,8 @@
 #include "Input.hpp"
 #include "JoltPhysics.hpp"
 #include "OpenGL.hpp"
-#include "Camera.hpp" // TODO: remove when camera is in OpenGL
-#include "Window.hpp"
+#include "resource/Camera.hpp" // TODO: remove when camera is in OpenGL
+#include "resource/window/Window.hpp"
 #include "Scene.hpp"
 #include "UI.hpp"
 #include "Sound.hpp"

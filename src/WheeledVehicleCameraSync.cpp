@@ -1,6 +1,6 @@
 #include "WheeledVehicleCameraSync.hpp"
 
-#include "WheeledVehicle3D.hpp"
+#include "component/WheeledVehicle3D.hpp"
 #include "Logger.hpp"
 #include "OpenGL.hpp"
 
