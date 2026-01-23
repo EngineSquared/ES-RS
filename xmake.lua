@@ -1,28 +1,26 @@
-add_repositories("package_repo https://github.com/EngineSquared/xrepo.git")
-
-add_requires("enginesquared v0.1.0")
-
-set_project("VehicleDemo")
+-- Build with xmake -P .
+set_project("ES-RS")
 set_languages("c++20")
 
-add_rules("mode.debug", "mode.release")
-
--- add /W4 for windows
 if is_plat("windows") then
     add_cxflags("/W4")
 end
 
-target("VehicleDemo")
+includes("../EngineSquared/xmake.lua")
+
+add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
+target("ES-RS")
     set_kind("binary")
-    set_default(true)
-    add_packages("enginesquared")
+
+    add_deps("EngineSquared")
 
     add_files("src/**.cpp")
+
     add_includedirs("$(projectdir)/src/")
-    add_includedirs("$(projectdir)/src/scene")
+
+    add_packages("entt", "glm", "glfw", "spdlog", "fmt", "joltphysics", "stb", "tinyobjloader", "wgpu-native", "glfw3webgpu", "lodepng")
 
     set_rundir("$(projectdir)")
-
 
 if is_mode("debug") then
     add_defines("ES_DEBUG")

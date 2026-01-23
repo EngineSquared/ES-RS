@@ -1,94 +1,77 @@
+/**************************************************************************
+ * EngineSquared - Vehicle Usage Example
+ *
+ * This example demonstrates how to use the Graphic and Physics plugins together for vehicle simulation.
+ **************************************************************************/
+
 #include "Engine.hpp"
 
-// Engine headers
+#include "CameraMovement.hpp"
+#include "DefaultPipeline.hpp"
+#include "Graphic.hpp"
 #include "Input.hpp"
-#include "JoltPhysics.hpp"
-#include "OpenGL.hpp"
-#include "resource/Camera.hpp" // TODO: remove when camera is in OpenGL
-#include "resource/Window/Window.hpp"
-#include "Scene.hpp"
-#include "UI.hpp"
-#include "Sound.hpp"
+#include "Object.hpp"
+#include "Physics.hpp"
+#include "RenderingPipeline.hpp"
+#include "plugin/PluginWindow.hpp"
+#include "resource/Window.hpp"
 
-// Demo headers
-#include "shader/LoadNoLightShader.hpp"
-#include "shader/LoadTextureShader.hpp"
-#include "LoadMaterials.hpp"
-#include "CreateRace.hpp"
-#include "CreateVehicle.hpp"
-#include "Game.hpp"
-#include "SpeedOMeter.hpp"
-#include "MainMenu.hpp"
+#include "component/PlayerVehicle.hpp"
+#include "resource/CameraControlSystemManager.hpp"
+#include "scenes/VehicleScene.hpp"
+#include "system/VehicleInput.hpp"
+#include "utils/ChaseCameraBehavior.hpp"
 
-using namespace ES::Plugin;
+void EscapeKeySystem(Engine::Core &core)
+{
+    auto &inputManager = core.GetResource<Input::Resource::InputManager>();
+
+    if (inputManager.IsKeyPressed(GLFW_KEY_ESCAPE))
+    {
+        core.Stop();
+    }
+}
+
+void Setup(Engine::Core &core)
+{
+    CreateCheckeredFloor(core);
+    auto vehicle = CreateVehicle(core);
+
+    auto camera = core.CreateEntity();
+
+    camera.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 1.0f, -10.0f));
+    camera.AddComponent<Object::Component::Camera>();
+
+    auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
+    cameraManager.SetActiveCamera(camera);
+    cameraManager.SetMovementSpeed(3.0f);
+
+    core.RegisterSystem(EscapeKeySystem);
+
+    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
+
+    auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
+    cameraManager.SetBehavior(chaseBehavior);
+
+    auto &fixedTimeScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
+    fixedTimeScheduler.SetTickRate(1.0f / 120.0f);
+
+    auto &cameraControlSystemManager = core.GetResource<CameraMovement::Resource::CameraControlSystemManager>();
+    cameraControlSystemManager.SetCameraControlSystemScheduler<Engine::Scheduler::FixedTimeUpdate>(core);
+}
+
+class GraphicExampleError : public std::runtime_error {
+  public:
+    using std::runtime_error::runtime_error;
+};
 
 int main(void)
 {
-    ES::Engine::Core core;
+    Engine::Core core;
 
-	core.AddPlugins<Input::Plugin, OpenGL::Plugin, Scene::Plugin, UI::Plugin, Sound::Plugin>();
+    core.AddPlugins<Window::Plugin, DefaultPipeline::Plugin, Input::Plugin, CameraMovement::Plugin, Physics::Plugin>();
 
-    /* Binding the PhysicPlugin here to keep track of the FixedUpdate systems */
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitJoltPhysics);
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(ES::Plugin::Physics::System::InitPhysicsManager);
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-        ES::Plugin::Physics::System::OnConstructLinkRigidBodiesToPhysicsSystem);
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-        ES::Plugin::Physics::System::OnConstructLinkSoftBodiesToPhysicsSystem);
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-        ES::Plugin::Physics::System::OnConstructLinkWheeledVehiclesToPhysicsSystem);
-    core.RegisterSystem<ES::Engine::Scheduler::Shutdown>(ES::Plugin::Physics::System::ShutdownJoltPhysics);
-
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-        LoadMaterials,
-        LoadNoLightShader,
-        LoadTextureShader
-    );
-
-    core.RegisterSystem<ES::Engine::Scheduler::Startup>(
-		[](ES::Engine::Core &c) {
-			c.GetResource<Window::Resource::Window>().SetTitle("ES VehicleDemo");
-			c.GetResource<Window::Resource::Window>().SetSize(1280, 720);
-		},
-		[](ES::Engine::Core &c) {
-			c.GetResource<OpenGL::Resource::Camera>().viewer.centerAt(glm::vec3(0.0f, 0.0f, 0.0f));
-			c.GetResource<OpenGL::Resource::Camera>().viewer.lookFrom(glm::vec3(0.0f, 5.0f, -10.0f));
-            c.GetResource<Physics::Resource::PhysicsManager>().GetPhysicsSystem().OptimizeBroadPhase();
-            c.GetScheduler<ES::Engine::Scheduler::FixedTimeUpdate>().SetTickRate(1.0f / 240.0f);
-            printf("Available controllers:\n");
-            ES::Plugin::Input::Utils::PrintAvailableControllers();
-		},
-        [](ES::Engine::Core &c) {
-            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("main-menu");
-            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().RegisterScene<Game::Race>("race");
-            c.GetResource<ES::Plugin::Scene::Resource::SceneManager>().SetNextScene("main-menu");
-        },
-        [](ES::Engine::Core &c) {
-            c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight = glm::vec3(3.0f, 20.0f, 0.0f);
-            c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection = glm::ortho(-50.0f, 50.0f, 50.0f, -50.0f, 1.0f, 50.0f);
-            c.GetResource<OpenGL::Resource::DirectionalLight>().lightView =
-                glm::lookAt(c.GetResource<OpenGL::Resource::DirectionalLight>().posOfLight,
-                            glm::vec3(0.0f, 5.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-            c.GetResource<OpenGL::Resource::DirectionalLight>().lightSpaceMatrix = c.GetResource<OpenGL::Resource::DirectionalLight>().lightProjection * c.GetResource<OpenGL::Resource::DirectionalLight>().lightView;
-        },
-        [](ES::Engine::Core &c) {
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("start-menu", "asset/sounds/start-menu.mp3");
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("button_hover", "asset/sounds/btn-hover.mp3");
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("button_click", "asset/sounds/btn-click.mp3");
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("main-menu", "asset/sounds/main-menu.mp3", true);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient", "asset/sounds/race-amb.mp3", true);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("race-ambient-life", "asset/sounds/race-amb-life.mp3", true);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().RegisterSound("pause-menu", "asset/sounds/pause-menu.mp3");
-        
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("start-menu", 0.2f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_hover", 0.6f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("button_click", 0.6f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("main-menu", 0.4f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient", 0.02f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("race-ambient-life", 0.3f);
-            c.GetResource<ES::Plugin::Sound::Resource::SoundManager>().SetVolume("pause-menu", 0.3f);
-        }
-    );
+    core.RegisterSystem<Engine::Scheduler::Startup>(Setup);
 
     core.RunCore();
 
