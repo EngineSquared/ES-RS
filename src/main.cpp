@@ -20,7 +20,7 @@
 #include "resource/CameraControlSystemManager.hpp"
 #include "scenes/VehicleScene.hpp"
 #include "system/VehicleInput.hpp"
-#include "utils/ChaseCameraBehavior.hpp"
+#include "utils/OrbitalChaseCameraBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core)
 {
@@ -34,6 +34,10 @@ void EscapeKeySystem(Engine::Core &core)
 
 void Setup(Engine::Core &core)
 {
+    // Option to lock the cursor to the window
+    auto &window = core.GetResource<Window::Resource::Window>();
+    window.MaskCursor();
+
     CreateCheckeredFloor(core);
     auto vehicle = CreateVehicle(core);
 
@@ -50,7 +54,7 @@ void Setup(Engine::Core &core)
 
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
 
-    auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
+    auto chaseBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
     cameraManager.SetBehavior(chaseBehavior);
 
     auto &fixedTimeScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
