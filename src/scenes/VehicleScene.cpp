@@ -132,19 +132,29 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     chassisMaterial.specular = glm::vec3(0.3f);
     chassisMaterial.shininess = 32.0f;
 
+    std::string shapeName = "TwiXeR_992_underbody_gt3rs";
+
     try
     {
-        Object::OBJLoader loader("asset/car/gt3rs_test.obj");
+        Object::OBJLoader loader("asset/car2/GT3_RS.obj");
         bool foundShape = false;
 
         for (auto &shape : loader.GetShapes())
         {
-            if (shape.GetName() == "GEO_Body_SUB3")
+            if (shape.GetName().starts_with(shapeName))
             {
                 Log::Debug(fmt::format("Found vehicle body shape: {}", shape.GetName()));
                 chassisMesh = shape.GetMesh();
                 chassisMaterial = shape.GetMaterial();
-                Log::Warn(fmt::format("chassis texture name: {}", chassisMaterial.ambientTexName));
+                if (!chassisMaterial.diffuseTexName.empty())
+                {
+                    chassisMaterial.diffuseTexName = "asset/car2/" + chassisMaterial.diffuseTexName;
+                }
+                else {
+                    chassisMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+                }
+                
+                Log::Debug(fmt::format("chassis texture name: {}", chassisMaterial.diffuseTexName));
                 foundShape = true;
             }
             else
@@ -156,7 +166,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
         if (!foundShape)
         {
-            Log::Warn("Shape GEO_Body_SUB3 not found, using full mesh.");
+            Log::Warn(fmt::format("Vehicle body shape '{}' not found in OBJ file, using entire mesh as chassis", shapeName));
             chassisMesh = loader.GetMesh();
         }
     }
@@ -174,7 +184,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
         AdjustMeshPosition(mesh, glm::vec3(0.0f, -0.69f, 0.0f));
     }
 
-    chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
+    chassisMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
     float wheelRadius = 0.692f / 2.0f;
     float wheelWidth = 0.277f;
 
@@ -249,10 +259,19 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
         childEntity.AddComponent<Object::Component::Mesh>(shape.GetMesh());
         
-        auto &shapeMaterial = shape.GetMaterial();
-        shapeMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
-        childEntity.AddComponent<Object::Component::Material>(shapeMaterial);
+        {
+            auto &shapeMaterial = shape.GetMaterial();
+            if (!shapeMaterial.diffuseTexName.empty())
+            {
+                shapeMaterial.diffuseTexName = "asset/car2/" + shapeMaterial.diffuseTexName;
+            }
+            else {
+                shapeMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+            }
 
+            childEntity.AddComponent<Object::Component::Material>(shapeMaterial);
+        }
+        
         childEntity.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 2.0f, 0.0f));
 
         childEntity.AddComponent<ChildOffset>();
@@ -278,4 +297,8 @@ Engine::Entity CreateLight(Engine::Core &core)
                                       .intensity = 3.0f,
                                       .radius = 100.0f,
                                       .falloff = 1.0f});
+
+    auto ambientLight = core.CreateEntity();
+    ambientLight.AddComponent<Object::Component::AmbientLight>(
+        Object::Component::AmbientLight{.color = glm::vec3(0.4f, 0.4f, 0.4f)});
 }

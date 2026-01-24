@@ -37,7 +37,7 @@ void Setup(Engine::Core &core)
 {
     // Option to lock the cursor to the window
     auto &window = core.GetResource<Window::Resource::Window>();
-    window.MaskCursor();
+    // window.MaskCursor();
 
     CreateCheckeredFloor(core);
     LoadCourse(core, "asset/course/Untitled.obj", "asset/course/collisions.obj");
@@ -75,7 +75,7 @@ class GraphicExampleError : public std::runtime_error {
 
 int main(void)
 {
-    spdlog::set_level(spdlog::level::err);
+    spdlog::set_level(spdlog::level::info);
     Engine::Core core;
 
     core.AddPlugins<Window::Plugin, DefaultPipeline::Plugin, Input::Plugin, CameraMovement::Plugin, Physics::Plugin>();
