@@ -101,7 +101,17 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     using enum Physics::Component::WheelIndex;
     using enum Physics::Component::DrivetrainType;
 
-    Object::Component::Mesh chassisMesh = Object::Utils::GenerateBoxMesh(1.0f, 0.8f, 2.0f);
+    Object::Component::Mesh chassisMesh;
+    try
+    {
+        Object::OBJLoader loader("asset/gt3rs_test.obj");
+        chassisMesh = loader.GetMesh();
+    }
+    catch (const Object::OBJLoaderError &e)
+    {
+        std::cerr << "Failed to load vehicle chassis mesh: " << e.what() << std::endl;
+        chassisMesh = Object::Utils::GenerateBoxMesh(1.0f, 0.8f, 2.0f);
+    }
     Object::Component::Mesh wheelMesh = Object::Utils::GenerateWheelMesh(0.4f, 0.3f);
 
     Physics::Component::WheelSettings frontWheel = Physics::Component::WheelSettings::CreateFrontWheel();
@@ -128,7 +138,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetWheelSettings(RearLeft, rearWheel)
                              .SetWheelSettings(RearRight, rearWheel)
                              .SetDrivetrain(RWD)
-                             .SetChassisMass(1200.0f)
+                             .SetChassisMass(500.0f)
                              .SetChassisHalfExtents(glm::vec3(0.5f, 0.4f, 1.0f))
                              .Build(core);
 
