@@ -1,0 +1,575 @@
+# Blender 5.0.1 MTL File: 'None'
+# www.blender.org
+
+newmtl Cockpit_LR.003
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt.png
+map_Ks texture/Cockpit_LR.png
+map_Bump texture/Cockpit_LR_NM.png
+
+newmtl Cockpit_LR_Skin_custom.003
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/Cockpit_LR.png
+map_Bump texture/Cockpit_LR_NM.png
+
+newmtl Cockpit_LR_rollbar.003
+Ns 79.999985
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/detail_rollcage.png
+map_Ks texture/Cockpit_LR.png
+map_Bump texture/FLAT_NM.png
+
+newmtl DAMAGE_GLASS.003
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/DAMAGE_GLASS_color.png
+map_Bump texture/DAMAGE_GLASS.png
+
+newmtl EXT_AT_Light.003
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.178000 0.178000 0.178000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+map_Bump texture/Glass_and_lights_NM.png
+
+newmtl EXT_Carpaint.004
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/metal_detail.png
+map_Ks texture/Skin_00.png
+map_Bump texture/DAMAGE_NM.png
+
+newmtl EXT_Carpaint_Aluminium.003
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/metal_detail_spoiler.png
+map_Ks texture/Skin_00.png
+map_Bump texture/FLAT_NM.png
+
+newmtl EXT_Carpaint_Plastic.003
+Ns 15.000002
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/PlasticDetail.png
+map_Ks texture/Skin_00.png
+map_Bump texture/DAMAGE_NM.png
+
+newmtl EXT_Flat_Light.003
+Ns 70.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.600000 0.600000 0.600000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+map_Bump texture/Glass_and_lights_NM.png
+
+newmtl EXT_Front_Light.003
+Ns 25.000004
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/PlasticDetail.png
+map_Ks texture/Lights_Chrome.png
+map_Bump texture/FLAT_NM.png
+
+newmtl EXT_Front_Light_chrome.003
+Ns 150.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.600000 0.600000 0.600000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Lights_Chrome.png
+map_Bump texture/FLAT_NM.png
+
+newmtl EXT_Glass_Light_INT.003
+Ns 200.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.693000 0.693000 0.693000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+map_Bump texture/Glass_and_lights_NM.png
+
+newmtl EXT_Glass_Windows.003
+Ns 650.000000
+Ka 1.000000 1.000000 1.000000
+Ks 2.000000 2.000000 2.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+map_Bump texture/Glass_and_lights_NM.png
+
+newmtl EXT_Glass_Windows_black.003
+Ns 499.999969
+Ka 1.000000 1.000000 1.000000
+Ks 1.500000 1.500000 1.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+
+newmtl EXT_Glass_light_EXT.003
+Ns 399.999969
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Glass_and_lights.png
+map_Bump texture/Glass_and_lights_NM.png
+
+newmtl EXT_Logos.003
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/LOGO.png
+map_Bump texture/LOGO_NM.png
+
+newmtl EXT_Mechanics_Flat.003
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Mechanics_Details.png
+
+newmtl EXT_Mechanics_aluminium.003
+Ns 45.000000
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/exhaust_detail.png
+map_Ks texture/Mechanics_Details.png
+map_Bump texture/FLAT_NM.png
+
+newmtl EXT_PLATE_plastic.003
+Ns 29.999998
+Ka 1.000000 1.000000 1.000000
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Plate_D.png
+map_Bump texture/Plate_NM.png
+
+newmtl EXT_grid.003
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Grille2_D.png
+map_Bump texture/Grille2_NM.png
+
+newmtl INT_Alcantara.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Belts.002
+Ns 25.000004
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/INT_Belt.png
+map_Bump texture/INT_Belt_NM.png
+
+newmtl INT_Carbon.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/MAT_Carbon_1.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Carpaint.002
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/metal_detail.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Carpet_Base.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Carpet.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Carpet_fine.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Carpet.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Custom_Gauges.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd texture/INT_Custom_Gauge.png
+
+newmtl INT_DECALS_Emissive.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd texture/INT_Decals_DIF.png
+
+newmtl INT_DECALS_Emissive_REF.002
+Ns 79.999985
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+
+newmtl INT_DECALS_Flat.002
+Ns 35.000008
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Flat_alfa.002
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Flat_alfa_LOGOs.003
+Ns 0.999999
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Metal.002
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.400000 0.400000 0.400000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Metal_alfa.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Plastic_base.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Plastic_ref.002
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_DECALS_Rubber.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.030000 0.030000 0.030000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Decals_DIF.png
+map_Bump texture/INT_Decals_NM.png
+
+newmtl INT_Extra_Belts.003
+Ns 25.000004
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/Extra_Belts_DIFF.png
+map_Bump texture/Extra_Belts_NM.png
+
+newmtl INT_Gauges_AT.002
+Ns 45.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Gauges.png
+
+newmtl INT_Glass.002
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Glass.png
+
+newmtl INT_Logo.002
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.400000 0.400000 0.400000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/LOGO.png
+map_Bump texture/LOGO_NM.png
+
+newmtl INT_Metal_Alu.002
+Ns 25.000004
+Ka 1.000000 1.000000 1.000000
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Metal_Rollbar.002
+Ns 79.999985
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/detail_rollcage.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Plastic_Flat.002
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/PlasticDetail.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Plastic_Grey_satinata.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/PlasticDetail.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Plastic_Speaker_Octagon.002
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Speakers_octagon.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Plastic_Speaker_base.002
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Speakers.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Skin_Grey.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/leather_top.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Skin_White.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/INT_Occlusion.png
+map_Bump texture/FLAT_NM.png
+
+newmtl INT_Stich.002
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/alcnt_bottom.png
+map_Ks texture/INT_Stiches_DIFF.png
+map_Bump texture/INT_Stiches_NM.png
+
+newmtl INT_Stickers.002
+Ns 0.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd texture/INT_Stickers.png
+map_d texture/INT_Stickers.png
+
+newmtl INT_Windows.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd texture/INTERNAL_glass.png
+
+newmtl MIRROR.003
+Ns 250.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.300000 0.300000 0.300000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd texture/Mirror.png

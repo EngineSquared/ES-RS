@@ -95,7 +95,6 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
         glm::vec3 vehiclePos = vehicleTransform.GetPosition();
         glm::quat vehicleRot = vehicleTransform.GetRotation();
 
-        // Target position (center of the vehicle, slightly elevated)
         glm::vec3 targetPos = vehiclePos + glm::vec3(0.0f, 1.0f, 0.0f);
 
         float horizontalDistance = _distance * std::cos(_pitch);
@@ -109,7 +108,6 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
 
         transform.SetPosition(cameraPosition);
 
-        // Always look at the target point on the vehicle
         glm::quat lookRotation =
             CameraMovement::Utils::ComputeLookAtQuaternion(cameraPosition, targetPos, glm::vec3(0.0f, 1.0f, 0.0f));
         transform.SetRotation(lookRotation);
@@ -153,6 +151,7 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
             _pitch += dy * sensitivity;
 
             // Clamp pitch to avoid gimbal lock and looking from directly above/below
+            // TODO: reactivate
             constexpr float maxPitch = 1.48f; // ~85 degrees
             constexpr float minPitch = -0.1f; // ~-5.7 degrees (slightly below horizon)
             _pitch = std::max(minPitch, std::min(maxPitch, _pitch));

@@ -5,3 +5,5 @@
 void CreateCheckeredFloor(Engine::Core &core);
 
 Engine::Entity CreateVehicle(Engine::Core &core);
+
+Engine::Entity CreateLight(Engine::Core &core);
