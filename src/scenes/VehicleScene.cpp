@@ -118,7 +118,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
     try
     {
-        Object::OBJLoader loader("asset/car/gt3rs_test2.obj");
+        Object::OBJLoader loader("asset/car/gt3rs_test.obj");
         bool foundShape = false;
 
         for (auto &shape : loader.GetShapes())
