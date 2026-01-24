@@ -175,8 +175,8 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     }
 
     chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
-    float wheelRadius = 0.3f;
-    float wheelWidth = 0.3f;
+    float wheelRadius = 0.692f / 2.0f;
+    float wheelWidth = 0.277f;
 
     Object::Component::Mesh wheelMesh = Object::Utils::GenerateWheelMesh(wheelRadius, wheelWidth);
 
@@ -196,11 +196,21 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     rearWheel.suspensionMinLength = 0.1f;
     rearWheel.suspensionMaxLength = 0.3f;
     
-    glm::vec3 frontLeftWheelPos = glm::vec3(-1.0f, -0.5f, 1.5f);
-    glm::vec3 frontRightWheelPos = glm::vec3(1.0f, -0.5f, 1.5f);
-    glm::vec3 rearLeftWheelPos = glm::vec3(-1.0f, -0.5f, -1.5f);
-    glm::vec3 rearRightWheelPos = glm::vec3(1.0f, -0.5f, -1.5f);
+    glm::vec3 frontLeftWheelPos = glm::vec3(-0.9f, -0.3f, 1.2f);
+    glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.2f);
+    glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.2f);
+    glm::vec3 rearRightWheelPos = glm::vec3(0.9f, -0.3f, -1.2f);
     glm::vec3 chassisPos = glm::vec3(0.0f, 3.0f, 0.0f);
+
+    // GT3 RS
+    Physics::Component::EngineSettings engineSettings;
+    engineSettings.maxRPM = 9000.0f;
+    engineSettings.minRPM = 950.0f;
+    engineSettings.maxTorque = 465.0f; // Nm
+    engineSettings.inertia = 0.25f;
+    engineSettings.angularDamping = 0.15f;
+
+    float chassisMass = 1450.0f; // kg
 
     Physics::Builder::VehicleBuilder<4> builder;
     auto vehicleEntity =
@@ -214,8 +224,9 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetWheelSettings(RearLeft, rearWheel)
                              .SetWheelSettings(RearRight, rearWheel)
                              .SetDrivetrain(RWD)
-                             //.SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos, rearRightWheelPos)
-                             .SetChassisMass(500.0f)
+                             .SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos, rearRightWheelPos)
+                             .SetChassisMass(chassisMass)
+                             .SetEngine(engineSettings)
                              .SetChassisHalfExtents(glm::vec3(0.5f, 0.4f, 1.0f))
                              .Build(core);
 
