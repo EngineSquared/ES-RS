@@ -152,9 +152,9 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
 
             // Clamp pitch to avoid gimbal lock and looking from directly above/below
             // TODO: reactivate
-            constexpr float maxPitch = 1.48f; // ~85 degrees
-            constexpr float minPitch = -0.1f; // ~-5.7 degrees (slightly below horizon)
-            _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
+            // constexpr float maxPitch = 1.48f; // ~85 degrees
+            // constexpr float minPitch = -0.1f; // ~-5.7 degrees (slightly below horizon)
+            // _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
         }
 
         _lastMouseX = xpos;
