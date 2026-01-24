@@ -20,6 +20,7 @@
 #include "resource/CameraControlSystemManager.hpp"
 #include "scenes/VehicleScene.hpp"
 #include "system/VehicleInput.hpp"
+#include "system/ChildFollowParentSystem.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core)
@@ -41,6 +42,7 @@ void Setup(Engine::Core &core)
     CreateCheckeredFloor(core);
     LoadCourse(core, "asset/course/Untitled.obj", "asset/course/collisions.obj");
     auto vehicle = CreateVehicle(core);
+    auto light = CreateLight(core);
 
     auto camera = core.CreateEntity();
 
@@ -54,6 +56,7 @@ void Setup(Engine::Core &core)
     core.RegisterSystem(EscapeKeySystem);
 
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
+    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(ChildFollowParentSystem);
 
     auto chaseBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
     cameraManager.SetBehavior(chaseBehavior);

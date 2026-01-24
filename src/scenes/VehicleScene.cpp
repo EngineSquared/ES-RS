@@ -1,10 +1,12 @@
 #include "scenes/VehicleScene.hpp"
 #include "component/Camera.hpp"
 #include "component/PlayerVehicle.hpp"
+#include "component/ChildOffset.hpp"
 
 #include "Graphic.hpp"
 #include "Object.hpp"
 #include "Physics.hpp"
+#include "Relationship.hpp"
 #include "builder/VehicleBuilder.hpp"
 #include "component/Transform.hpp"
 #include "component/VehicleController.hpp"
@@ -12,7 +14,8 @@
 #include "utils/BoxGenerator.hpp"
 
 #include <glm/glm.hpp>
-#include <iostream>
+#include "Logger.hpp"
+#include "spdlog/fmt/fmt.h"
 
 namespace {
 constexpr float kCourseSurfaceY = 50.0f;
@@ -32,7 +35,7 @@ void CreateCheckeredFloor(Engine::Core &core)
     const float totalSize = tileSize * tilesPerSide;
     const float startOffset = -totalSize / 2.0f;
 
-    std::cout << "Creating " << tilesPerSide << "x" << tilesPerSide << " checkered floor..." << std::endl;
+    Log::Info(fmt::format("Creating {}x{} checkered floor...", tilesPerSide, tilesPerSide));
 
     // Create a single large physics floor to avoid ghost collisions at tile edges
     auto floorPhysics = core.CreateEntity();
@@ -95,6 +98,9 @@ void LoadCourse(Engine::Core &core, const std::string &modelPath, const std::str
 
 /**
  * @brief Create a drivable vehicle using VehicleBuilder
+ *
+ * Loads all shapes from the car OBJ file. The main body shape is used for physics,
+ * while other shapes are created as child entities that follow the main body.
  */
 Engine::Entity CreateVehicle(Engine::Core &core)
 {
@@ -102,27 +108,62 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     using enum Physics::Component::DrivetrainType;
 
     Object::Component::Mesh chassisMesh;
+    Object::Component::Material chassisMaterial;
+    std::vector<Object::Resource::Shape> otherShapes;
+
+    chassisMaterial.diffuse = glm::vec3(0.4f, 0.7f, 0.95f);
+    chassisMaterial.ambient = chassisMaterial.diffuse * 0.3f;
+    chassisMaterial.specular = glm::vec3(0.3f);
+    chassisMaterial.shininess = 32.0f;
+
     try
     {
-        Object::OBJLoader loader("asset/gt3rs_test.obj");
-        chassisMesh = loader.GetMesh();
+        Object::OBJLoader loader("asset/car/gt3rs_test2.obj");
+        bool foundShape = false;
+
+        for (auto &shape : loader.GetShapes())
+        {
+            if (shape.GetName() == "GEO_Body_SUB3")
+            {
+                Log::Debug(fmt::format("Found vehicle body shape: {}", shape.GetName()));
+                chassisMesh = shape.GetMesh();
+                chassisMaterial = shape.GetMaterial();
+                Log::Warn(fmt::format("chassis texture name: {}", chassisMaterial.ambientTexName));
+                foundShape = true;
+            }
+            else
+            {
+                otherShapes.push_back(shape);
+                Log::Debug(fmt::format("Found additional vehicle shape: {}", shape.GetName()));
+            }
+        }
+
+        if (!foundShape)
+        {
+            Log::Warn("Shape GEO_Body_SUB3 not found, using full mesh.");
+            chassisMesh = loader.GetMesh();
+        }
     }
     catch (const Object::OBJLoaderError &e)
     {
-        std::cerr << "Failed to load vehicle chassis mesh: " << e.what() << std::endl;
+        Log::Error(fmt::format("Failed to load vehicle chassis mesh: {}", e.what()));
         chassisMesh = Object::Utils::GenerateBoxMesh(1.0f, 0.8f, 2.0f);
     }
-    Object::Component::Mesh wheelMesh = Object::Utils::GenerateWheelMesh(0.4f, 0.3f);
+    chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
+    float wheelRadius = 0.3f;
+    float wheelWidth = 0.3f;
+
+    Object::Component::Mesh wheelMesh = Object::Utils::GenerateWheelMesh(wheelRadius, wheelWidth);
 
     Physics::Component::WheelSettings frontWheel = Physics::Component::WheelSettings::CreateFrontWheel();
-    frontWheel.radius = 0.4f;
-    frontWheel.width = 0.3f;
+    frontWheel.radius = wheelRadius;
+    frontWheel.width = wheelWidth;
     frontWheel.longitudinalFriction = 2.5f;
     frontWheel.lateralFriction = 2.0f;
 
     Physics::Component::WheelSettings rearWheel = Physics::Component::WheelSettings::CreateRearWheel();
-    rearWheel.radius = 0.4f;
-    rearWheel.width = 0.3f;
+    rearWheel.radius = wheelRadius;
+    rearWheel.width = wheelWidth;
     rearWheel.longitudinalFriction = 2.5f;
     rearWheel.lateralFriction = 2.0f;
 
@@ -151,7 +192,43 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     // Use engine default texture to avoid missing texture warnings while keeping a plain material
     //chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
     vehicleEntity.AddComponent<Object::Component::Material>(chassisMaterial);
-
     vehicleEntity.AddComponent<PlayerVehicle>();
+
+    vehicleEntity.AddComponent<Relationship::Component::Relationship>();
+
+    for (auto &shape : otherShapes)
+    {
+        auto childEntity = core.CreateEntity();
+
+        childEntity.AddComponent<Object::Component::Mesh>(shape.GetMesh());
+        
+        auto &shapeMaterial = shape.GetMaterial();
+        shapeMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+        childEntity.AddComponent<Object::Component::Material>(shapeMaterial);
+
+        childEntity.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 2.0f, 0.0f));
+
+        childEntity.AddComponent<ChildOffset>();
+
+        childEntity.AddComponent<Relationship::Component::Relationship>();
+
+        Relationship::Utils::SetChildOf(childEntity, vehicleEntity);
+
+        Log::Debug(fmt::format("Created child entity for shape: {}", shape.GetName()));
+    }
+
+    Log::Info(fmt::format("Vehicle created with {} child shapes", otherShapes.size()));
+
     return vehicleEntity;
+}
+
+Engine::Entity CreateLight(Engine::Core &core)
+{
+    auto pointLight = core.CreateEntity();
+    pointLight.AddComponent<Object::Component::Transform>(glm::vec3(-2.0f, 7.0f, -1.0f));
+    pointLight.AddComponent<Object::Component::PointLight>(
+        Object::Component::PointLight{.color = glm::vec3(1.0f, 1.0f, 1.0f),
+                                      .intensity = 3.0f,
+                                      .radius = 100.0f,
+                                      .falloff = 1.0f});
 }
