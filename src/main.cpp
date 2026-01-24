@@ -75,6 +75,7 @@ class GraphicExampleError : public std::runtime_error {
 
 int main(void)
 {
+    spdlog::set_level(spdlog::level::err);
     Engine::Core core;
 
     core.AddPlugins<Window::Plugin, DefaultPipeline::Plugin, Input::Plugin, CameraMovement::Plugin, Physics::Plugin>();
