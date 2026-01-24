@@ -166,8 +166,8 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
      */
     void HandleScroll(Engine::Core & /*core*/, double /*xoffset*/, double yoffset)
     {
-        _distance -= static_cast<float>(yoffset) * 1.5f;
-        _distance = std::max(2.0f, std::min(50.0f, _distance));
+        _distance -= static_cast<float>(yoffset) * 1.1f;
+        _distance = std::max(0.001f, std::min(50.0f, _distance));
     }
 
     Engine::Core *_core;
