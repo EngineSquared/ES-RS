@@ -67,6 +67,22 @@ void CreateCheckeredFloor(Engine::Core &core)
     }
 }
 
+
+/**
+ * @brief Adjust a mesh position by a given offset
+ * 
+ * @param mesh  Mesh to adjust
+ * @param offset Offset to apply
+ */
+void AdjustMeshPosition(Object::Component::Mesh &mesh, const glm::vec3 &offset)
+{
+    auto &vertices = mesh.GetVertices();
+    for (size_t i = 0; i < vertices.size(); ++i)
+    {
+        mesh.SetVertexAt(i, vertices[i] + offset);
+    }
+}
+
 /**
  * @brief Create a drivable vehicle using VehicleBuilder
  *
@@ -120,6 +136,15 @@ Engine::Entity CreateVehicle(Engine::Core &core)
         Log::Error(fmt::format("Failed to load vehicle chassis mesh: {}", e.what()));
         chassisMesh = Object::Utils::GenerateBoxMesh(1.0f, 0.8f, 2.0f);
     }
+
+    // Adjust chassis mesh and shapes mesh with a Y offset of -0.69 to set the origin at the bottom of the chassis
+    AdjustMeshPosition(chassisMesh, glm::vec3(0.0f, -0.69f, 0.0f));
+    for (auto &shape : otherShapes)
+    {
+        auto &mesh = shape.GetMesh();
+        AdjustMeshPosition(mesh, glm::vec3(0.0f, -0.69f, 0.0f));
+    }
+
     chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
     float wheelRadius = 0.3f;
     float wheelWidth = 0.3f;
@@ -131,15 +156,25 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     frontWheel.width = wheelWidth;
     frontWheel.longitudinalFriction = 2.5f;
     frontWheel.lateralFriction = 2.0f;
+    frontWheel.suspensionMinLength = 0.1f;
+    frontWheel.suspensionMaxLength = 0.3f;
 
     Physics::Component::WheelSettings rearWheel = Physics::Component::WheelSettings::CreateRearWheel();
     rearWheel.radius = wheelRadius;
     rearWheel.width = wheelWidth;
     rearWheel.longitudinalFriction = 2.5f;
     rearWheel.lateralFriction = 2.0f;
+    rearWheel.suspensionMinLength = 0.1f;
+    rearWheel.suspensionMaxLength = 0.3f;
+    
+    glm::vec3 frontLeftWheelPos = glm::vec3(-1.0f, -0.5f, 1.5f);
+    glm::vec3 frontRightWheelPos = glm::vec3(1.0f, -0.5f, 1.5f);
+    glm::vec3 rearLeftWheelPos = glm::vec3(-1.0f, -0.5f, -1.5f);
+    glm::vec3 rearRightWheelPos = glm::vec3(1.0f, -0.5f, -1.5f);
+    glm::vec3 chassisPos = glm::vec3(0.0f, 3.0f, 0.0f);
 
     Physics::Builder::VehicleBuilder<4> builder;
-    auto vehicleEntity = builder.SetChassisMesh(chassisMesh, glm::vec3(0.0f, 2.0f, 0.0f))
+    auto vehicleEntity = builder.SetChassisMesh(chassisMesh, chassisPos)
                              .SetWheelMesh(FrontLeft, wheelMesh)
                              .SetWheelMesh(FrontRight, wheelMesh)
                              .SetWheelMesh(RearLeft, wheelMesh)
@@ -149,6 +184,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetWheelSettings(RearLeft, rearWheel)
                              .SetWheelSettings(RearRight, rearWheel)
                              .SetDrivetrain(RWD)
+                             //.SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos, rearRightWheelPos)
                              .SetChassisMass(500.0f)
                              .SetChassisHalfExtents(glm::vec3(0.5f, 0.4f, 1.0f))
                              .Build(core);
