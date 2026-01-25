@@ -170,8 +170,11 @@ void LoadCourse(Engine::Core &core)
     auto colliderEntity = core.CreateEntity();
     colliderEntity.AddComponent<Object::Component::Mesh>(courseCollider.GetMesh());
     colliderEntity.AddComponent<Object::Component::Transform>(courseOffset, courseScale, courseRotation);
+    
+    Physics::Component::MeshCollider meshCollider;
+    colliderEntity.AddComponent<Physics::Component::MeshCollider>(meshCollider);
+    
     colliderEntity.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
-    colliderEntity.AddComponent<Physics::Component::MeshCollider>(0.02f);
 }
 
 /**
