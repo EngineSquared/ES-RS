@@ -1,4 +1,5 @@
 #include "scenes/VehicleScene.hpp"
+#include "component/Camera.hpp"
 #include "component/PlayerVehicle.hpp"
 
 #include "Graphic.hpp"
@@ -7,9 +8,16 @@
 #include "builder/VehicleBuilder.hpp"
 #include "component/Transform.hpp"
 #include "component/VehicleController.hpp"
+#include "resource/OBJLoader.hpp"
+#include "utils/BoxGenerator.hpp"
 
 #include <glm/glm.hpp>
 #include <iostream>
+
+namespace {
+constexpr float kCourseSurfaceY = 50.0f;
+constexpr float kVehicleSpawnYOffset = 2.0f;
+} // namespace
 
 /**
  * @brief Create a checkered floor (200x200 meters) with alternating grey tiles
@@ -28,7 +36,7 @@ void CreateCheckeredFloor(Engine::Core &core)
 
     // Create a single large physics floor to avoid ghost collisions at tile edges
     auto floorPhysics = core.CreateEntity();
-    floorPhysics.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 0.0f, 0.0f));
+    floorPhysics.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, kCourseSurfaceY, 0.0f));
     auto floorCollider = Physics::Component::BoxCollider(glm::vec3(totalSize / 2.0f, 0.1f, totalSize / 2.0f));
     floorPhysics.AddComponent<Physics::Component::BoxCollider>(floorCollider);
     floorPhysics.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
@@ -47,7 +55,7 @@ void CreateCheckeredFloor(Engine::Core &core)
 
             auto tile = Object::Helper::CreatePlane(core, {.width = tileSize,
                                                            .depth = tileSize,
-                                                           .position = glm::vec3(posX, 0.0f, posZ),
+                                                           .position = glm::vec3(posX, kCourseSurfaceY, posZ),
                                                            .rotation = glm::vec3(0.0f, 0.0f, 0.0f)});
 
             Object::Component::Material tileMaterial;
@@ -56,12 +64,33 @@ void CreateCheckeredFloor(Engine::Core &core)
             tileMaterial.specular = glm::vec3(0.1f);
             tileMaterial.shininess = 16.0f;
             // Use engine default texture (1x1) so material color is used without external textures
-            tileMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+            //tileMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
             tile.AddComponent<Object::Component::Material>(tileMaterial);
 
             // No physics on visual tiles - single floor body handles collision
         }
     }
+}
+
+/**
+ * @brief Load a course from a file
+ * @param core The core instance
+ * @param filePath The path to the course file to load
+ */
+void LoadCourse(Engine::Core &core, const std::string &modelPath, const std::string &colliderPath)
+{
+    std::cout << "Loading course: " << modelPath << " with collider: " << colliderPath << std::endl;
+    Object::OBJLoader courseModel(modelPath);
+    Object::OBJLoader courseCollider(colliderPath);
+    auto mesh = courseModel.GetMesh();
+    auto materials = courseModel.GetMaterials();
+    auto colliderShapes = courseCollider.GetShapes();
+    auto courseEntity = core.CreateEntity();
+
+    courseEntity.AddComponent<Object::Component::Mesh>(mesh);
+    courseEntity.AddComponent<Object::Component::Material>(materials[0]);
+    courseEntity.AddComponent<Physics::Component::BoxCollider>(Physics::Component::BoxCollider(glm::vec3(20.0f, 0.1f, 20.0f)));
+    courseEntity.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
 }
 
 /**
@@ -88,7 +117,8 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     rearWheel.lateralFriction = 2.0f;
 
     Physics::Builder::VehicleBuilder<4> builder;
-    auto vehicleEntity = builder.SetChassisMesh(chassisMesh, glm::vec3(0.0f, 2.0f, 0.0f))
+    auto vehicleEntity =
+        builder.SetChassisMesh(chassisMesh, glm::vec3(0.0f, kCourseSurfaceY + kVehicleSpawnYOffset, 0.0f))
                              .SetWheelMesh(FrontLeft, wheelMesh)
                              .SetWheelMesh(FrontRight, wheelMesh)
                              .SetWheelMesh(RearLeft, wheelMesh)
@@ -109,7 +139,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     chassisMaterial.specular = glm::vec3(0.3f);
     chassisMaterial.shininess = 32.0f;
     // Use engine default texture to avoid missing texture warnings while keeping a plain material
-    chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+    //chassisMaterial.ambientTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
     vehicleEntity.AddComponent<Object::Component::Material>(chassisMaterial);
 
     vehicleEntity.AddComponent<PlayerVehicle>();

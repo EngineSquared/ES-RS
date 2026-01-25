@@ -35,6 +35,7 @@ void EscapeKeySystem(Engine::Core &core)
 void Setup(Engine::Core &core)
 {
     CreateCheckeredFloor(core);
+    LoadCourse(core, "asset/course/Untitled.obj", "asset/course/collisions.obj");
     auto vehicle = CreateVehicle(core);
 
     auto camera = core.CreateEntity();
