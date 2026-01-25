@@ -17,10 +17,6 @@
 #include "Logger.hpp"
 #include "spdlog/fmt/fmt.h"
 
-namespace {
-constexpr float kCourseSurfaceY = 50.0f;
-constexpr float kVehicleSpawnYOffset = 2.0f;
-} // namespace
 /**
  * @brief Invert mesh on the X axis to go from right-handed to left-handed coordinate system
  * 
@@ -65,7 +61,7 @@ void InvertMeshUVs(Object::Component::Mesh &mesh, bool invertU = true, bool inve
  * Uses a single large physics body to avoid ghost collisions at tile edges,
  * while creating separate visual tiles for the checkered pattern.
  */
-void CreateCheckeredFloor(Engine::Core &core)
+/* void CreateCheckeredFloor(Engine::Core &core)
 {
     const float tileSize = 10.0f;
     const int tilesPerSide = 20; // 20 tiles * 10m = 200m
@@ -110,7 +106,7 @@ void CreateCheckeredFloor(Engine::Core &core)
             // No physics on visual tiles - single floor body handles collision
         }
     }
-}
+} */
 
 
 /**
@@ -141,6 +137,11 @@ void LoadCourse(Engine::Core &core)
         Object::OBJLoader("asset/course/course_ground.obj"),
         Object::OBJLoader("asset/course/course_misc.obj")
     };
+    const auto courseOffset = glm::vec3(10.0f, 0.0f, 1530.0f);
+    const auto courseScale = glm::vec3(2.5f, 2.5f, 2.5f);
+    const auto courseRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
+
+    Object::OBJLoader courseCollider("asset/course/collisions.obj");
 
     for (auto &loader : courseLoaders)
     {
@@ -161,11 +162,16 @@ void LoadCourse(Engine::Core &core)
 
             coursePart.AddComponent<Object::Component::Mesh>(shape.GetMesh());
             coursePart.AddComponent<Object::Component::Material>(shapeMaterial);
-            coursePart.AddComponent<Object::Component::Transform>(glm::vec3(10.0f, 0.0f, 1530.0f), glm::vec3(3.0f, 3.0f, 3.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
-            coursePart.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
-            coursePart.AddComponent<Physics::Component::MeshCollider>(0.05f);
+            coursePart.AddComponent<Object::Component::Transform>(courseOffset, courseScale, courseRotation);
         }
     }
+
+    Log::Info(fmt::format("Creating course collider"));
+    auto colliderEntity = core.CreateEntity();
+    colliderEntity.AddComponent<Object::Component::Mesh>(courseCollider.GetMesh());
+    colliderEntity.AddComponent<Object::Component::Transform>(courseOffset, courseScale, courseRotation);
+    colliderEntity.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
+    colliderEntity.AddComponent<Physics::Component::MeshCollider>(0.02f);
 }
 
 /**
@@ -273,7 +279,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.1f);
     glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.35f);
     glm::vec3 rearRightWheelPos = glm::vec3(0.9f, -0.3f, -1.35f);
-    glm::vec3 chassisPos = glm::vec3(0.0f, kCourseSurfaceY + kVehicleSpawnYOffset, 0.0f);
+    glm::vec3 chassisPos = glm::vec3(0.0f, 150.0f, 0.0f);
 
     // GT3 RS
     Physics::Component::EngineSettings engineSettings;
@@ -354,4 +360,5 @@ Engine::Entity CreateLight(Engine::Core &core)
     auto ambientLight = core.CreateEntity();
     ambientLight.AddComponent<Object::Component::AmbientLight>(
         Object::Component::AmbientLight{.color = glm::vec3(0.4f, 0.4f, 0.4f)});
+    return ambientLight;
 }
