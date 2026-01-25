@@ -19,7 +19,9 @@
 
 #include "component/PlayerVehicle.hpp"
 #include "resource/CameraControlSystemManager.hpp"
-#include "scenes/VehicleScene.hpp"
+#include "scenes/LoadCourse.hpp"
+#include "scenes/CreateVehicle.hpp"
+#include "scenes/CreateLight.hpp"
 #include "system/VehicleInput.hpp"
 #include "system/ChildFollowParentSystem.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"

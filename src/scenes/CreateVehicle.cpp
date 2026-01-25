@@ -1,5 +1,6 @@
-#include "scenes/VehicleScene.hpp"
-#include "component/Camera.hpp"
+#include "scenes/CreateVehicle.hpp"
+#include "scenes/SceneUtils.hpp"
+
 #include "component/PlayerVehicle.hpp"
 #include "component/ChildOffset.hpp"
 
@@ -10,172 +11,10 @@
 #include "builder/VehicleBuilder.hpp"
 #include "component/Transform.hpp"
 #include "component/VehicleController.hpp"
-#include "resource/OBJLoader.hpp"
-#include "utils/BoxGenerator.hpp"
 
 #include <glm/glm.hpp>
 #include "Logger.hpp"
 #include "spdlog/fmt/fmt.h"
-
-/**
- * @brief Invert mesh on the X axis to go from right-handed to left-handed coordinate system
- *
- * @param mesh  Mesh to invert
- * @return Inverted mesh
- */
-Object::Component::Mesh InvertMeshX(const Object::Component::Mesh &mesh)
-{
-    Object::Component::Mesh invertedMesh = mesh;
-    auto &vertices = invertedMesh.GetVertices();
-    for (size_t i = 0; i < vertices.size(); ++i)
-    {
-        invertedMesh.SetVertexAt(i, glm::vec3(-vertices[i].x, vertices[i].y, vertices[i].z));
-    }
-    return invertedMesh;
-}
-
-/**
- * @brief Invert mesh UVs (U and/or V) in-place.
- *
- * @param mesh Mesh to modify
- * @param invertU If true, set u -> 1 - u
- * @param invertV If true, set v -> 1 - v
- */
-void InvertMeshUVs(Object::Component::Mesh &mesh, bool invertU = true, bool invertV = false)
-{
-    const auto &texCoords = mesh.GetTexCoords();
-    for (size_t i = 0; i < texCoords.size(); ++i)
-    {
-        glm::vec2 uv = texCoords[i];
-        if (invertU)
-            uv.x = 1.0f - uv.x;
-        if (invertV)
-            uv.y = 1.0f - uv.y;
-        mesh.SetTexCoordAt(i, uv);
-    }
-}
-
-/**
- * @brief Create a checkered floor (200x200 meters) with alternating grey tiles
- *
- * Uses a single large physics body to avoid ghost collisions at tile edges,
- * while creating separate visual tiles for the checkered pattern.
- */
-/* void CreateCheckeredFloor(Engine::Core &core)
-{
-    const float tileSize = 10.0f;
-    const int tilesPerSide = 20; // 20 tiles * 10m = 200m
-    const float totalSize = tileSize * tilesPerSide;
-    const float startOffset = -totalSize / 2.0f;
-
-    Log::Info(fmt::format("Creating {}x{} checkered floor...", tilesPerSide, tilesPerSide));
-
-    // Create a single large physics floor to avoid ghost collisions at tile edges
-    auto floorPhysics = core.CreateEntity();
-    floorPhysics.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, kCourseSurfaceY, 0.0f));
-    auto floorCollider = Physics::Component::BoxCollider(glm::vec3(totalSize / 2.0f, 0.1f, totalSize / 2.0f));
-    floorPhysics.AddComponent<Physics::Component::BoxCollider>(floorCollider);
-    floorPhysics.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
-
-    // Create visual tiles (no physics) for the checkered pattern
-    for (int x = 0; x < tilesPerSide; ++x)
-    {
-        for (int z = 0; z < tilesPerSide; ++z)
-        {
-            float posX = startOffset + (x * tileSize) + (tileSize / 2.0f);
-            float posZ = startOffset + (z * tileSize) + (tileSize / 2.0f);
-
-            bool isLightTile = (x + z) % 2 == 0;
-            // Use a dark / light grey checker pattern
-            glm::vec3 color = isLightTile ? glm::vec3(0.6f, 0.6f, 0.6f) : glm::vec3(0.2f, 0.2f, 0.2f);
-
-            auto tile = Object::Helper::CreatePlane(core, {.width = tileSize,
-                                                           .depth = tileSize,
-                                                           .position = glm::vec3(posX, kCourseSurfaceY, posZ),
-                                                           .rotation = glm::vec3(0.0f, 0.0f, 0.0f)});
-
-            Object::Component::Material tileMaterial;
-            tileMaterial.diffuse = color;
-            tileMaterial.ambient = color * 0.3f;
-            tileMaterial.specular = glm::vec3(0.1f);
-            tileMaterial.shininess = 16.0f;
-            // Use engine default texture (1x1) so material color is used without external textures
-            // tileMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
-            tile.AddComponent<Object::Component::Material>(tileMaterial);
-
-            // No physics on visual tiles - single floor body handles collision
-        }
-    }
-} */
-
-
-/**
- * @brief Adjust a mesh position by a given offset
- *
- * @param mesh  Mesh to adjust
- * @param offset Offset to apply
- */
-void AdjustMeshPosition(Object::Component::Mesh &mesh, const glm::vec3 &offset)
-{
-    auto &vertices = mesh.GetVertices();
-    for (size_t i = 0; i < vertices.size(); ++i)
-    {
-        mesh.SetVertexAt(i, vertices[i] + offset);
-    }
-}
-
-/**
- * @brief Load a course from a file
- * @param core The core instance
- */
-void LoadCourse(Engine::Core &core)
-{
-    Log::Info(fmt::format("Loading course model"));
-    std::array<Object::OBJLoader, 4> courseLoaders = {
-        Object::OBJLoader("asset/course/course_props.obj"),
-        Object::OBJLoader("asset/course/course_details.obj"),
-        Object::OBJLoader("asset/course/course_ground.obj"),
-        Object::OBJLoader("asset/course/course_misc.obj")
-    };
-    const auto courseOffset = glm::vec3(10.0f, 0.0f, 1530.0f);
-    const auto courseScale = glm::vec3(2.5f, 2.5f, 2.5f);
-    const auto courseRotation = glm::quat(1.0f, 0.0f, 0.0f, 0.0f);
-
-    Object::OBJLoader courseCollider("asset/course/collisions.obj");
-
-    for (auto &loader : courseLoaders)
-    {
-        auto shapes = loader.GetShapes();
-        for (auto &shape : shapes)
-        {
-            auto coursePart = core.CreateEntity();
-            Object::Component::Material shapeMaterial(shape.GetMaterial());
-            if (!shapeMaterial.diffuseTexName.empty())
-            {
-                const std::filesystem::path textureFile = std::filesystem::path(shapeMaterial.diffuseTexName).filename();
-                shapeMaterial.diffuseTexName = ("asset/textures/" + textureFile.string()).c_str();
-            }
-            else
-            {
-                shapeMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
-            }
-
-            coursePart.AddComponent<Object::Component::Mesh>(shape.GetMesh());
-            coursePart.AddComponent<Object::Component::Material>(shapeMaterial);
-            coursePart.AddComponent<Object::Component::Transform>(courseOffset, courseScale, courseRotation);
-        }
-    }
-
-    Log::Info(fmt::format("Creating course collider"));
-    auto colliderEntity = core.CreateEntity();
-    colliderEntity.AddComponent<Object::Component::Mesh>(courseCollider.GetMesh());
-    colliderEntity.AddComponent<Object::Component::Transform>(courseOffset, courseScale, courseRotation);
-    
-    Physics::Component::MeshCollider meshCollider;
-    colliderEntity.AddComponent<Physics::Component::MeshCollider>(meshCollider);
-    
-    colliderEntity.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
-}
 
 /**
  * @brief Create a drivable vehicle using VehicleBuilder
@@ -348,21 +187,4 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     Log::Info(fmt::format("Vehicle created with {} child shapes", otherShapes.size()));
 
     return vehicleEntity;
-}
-
-Engine::Entity CreateLight(Engine::Core &core)
-{
-    auto pointLight = core.CreateEntity();
-    pointLight.AddComponent<Object::Component::Transform>(glm::vec3(-2.0f, 7.0f, -1.0f));
-    pointLight.AddComponent<Object::Component::PointLight>(
-        Object::Component::PointLight{.color = glm::vec3(1.0f, 1.0f, 1.0f),
-                                      .intensity = 3.0f,
-                                      .radius = 100.0f,
-                                      .falloff = 1.0f});
-
-    auto ambientLight = core.CreateEntity();
-    ambientLight.AddComponent<Object::Component::AmbientLight>(
-        Object::Component::AmbientLight{.color = glm::vec3(0.4f, 0.4f, 0.4f)});
-
-    return pointLight;
 }
