@@ -16,7 +16,7 @@
 
 /**
  * @brief Invert mesh on the X axis to go from right-handed to left-handed coordinate system
- * 
+ *
  * @param mesh  Mesh to invert
  * @return Inverted mesh
  */
@@ -108,7 +108,7 @@ void CreateCheckeredFloor(Engine::Core &core)
 
 /**
  * @brief Adjust a mesh position by a given offset
- * 
+ *
  * @param mesh  Mesh to adjust
  * @param offset Offset to apply
  */
@@ -164,7 +164,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                 else {
                     chassisMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
                 }
-                
+
                 Log::Debug(fmt::format("chassis texture name: {}", chassisMaterial.diffuseTexName));
                 foundShape = true;
             }
@@ -221,7 +221,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     rearWheel.lateralFriction = 2.0f;
     rearWheel.suspensionMinLength = 0.1f;
     rearWheel.suspensionMaxLength = 0.3f;
-    
+
     glm::vec3 frontLeftWheelPos = glm::vec3(-0.9f, -0.3f, 1.1f);
     glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.1f);
     glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.35f);
@@ -264,7 +264,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
         auto childEntity = core.CreateEntity();
 
         childEntity.AddComponent<Object::Component::Mesh>(shape.GetMesh());
-        
+
         {
             auto &shapeMaterial = shape.GetMaterial();
             if (!shapeMaterial.diffuseTexName.empty())
@@ -277,7 +277,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
             childEntity.AddComponent<Object::Component::Material>(shapeMaterial);
         }
-        
+
         childEntity.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 2.0f, 0.0f));
 
         childEntity.AddComponent<ChildOffset>();
@@ -307,4 +307,5 @@ Engine::Entity CreateLight(Engine::Core &core)
     auto ambientLight = core.CreateEntity();
     ambientLight.AddComponent<Object::Component::AmbientLight>(
         Object::Component::AmbientLight{.color = glm::vec3(0.4f, 0.4f, 0.4f)});
+    return pointLight;
 }

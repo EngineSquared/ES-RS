@@ -18,16 +18,17 @@ target("ES-RS")
 
     add_includedirs("$(projectdir)/src/")
 
-    add_packages("entt", "glm", "glfw", "spdlog", "fmt", "joltphysics", "stb", "tinyobjloader", "wgpu-native", "glfw3webgpu", "lodepng")
+    add_packages("entt", "glm", "glfw", "spdlog", "fmt", "joltphysics", "stb", "tinyobjloader", "wgpu-native", "glfw3webgpu", "lodepng", "miniaudio")
 
     set_rundir("$(projectdir)")
 
-if is_mode("debug") then
-    add_defines("ES_DEBUG")
-    set_symbols("debug")
-    set_optimize("none")
-end
+    if is_mode("debug") then
+        add_defines("ES_DEBUG")
+        set_symbols("debug")
+        set_optimize("none")
+    end
 
-if is_mode("release") then
-    set_optimize("fastest")
-end
+    if is_mode("release") then
+        set_optimize("fastest")
+    end
+target_end()
