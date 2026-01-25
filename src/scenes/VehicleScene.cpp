@@ -125,6 +125,8 @@ void LoadCourse(Engine::Core &core)
             coursePart.AddComponent<Object::Component::Mesh>(shape.GetMesh());
             coursePart.AddComponent<Object::Component::Material>(shapeMaterial);
             coursePart.AddComponent<Object::Component::Transform>(glm::vec3(10.0f, 0.0f, 1530.0f), glm::vec3(3.0f, 3.0f, 3.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+            coursePart.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
+            coursePart.AddComponent<Physics::Component::MeshCollider>(0.05f);
         }
     }
 }
