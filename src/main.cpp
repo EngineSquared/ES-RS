@@ -4,24 +4,20 @@
  * This example demonstrates how to use the Graphic and Physics plugins together for vehicle simulation.
  **************************************************************************/
 
-#include "Engine.hpp"
-
-#include "CameraMovement.hpp"
-#include "DefaultPipeline.hpp"
-#include "Graphic.hpp"
-#include "Input.hpp"
-#include "Object.hpp"
-#include "Physics.hpp"
-#include "RenderingPipeline.hpp"
+#include "plugin/PhysicsPlugin.hpp"
+#include "plugin/PluginCameraMovement.hpp"
+#include "plugin/PluginDefaultPipeline.hpp"
+#include "plugin/PluginInput.hpp"
+#include "plugin/PluginRmlui.hpp"
+#include "plugin/PluginScene.hpp"
 #include "plugin/PluginWindow.hpp"
+#include "plugin/PluginSound.hpp"
+
+#include "resource/SceneManager.hpp"
 #include "resource/Window.hpp"
 
-#include "component/PlayerVehicle.hpp"
-#include "resource/CameraControlSystemManager.hpp"
-#include "scenes/VehicleScene.hpp"
-#include "system/VehicleInput.hpp"
-#include "system/ChildFollowParentSystem.hpp"
-#include "utils/OrbitalChaseCameraBehavior.hpp"
+#include "scenes/CourseScene.hpp"
+#include "scenes/MainMenu.hpp"
 
 void EscapeKeySystem(Engine::Core &core)
 {
@@ -35,13 +31,10 @@ void EscapeKeySystem(Engine::Core &core)
 
 void Setup(Engine::Core &core)
 {
-    // Option to lock the cursor to the window
     auto &window = core.GetResource<Window::Resource::Window>();
-    // window.MaskCursor();
+    window.SetSize(1280, 720);
 
-    CreateCheckeredFloor(core);
-    auto vehicle = CreateVehicle(core);
-    auto light = CreateLight(core);
+    core.RegisterSystem(EscapeKeySystem);
 
     auto camera = core.CreateEntity();
 
@@ -52,19 +45,9 @@ void Setup(Engine::Core &core)
     cameraManager.SetActiveCamera(camera);
     cameraManager.SetMovementSpeed(3.0f);
 
-    core.RegisterSystem(EscapeKeySystem);
-
-    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
-    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(ChildFollowParentSystem);
-
-    auto chaseBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
-    cameraManager.SetBehavior(chaseBehavior);
-
-    auto &fixedTimeScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
-    fixedTimeScheduler.SetTickRate(1.0f / 120.0f);
-
-    auto &cameraControlSystemManager = core.GetResource<CameraMovement::Resource::CameraControlSystemManager>();
-    cameraControlSystemManager.SetCameraControlSystemScheduler<Engine::Scheduler::FixedTimeUpdate>(core);
+    core.GetResource<Scene::Resource::SceneManager>().RegisterScene<Game::MainMenu>("MenuScene");
+    core.GetResource<Scene::Resource::SceneManager>().RegisterScene<Game::CourseScene>("CourseScene");
+    core.GetResource<Scene::Resource::SceneManager>().SetNextScene("MenuScene");
 }
 
 class GraphicExampleError : public std::runtime_error {
@@ -77,7 +60,8 @@ int main(void)
     spdlog::set_level(spdlog::level::info);
     Engine::Core core;
 
-    core.AddPlugins<Window::Plugin, DefaultPipeline::Plugin, Input::Plugin, CameraMovement::Plugin, Physics::Plugin>();
+    core.AddPlugins<Window::Plugin, Scene::Plugin, DefaultPipeline::Plugin, Input::Plugin, Rmlui::Plugin,
+        CameraMovement::Plugin, Physics::Plugin, Sound::Plugin>();
 
     core.RegisterSystem<Engine::Scheduler::Startup>(Setup);
 
