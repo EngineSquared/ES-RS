@@ -104,16 +104,35 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     Physics::Component::WheelSettings frontWheel = Physics::Component::WheelSettings::CreateFrontWheel();
     frontWheel.radius = wheelRadius;
     frontWheel.width = wheelWidth;
-    frontWheel.longitudinalFriction = 2.5f;
-    frontWheel.lateralFriction = 2.0f;
+    // High-performance tire friction curves
+    frontWheel.longitudinalFriction = {
+        {0.0f, 0.0f},
+        {0.05f, 1.4f},   // Racing tire peak grip
+        {0.15f, 1.2f}
+    };
+    frontWheel.lateralFriction = {
+        {0.0f, 0.0f},
+        {2.5f, 1.4f},    // High cornering grip
+        {15.0f, 1.1f}
+    };
     frontWheel.suspensionMinLength = 0.1f;
     frontWheel.suspensionMaxLength = 0.3f;
 
     Physics::Component::WheelSettings rearWheel = Physics::Component::WheelSettings::CreateRearWheel();
     rearWheel.radius = wheelRadius;
     rearWheel.width = wheelWidth;
-    rearWheel.longitudinalFriction = 2.5f;
-    rearWheel.lateralFriction = 2.0f;
+    // High-performance tire friction curves
+    rearWheel.longitudinalFriction = {
+        {0.0f, 0.1f},
+        {0.1f, 2.5f},
+        {0.5f, 2.2f},
+        {1.0f, 2.0f}
+    };
+    rearWheel.lateralFriction = {
+        {0.0f, 0.1f},
+        {5.0f, 2.5f},
+        {20.0f, 2.0f}
+    };
     rearWheel.suspensionMinLength = 0.1f;
     rearWheel.suspensionMaxLength = 0.3f;
 
@@ -133,6 +152,24 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
     float chassisMass = 1450.0f; // kg
 
+    // Gearbox - GT3 RS 7-speed PDK
+    Physics::Component::GearboxSettings gearboxSettings;
+    gearboxSettings.forwardGearRatios = {3.66f, 2.43f, 1.69f, 1.31f, 1.0f, 0.84f, 0.69f};
+    gearboxSettings.reverseGearRatios = {-3.91f};
+    gearboxSettings.clutchReleaseTime = 0.2f;
+    gearboxSettings.switchTime = 0.10f;  // Fast dual-clutch
+    gearboxSettings.shiftUpRPM = 6500.0f; // Usually it's higher, this is between comfort and sport mode
+    gearboxSettings.shiftDownRPM = 2000.0f;
+
+    // Torque curve
+    engineSettings.normalizedTorque = {
+        {0.0f,  0.7f}, // 70% torque at minRPM
+        {0.3f,  0.9f},
+        {0.6f,  1.0f}, // 100% torque at 60% of RPM range (peak)
+        {0.85f, 0.95f},
+        {1.0f,  0.8f}  // 80% torque at maxRPM
+    };
+
     Physics::Builder::VehicleBuilder<4> builder;
     auto vehicleEntity = builder.SetChassisMesh(chassisMesh, chassisPos)
                              .SetWheelMesh(FrontLeft, wheelMesh)
@@ -147,6 +184,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos, rearRightWheelPos)
                              .SetChassisMass(chassisMass)
                              .SetEngine(engineSettings)
+                             .SetGearbox(gearboxSettings)
                              .Build(core);
 
     vehicleEntity.AddComponent<Object::Component::Material>(chassisMaterial);
