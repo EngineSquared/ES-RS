@@ -40,7 +40,7 @@ void Setup(Engine::Core &core)
     // window.MaskCursor();
 
     CreateCheckeredFloor(core);
-    LoadCourse(core, "asset/course/Untitled.obj", "asset/course/collisions.obj");
+    LoadCourse(core);
     auto vehicle = CreateVehicle(core);
     auto light = CreateLight(core);
 

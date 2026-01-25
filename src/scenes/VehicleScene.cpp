@@ -94,22 +94,39 @@ void AdjustMeshPosition(Object::Component::Mesh &mesh, const glm::vec3 &offset)
 /**
  * @brief Load a course from a file
  * @param core The core instance
- * @param filePath The path to the course file to load
  */
-void LoadCourse(Engine::Core &core, const std::string &modelPath, const std::string &colliderPath)
+void LoadCourse(Engine::Core &core)
 {
-    std::cout << "Loading course: " << modelPath << " with collider: " << colliderPath << std::endl;
-    Object::OBJLoader courseModel(modelPath);
-    Object::OBJLoader courseCollider(colliderPath);
-    auto mesh = courseModel.GetMesh();
-    auto materials = courseModel.GetMaterials();
-    auto colliderShapes = courseCollider.GetShapes();
-    auto courseEntity = core.CreateEntity();
+    Log::Info(fmt::format("Loading course model"));
+    std::array<Object::OBJLoader, 4> courseLoaders = {
+        Object::OBJLoader("asset/course/course_props.obj"),
+        Object::OBJLoader("asset/course/course_details.obj"),
+        Object::OBJLoader("asset/course/course_ground.obj"),
+        Object::OBJLoader("asset/course/course_misc.obj")
+    };
 
-    courseEntity.AddComponent<Object::Component::Mesh>(mesh);
-    courseEntity.AddComponent<Object::Component::Material>(materials[0]);
-    courseEntity.AddComponent<Physics::Component::BoxCollider>(Physics::Component::BoxCollider(glm::vec3(20.0f, 0.1f, 20.0f)));
-    courseEntity.AddComponent<Physics::Component::RigidBody>(Physics::Component::RigidBody::CreateStatic());
+    for (auto &loader : courseLoaders)
+    {
+        auto shapes = loader.GetShapes();
+        for (auto &shape : shapes)
+        {
+            auto coursePart = core.CreateEntity();
+            Object::Component::Material shapeMaterial(shape.GetMaterial());
+            if (!shapeMaterial.diffuseTexName.empty())
+            {
+                const std::filesystem::path textureFile = std::filesystem::path(shapeMaterial.diffuseTexName).filename();
+                shapeMaterial.diffuseTexName = ("asset/textures/" + textureFile.string()).c_str();
+            }
+            else
+            {
+                shapeMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
+            }
+
+            coursePart.AddComponent<Object::Component::Mesh>(shape.GetMesh());
+            coursePart.AddComponent<Object::Component::Material>(shapeMaterial);
+            coursePart.AddComponent<Object::Component::Transform>(glm::vec3(10.0f, 0.0f, 1530.0f), glm::vec3(3.0f, 3.0f, 3.0f), glm::quat(1.0f, 0.0f, 0.0f, 0.0f));
+        }
+    }
 }
 
 /**

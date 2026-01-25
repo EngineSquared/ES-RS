@@ -4,7 +4,7 @@
 
 void CreateCheckeredFloor(Engine::Core &core);
 
-void LoadCourse(Engine::Core &core, const std::string &modelPath, const std::string &colliderPath);
+void LoadCourse(Engine::Core &core);
 
 Engine::Entity CreateVehicle(Engine::Core &core);
 
