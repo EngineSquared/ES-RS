@@ -257,7 +257,6 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetChassisHalfExtents(glm::vec3(0.5f, 0.4f, 1.0f))
                              .Build(core);
 
-    Object::Component::Material chassisMaterial;
     // Light blue car color
     chassisMaterial.diffuse = glm::vec3(0.4f, 0.7f, 0.95f);
     chassisMaterial.ambient = chassisMaterial.diffuse * 0.3f;
