@@ -27,11 +27,7 @@ void EngineAudioSystem(Engine::Core &core)
         Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(e)};
         auto rpmOpt = telemetry.GetRPM(eid);
 
-        if (!rpmOpt.has_value()) {
-            continue;
-        }
-
-        float rpm = rpmOpt.value();
+        float rpm = rpmOpt.has_value() ? rpmOpt.value() : 0.0f;
         float targetPitch = ComputePitchClamped(rpm, audio.minPitch, audio.maxPitch, vehicle.engine.minRPM, vehicle.engine.maxRPM);
         float alpha = audio.smoothingAlpha;
         audio.currentPitch = alpha * targetPitch + (1.0f - alpha) * audio.currentPitch;
