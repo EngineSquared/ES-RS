@@ -19,7 +19,9 @@
 
 #include "component/PlayerVehicle.hpp"
 #include "resource/CameraControlSystemManager.hpp"
-#include "scenes/VehicleScene.hpp"
+#include "scenes/LoadCourse.hpp"
+#include "scenes/CreateVehicle.hpp"
+#include "scenes/CreateLight.hpp"
 #include "system/VehicleInput.hpp"
 #include "system/ChildFollowParentSystem.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
@@ -41,7 +43,8 @@ void Setup(Engine::Core &core)
     auto &window = core.GetResource<Window::Resource::Window>();
     // window.MaskCursor();
 
-    CreateCheckeredFloor(core);
+    //CreateCheckeredFloor(core);
+    LoadCourse(core);
     auto vehicle = CreateVehicle(core);
     auto light = CreateLight(core);
 
@@ -49,6 +52,7 @@ void Setup(Engine::Core &core)
 
     camera.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 1.0f, -10.0f));
     camera.AddComponent<Object::Component::Camera>();
+    camera.GetComponents<Object::Component::Camera>().farPlane = 10000.0f;
 
     auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
     cameraManager.SetActiveCamera(camera);
