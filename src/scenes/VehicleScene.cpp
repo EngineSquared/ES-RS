@@ -15,6 +15,44 @@
 #include "spdlog/fmt/fmt.h"
 
 /**
+ * @brief Invert mesh on the X axis to go from right-handed to left-handed coordinate system
+ * 
+ * @param mesh  Mesh to invert
+ * @return Inverted mesh
+ */
+Object::Component::Mesh InvertMeshX(const Object::Component::Mesh &mesh)
+{
+    Object::Component::Mesh invertedMesh = mesh;
+    auto &vertices = invertedMesh.GetVertices();
+    for (size_t i = 0; i < vertices.size(); ++i)
+    {
+        invertedMesh.SetVertexAt(i, glm::vec3(-vertices[i].x, vertices[i].y, vertices[i].z));
+    }
+    return invertedMesh;
+}
+
+/**
+ * @brief Invert mesh UVs (U and/or V) in-place.
+ *
+ * @param mesh Mesh to modify
+ * @param invertU If true, set u -> 1 - u
+ * @param invertV If true, set v -> 1 - v
+ */
+void InvertMeshUVs(Object::Component::Mesh &mesh, bool invertU = true, bool invertV = false)
+{
+    const auto &texCoords = mesh.GetTexCoords();
+    for (size_t i = 0; i < texCoords.size(); ++i)
+    {
+        glm::vec2 uv = texCoords[i];
+        if (invertU)
+            uv.x = 1.0f - uv.x;
+        if (invertV)
+            uv.y = 1.0f - uv.y;
+        mesh.SetTexCoordAt(i, uv);
+    }
+}
+
+/**
  * @brief Create a checkered floor (200x200 meters) with alternating grey tiles
  *
  * Uses a single large physics body to avoid ghost collisions at tile edges,
@@ -105,6 +143,8 @@ Engine::Entity CreateVehicle(Engine::Core &core)
 
     std::string shapeName = "TwiXeR_992_underbody_gt3rs";
 
+    glm::vec3 meshOffset = glm::vec3(0.0f, -0.6f, 0.0f);
+
     try
     {
         Object::OBJLoader loader("asset/car2/GT3_RS.obj");
@@ -147,12 +187,17 @@ Engine::Entity CreateVehicle(Engine::Core &core)
         chassisMesh = Object::Utils::GenerateBoxMesh(1.0f, 0.8f, 2.0f);
     }
 
-    // Adjust chassis mesh and shapes mesh with a Y offset of -0.69 to set the origin at the bottom of the chassis
-    AdjustMeshPosition(chassisMesh, glm::vec3(0.0f, -0.69f, 0.0f));
+    // Adjust chassis mesh and shapes mesh with a Y offset to set the origin at the bottom of the chassis
+    AdjustMeshPosition(chassisMesh, meshOffset);
+    chassisMesh = InvertMeshX(chassisMesh);
+    InvertMeshUVs(chassisMesh, true, false);
+
     for (auto &shape : otherShapes)
     {
         auto &mesh = shape.GetMesh();
-        AdjustMeshPosition(mesh, glm::vec3(0.0f, -0.69f, 0.0f));
+        AdjustMeshPosition(mesh, meshOffset);
+        shape.mesh = InvertMeshX(mesh);
+        InvertMeshUVs(shape.mesh, true, false);
     }
 
     chassisMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME; // Temp fix while diffuse textures are not available
@@ -177,10 +222,10 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     rearWheel.suspensionMinLength = 0.1f;
     rearWheel.suspensionMaxLength = 0.3f;
     
-    glm::vec3 frontLeftWheelPos = glm::vec3(-0.9f, -0.3f, 1.2f);
-    glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.2f);
-    glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.2f);
-    glm::vec3 rearRightWheelPos = glm::vec3(0.9f, -0.3f, -1.2f);
+    glm::vec3 frontLeftWheelPos = glm::vec3(-0.9f, -0.3f, 1.1f);
+    glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.1f);
+    glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.35f);
+    glm::vec3 rearRightWheelPos = glm::vec3(0.9f, -0.3f, -1.35f);
     glm::vec3 chassisPos = glm::vec3(0.0f, 3.0f, 0.0f);
 
     // GT3 RS
@@ -207,7 +252,6 @@ Engine::Entity CreateVehicle(Engine::Core &core)
                              .SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos, rearRightWheelPos)
                              .SetChassisMass(chassisMass)
                              .SetEngine(engineSettings)
-                             .SetChassisHalfExtents(glm::vec3(0.5f, 0.4f, 1.0f))
                              .Build(core);
 
     vehicleEntity.AddComponent<Object::Component::Material>(chassisMaterial);
