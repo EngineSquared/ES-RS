@@ -21,8 +21,8 @@ void EngineAudioSystem(Engine::Core &core)
     auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
     auto &sound = core.GetResource<Sound::Resource::SoundManager>();
 
-    auto view = registry.view<Game::Component::EngineAudioComponent>();
-    for (auto [e, audio] : view.each())
+    auto view = registry.view<Game::Component::EngineAudioComponent, Physics::Component::Vehicle>();
+    for (auto [e, audio, vehicle] : view.each())
     {
         Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(e)};
         auto rpmOpt = telemetry.GetRPM(eid);
@@ -32,7 +32,7 @@ void EngineAudioSystem(Engine::Core &core)
         }
 
         float rpm = rpmOpt.value();
-        float targetPitch = ComputePitchClamped(rpm, audio.minPitch, audio.maxPitch, audio.minRPM, audio.maxRPM);
+        float targetPitch = ComputePitchClamped(rpm, audio.minPitch, audio.maxPitch, vehicle.engine.minRPM, vehicle.engine.maxRPM);
         float alpha = audio.smoothingAlpha;
         audio.currentPitch = alpha * targetPitch + (1.0f - alpha) * audio.currentPitch;
 
@@ -41,7 +41,7 @@ void EngineAudioSystem(Engine::Core &core)
         sound.SetPitch(audio.soundName, audio.currentPitch);
 
         if (audio.autoPlay) {
-            if (rpm > audio.minRPM && !sound.IsPlaying(audio.soundName)) {
+            if (rpm > vehicle.engine.minRPM && !sound.IsPlaying(audio.soundName)) {
                 Log::Info(fmt::format("Starting engine sound: {}", audio.soundName));
                 sound.Play(audio.soundName);
             } else if (rpm < 1.0f && sound.IsPlaying(audio.soundName)) {
