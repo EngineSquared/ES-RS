@@ -282,7 +282,7 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     glm::vec3 frontRightWheelPos = glm::vec3(0.9f, -0.3f, 1.1f);
     glm::vec3 rearLeftWheelPos = glm::vec3(-0.9f, -0.3f, -1.35f);
     glm::vec3 rearRightWheelPos = glm::vec3(0.9f, -0.3f, -1.35f);
-    glm::vec3 chassisPos = glm::vec3(0.0f, 150.0f, 0.0f);
+    glm::vec3 chassisPos = glm::vec3(0.0f, 300.0f, 0.0f);
 
     // GT3 RS
     Physics::Component::EngineSettings engineSettings;
