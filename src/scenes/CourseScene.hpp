@@ -26,31 +26,29 @@ protected:
         auto vehicle = CreateVehicle(core);
         auto light = CreateLight(core);
 
-        /* auto camera = core.GetResource<CameraMovement::Resource::CameraManager>().GetActiveCamera();
- */
-        /* camera.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 1.0f, -10.0f));
-        camera.AddComponent<Object::Component::Camera>(); */
-
         auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
-        /* cameraManager.SetActiveCamera(camera); */
+        auto camera = cameraManager.GetActiveCamera();
+
+        camera.GetComponents<Object::Component::Camera>().farPlane = 10000.0f;
+        camera.GetComponents<Object::Component::Transform>().SetPosition(glm::vec3(0.0f, 1.0f, -10.0f));
+
         cameraManager.SetMovementSpeed(3.0f);
 
         core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
         core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(ChildFollowParentSystem);
     
         auto chaseBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
-    cameraManager.SetBehavior(chaseBehavior);
+        cameraManager.SetBehavior(chaseBehavior);
 
-    auto &fixedTimeScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
-    fixedTimeScheduler.SetTickRate(1.0f / 120.0f);
+        auto &fixedTimeScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
+        fixedTimeScheduler.SetTickRate(1.0f / 120.0f);
 
-    auto &cameraControlSystemManager = core.GetResource<CameraMovement::Resource::CameraControlSystemManager>();
-    cameraControlSystemManager.SetCameraControlSystemScheduler<Engine::Scheduler::FixedTimeUpdate>(core);
+        auto &cameraControlSystemManager = core.GetResource<CameraMovement::Resource::CameraControlSystemManager>();
+        cameraControlSystemManager.SetCameraControlSystemScheduler<Engine::Scheduler::FixedTimeUpdate>(core);
     }
 
     void _onDestroy(Engine::Core &core) final
     {
-        core.ClearEntities();
     }
 
 private:

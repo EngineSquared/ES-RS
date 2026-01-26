@@ -307,4 +307,6 @@ Engine::Entity CreateLight(Engine::Core &core)
     auto ambientLight = core.CreateEntity();
     ambientLight.AddComponent<Object::Component::AmbientLight>(
         Object::Component::AmbientLight{.color = glm::vec3(0.4f, 0.4f, 0.4f)});
+    
+    return ambientLight;
 }
