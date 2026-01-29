@@ -107,7 +107,11 @@ protected:
 
     void _onDestroy(Engine::Core &core) final
     {
-        core.GetResource<Rmlui::Resource::UIContext>().Destroy(core); // TEMPORARY
+        auto &uiContext = core.GetResource<Rmlui::Resource::UIContext>();
+        if (auto *document = uiContext.GetDocument())
+        {
+            document->Hide();
+        }
     }
 };
 } // namespace Game
