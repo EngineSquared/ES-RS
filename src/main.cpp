@@ -4,10 +4,16 @@
  * This example demonstrates how to use the Graphic and Physics plugins together for vehicle simulation.
  **************************************************************************/
 
-#include "plugin/PhysicsPlugin.hpp"
-#include "plugin/PluginCameraMovement.hpp"
-#include "plugin/PluginDefaultPipeline.hpp"
-#include "plugin/PluginInput.hpp"
+#include "Engine.hpp"
+
+#include "CameraMovement.hpp"
+#include "DefaultPipeline.hpp"
+#include "Graphic.hpp"
+#include "Input.hpp"
+#include "Object.hpp"
+#include "Physics.hpp"
+#include "Sound.hpp"
+#include "RenderingPipeline.hpp"
 #include "plugin/PluginRmlui.hpp"
 #include "plugin/PluginScene.hpp"
 #include "plugin/PluginWindow.hpp"
@@ -18,6 +24,15 @@
 
 #include "scenes/CourseScene.hpp"
 #include "scenes/MainMenu.hpp"
+#include "component/PlayerVehicle.hpp"
+#include "resource/CameraControlSystemManager.hpp"
+#include "scenes/LoadCourse.hpp"
+#include "scenes/CreateVehicle.hpp"
+#include "scenes/CreateLight.hpp"
+#include "system/VehicleInput.hpp"
+#include "system/ChildFollowParentSystem.hpp"
+#include "utils/OrbitalChaseCameraBehavior.hpp"
+#include "system/EngineAudioSystem.hpp"
 
 void EscapeKeySystem(Engine::Core &core)
 {
@@ -40,6 +55,7 @@ void Setup(Engine::Core &core)
 
     camera.AddComponent<Object::Component::Transform>(glm::vec3(0.0f, 1.0f, -10.0f));
     camera.AddComponent<Object::Component::Camera>();
+    camera.GetComponents<Object::Component::Camera>().farPlane = 10000.0f;
 
     auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
     cameraManager.SetActiveCamera(camera);
