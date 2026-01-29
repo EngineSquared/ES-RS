@@ -22,8 +22,8 @@
 #include "resource/SceneManager.hpp"
 #include "resource/Window.hpp"
 
-#include "scenes/CourseScene.hpp"
 #include "scenes/MainMenu.hpp"
+#include "scenes/CourseScene.hpp"
 #include "component/PlayerVehicle.hpp"
 #include "resource/CameraControlSystemManager.hpp"
 #include "scenes/LoadCourse.hpp"

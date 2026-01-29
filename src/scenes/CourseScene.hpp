@@ -1,21 +1,24 @@
 #pragma once
 
-#include "Logger.hpp"
-#include "component/Camera.hpp"
 #include "component/PlayerVehicle.hpp"
 #include "component/Transform.hpp"
-#include "component/Vehicle.hpp"
-#include "resource/CameraControlSystemManager.hpp"
-#include "resource/CameraManager.hpp"
+#include "resource/SoundManager.hpp"
 #include "resource/UIContext.hpp"
+
+#include "Physics.hpp"
+#include "resource/CameraControlSystemManager.hpp"
 #include "resource/VehicleTelemetry.hpp"
-#include "scenes/VehicleScene.hpp"
-#include "system/ChildFollowParentSystem.hpp"
+#include "scenes/CreateVehicle.hpp"
+#include "scenes/CreateLight.hpp"
+#include "scenes/LoadCourse.hpp"
 #include "system/VehicleInput.hpp"
+#include "system/ChildFollowParentSystem.hpp"
 #include "utils/AScene.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
+#include "system/EngineAudioSystem.hpp"
 #include "utils/Timer.hpp"
 
+#include <RmlUi/Core/StringUtilities.h>
 #include <algorithm>
 #include <cmath>
 #include <iomanip>
@@ -30,20 +33,21 @@ struct StartupCircuitTimer {
 struct GameChrono {
   Timer timer;
 };
+
 class CourseScene : public Scene::Utils::AScene {
 public:
-  CourseScene();
-      /* : _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))},
-        _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))},
-        _IsCountingDown(true) {}; */
+  CourseScene() :
+    _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))},
+    _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))},
+    _IsCountingDown(true) {};
 
 protected:
   void _onCreate(Engine::Core &core) final {
     Log::Info("Creating CourseScene");
 
-    CreateCheckeredFloor(core);
     auto vehicle = CreateVehicle(core);
     auto light = CreateLight(core);
+    LoadCourse(core);
 
     auto &cameraManager =
         core.GetResource<CameraMovement::Resource::CameraManager>();
@@ -73,9 +77,26 @@ protected:
         .SetCameraControlSystemScheduler<Engine::Scheduler::FixedTimeUpdate>(
             core);
 
+    // Register engine sound and attach audio component to vehicle entity
+    auto &soundMgr = core.GetResource<Sound::Resource::SoundManager>();
+    soundMgr.RegisterSound("engine_low",
+                           "asset/sounds/911_RSR30_1_in_on_high.wav", true);
+    Log::Info("Engine sound registered: engine_low");
+
+    vehicle.AddComponent<Game::Component::EngineAudioComponent>();
+    Log::Info("EngineAudioComponent added to vehicle");
+
+    // Drive audio updates on regular Update scheduler
+    core.RegisterSystem<Engine::Scheduler::Update>(EngineAudioSystem);
+
     auto &uiContext = core.GetResource<Rmlui::Resource::UIContext>();
+    uiContext.SetFont("asset/font/Tomorrow-Medium.ttf");
+    uiContext.SetFont("asset/font/airborne.ttf");
+    uiContext.EnableDebugger(true);
     uiContext.LoadDocument("asset/ui/race/game.rml");
-    /* auto *pauseMenu = uiContext.GetElementById("pause-menu");
+    //uiContext.LoadOverlayDocument("asset/ui/race/pause-menu.rml");
+    //auto pauseMenuDocument = uiContext.GetOverlayDocument("asset/ui/race/pause-menu.rml");
+    auto *pauseMenu = uiContext.GetElementById("pause-menu");
     auto *resumeBtn = uiContext.GetElementById("resume-btn");
     auto *quitBtn = uiContext.GetElementById("quit-btn");
     if (pauseMenu != nullptr && resumeBtn != nullptr) {
@@ -84,29 +105,34 @@ protected:
             pauseMenu->SetProperty("visibility", "hidden");
             pauseMenu->SetProperty("animation", "none");
             _hasLastVehiclePosition = false;
+            _smoothedSpeedKmh = 0.0f;
           });
     }
     if (quitBtn != nullptr) {
       uiContext.RegisterEventListener(
           *quitBtn, "click",
           [&core](Rml::Event & event) { core.Stop(); });
-    } */
-    /* AddChronoDisplay(core);
+    }
+    AddChronoDisplay(core);
     AddSpeedometerDisplay(core);
-    AddSpeedometerAnimation(core); */
+    AddSpeedometerAnimation(core);
   }
 
   void _onDestroy(Engine::Core &core) final {}
 
 private:
-  /* GameChrono _gameChrono;
+  GameChrono _gameChrono;
   StartupCircuitTimer _startupCircuitChrono;
   bool _IsCountingDown;
-  mutable std::size_t _chronoSystemId = std::numeric_limits<std::size_t>::max();
-  mutable std::size_t _speedometerSystemId = std::numeric_limits<std::size_t>::max();
-  mutable std::size_t _speedometerAnimSystemId = std::numeric_limits<std::size_t>::max();
+  mutable std::size_t _chronoSystemId =
+      std::numeric_limits<std::size_t>::max();
+  mutable std::size_t _speedometerSystemId =
+      std::numeric_limits<std::size_t>::max();
+  mutable std::size_t _speedometerAnimSystemId =
+      std::numeric_limits<std::size_t>::max();
   glm::vec3 _lastVehiclePosition = glm::vec3(0.0f);
   bool _hasLastVehiclePosition = false;
+  float _smoothedSpeedKmh = 0.0f;
 
   void StartupCircuitTimerUpdate(Engine::Core &core) {
     auto dt = core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
@@ -158,8 +184,10 @@ private:
                    << std::setw(2) << seconds << ":" << std::setw(3)
                    << milliseconds;
 
-        if (auto *timeValue = uiResource.GetElementById("time-value"))
-          timeValue->SetInnerRML(timeStream.str());
+        if (auto *timeValue = uiResource.GetElementById("time-value")) {
+          timeValue->SetInnerRML(
+              Rml::StringUtilities::EncodeRml(timeStream.str()));
+        }
       }
     }
   }
@@ -175,7 +203,8 @@ private:
     if (_speedometerAnimSystemId == std::numeric_limits<std::size_t>::max())
       _speedometerAnimSystemId =
           std::get<0>(core.RegisterSystem<Engine::Scheduler::Update>(
-              [this](Engine::Core &core) { this->UpdateSpeedometerRPM(core); }));
+              [this](Engine::Core &core) { this->UpdateSpeedometerRPM(core);
+  }));
   }
 
   void UpdateSpeedometer(Engine::Core &core) {
@@ -183,49 +212,70 @@ private:
     if (uiResource.GetTitle() != "game" || !IsPauseMenuHidden(uiResource))
       return;
 
-    auto *speedValue = uiResource.GetElementById("value");
-    auto *gearValue = uiResource.GetElementById("gear-current");
-    auto *speedPointer = uiResource.GetElementById("speed-counter-pointer");
-    if (!speedValue || !speedPointer)
+    auto speedValue = uiResource.GetElementById("value");
+    auto gearValue = uiResource.GetElementById("gear-current");
+    auto speedPointer = uiResource.GetElementById("speed-counter-pointer");
+    Log::Info(fmt::format("speed value: {}", speedValue->GetInnerRML()));
+    Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML()));
+    Log::Info(fmt::format("speed pointer: {}", speedPointer->GetInnerRML()));
+    if (!speedValue || !speedPointer) {
+      Log::Error("speed value or speed pointer not found");
       return;
+    }
 
     auto &registry = core.GetRegistry();
-    auto view = registry.view<PlayerVehicle>();
-    if (view.begin() == view.end())
+    auto view = registry.view<PlayerVehicle, Physics::Component::Vehicle,
+                               Object::Component::Transform>();
+    if (view.begin() == view.end()) {
+      Log::Error("No player vehicle found");
       return;
+    }
 
     for (auto entity : view) {
-      if (!registry.all_of<Physics::Component::Vehicle,
-                           Object::Component::Transform>(entity))
-        continue;
-      auto &vehicle = registry.get<Physics::Component::Vehicle>(entity);
-      auto &transform = registry.get<Object::Component::Transform>(entity);
+      auto &vehicle = view.get<Physics::Component::Vehicle>(entity);
+      auto &transform = view.get<Object::Component::Transform>(entity);
 
-      auto currentPosition = transform.GetPosition();
-      float speedKmh = 0.0f;
-      float dt = core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
+      const float dt =
+          core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
+      const auto currentPosition = transform.GetPosition();
+
+      float instantSpeedKmh = 0.0f;
       if (_hasLastVehiclePosition && dt > 0.0f) {
-        float speedMps =
+        const float speedMps =
             glm::length(currentPosition - _lastVehiclePosition) / dt;
-        speedKmh = speedMps * 3.6f;
+        instantSpeedKmh = speedMps * 3.6f;
       }
       _lastVehiclePosition = currentPosition;
       _hasLastVehiclePosition = true;
-      int speedRounded = static_cast<int>(std::round(speedKmh));
+
+      constexpr float kSpeedSmoothingTau = 0.15f;
+      const float smoothingAlpha =
+          std::clamp(1.0f - std::exp(-dt / kSpeedSmoothingTau), 0.0f, 1.0f);
+      _smoothedSpeedKmh =
+          std::lerp(_smoothedSpeedKmh, instantSpeedKmh, smoothingAlpha);
+
+      const int speedRounded =
+          static_cast<int>(std::round(_smoothedSpeedKmh));
+      Log::Info(fmt::format("Speed value: {}", speedRounded));
       speedValue->SetInnerRML(std::to_string(speedRounded));
       if (gearValue != nullptr) {
+        Log::Info(fmt::format("Gear value: {}", gearValue->GetInnerRML()));
+        Log::Info(fmt::format("current gear: {}", vehicle.gearbox.currentGear));
         if (vehicle.gearbox.currentGear <= 0)
           gearValue->SetInnerRML("R");
         else
           gearValue->SetInnerRML(std::to_string(vehicle.gearbox.currentGear));
       }
 
-      constexpr float kMinNeedleAngle = -130.0f;
-      constexpr float kMaxNeedleAngle = 130.0f;
+      Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML()));
+
+      constexpr float kMinNeedleAngle = 0.0f;
+      constexpr float kMaxNeedleAngle = 230.0f;
       constexpr float kMaxSpeedKmh = 260.0f;
-      float clampedSpeed = std::clamp(speedKmh, 0.0f, kMaxSpeedKmh);
-      float t = clampedSpeed / kMaxSpeedKmh;
-      float angle = kMinNeedleAngle + (kMaxNeedleAngle - kMinNeedleAngle) * t;
+      const float clampedSpeed =
+          std::clamp(_smoothedSpeedKmh, 0.0f, kMaxSpeedKmh);
+      const float t = clampedSpeed / kMaxSpeedKmh;
+      const float angle = std::lerp(kMinNeedleAngle, kMaxNeedleAngle, t);
       speedPointer->SetProperty("transform",
                                 fmt::format("rotate({:.1f}deg)", angle));
       break;
@@ -272,7 +322,10 @@ private:
   }
 
   bool IsPauseMenuHidden(Rmlui::Resource::UIContext &uiResource) const {
-    auto *pauseMenu = uiResource.GetElementById("pause-menu");
+    auto pauseMenuDocument = uiResource.GetOverlayDocument("asset/ui/race/pause-menu.rml");
+    if (pauseMenuDocument == nullptr)
+      return true;
+    auto *pauseMenu = pauseMenuDocument->GetElementById("pause-menu");
     if (pauseMenu == nullptr)
       return true;
 
@@ -281,6 +334,6 @@ private:
       return visibility == "hidden";
     }
     return true;
-  } */
+  }
 };
 } // namespace Game
