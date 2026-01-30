@@ -34,6 +34,11 @@ struct GameChrono {
   Timer timer;
 };
 
+class GraphicExampleError : public std::runtime_error {
+  public:
+    using std::runtime_error::runtime_error;
+  };
+
 class CourseScene : public Scene::Utils::AScene {
 public:
   CourseScene() :
@@ -85,6 +90,31 @@ protected:
 
     vehicle.AddComponent<Game::Component::EngineAudioComponent>();
     Log::Info("EngineAudioComponent added to vehicle");
+
+    core.RegisterSystem([](Engine::Core &core) {
+      auto view1 =
+          core.GetRegistry()
+              .view<PlayerVehicle, Physics::Component::VehicleController>();
+      if (view1.begin() == view1.end()) {
+        throw GraphicExampleError(
+            "No entity with PlayerVehicle and VehicleController found.");
+      }
+      Engine::Entity playerVehicle{core, *view1.begin()};
+      const auto &vehicleTransform =
+          playerVehicle.GetComponents<Object::Component::Transform>();
+  
+      auto view2 = core.GetRegistry().view<Object::Component::DirectionalLight>();
+      if (view2.begin() == view2.end()) {
+        throw GraphicExampleError(
+            "No entity with DirectionalLight found.");
+      }
+      Engine::Entity playerDirectionalLight{core, *view2.begin()};
+      auto &directionalLightTransform =
+          playerDirectionalLight.GetComponents<Object::Component::Transform>();
+  
+      directionalLightTransform.SetPosition(vehicleTransform.GetPosition() +
+                                            glm::vec3(3.35, 7.12, -5.14) * 5.f);
+    });
 
     // Drive audio updates on regular Update scheduler
     core.RegisterSystem<Engine::Scheduler::Update>(EngineAudioSystem);

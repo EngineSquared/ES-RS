@@ -104,16 +104,12 @@ Engine::Entity CreateVehicle(Engine::Core &core)
     Physics::Component::WheelSettings frontWheel = Physics::Component::WheelSettings::CreateFrontWheel();
     frontWheel.radius = wheelRadius;
     frontWheel.width = wheelWidth;
-    frontWheel.longitudinalFriction = 2.5f;
-    frontWheel.lateralFriction = 2.0f;
     frontWheel.suspensionMinLength = 0.1f;
     frontWheel.suspensionMaxLength = 0.3f;
 
     Physics::Component::WheelSettings rearWheel = Physics::Component::WheelSettings::CreateRearWheel();
     rearWheel.radius = wheelRadius;
     rearWheel.width = wheelWidth;
-    rearWheel.longitudinalFriction = 2.5f;
-    rearWheel.lateralFriction = 2.0f;
     rearWheel.suspensionMinLength = 0.1f;
     rearWheel.suspensionMaxLength = 0.3f;
 
