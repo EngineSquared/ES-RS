@@ -25,6 +25,10 @@
 #include "scenes/LoadCourse.hpp"
 #include "system/ChildFollowParentSystem.hpp"
 #include "system/EngineAudioSystem.hpp"
+#include "resource/VehicleTelemetry.hpp"
+#include "resource/PhysicsManager.hpp"
+#include "component/VehicleInternal.hpp"
+#include <Jolt/Physics/Vehicle/WheeledVehicleController.h>
 #include "system/VehicleInput.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
 
@@ -36,10 +40,70 @@ void EscapeKeySystem(Engine::Core &core) {
   }
 }
 
-void Setup(Engine::Core &core) {
-  // Option to lock the cursor to the window
-  auto &window = core.GetResource<Window::Resource::Window>();
-  // window.MaskCursor();
+void VehicleDebugSystem(Engine::Core &core)
+{
+    auto &registry = core.GetRegistry();
+    auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
+    auto &physicsMgr = core.GetResource<Physics::Resource::PhysicsManager>();
+
+    auto view = registry.view<Physics::Component::Vehicle, Physics::Component::VehicleInternal, Physics::Component::VehicleController>();
+    for (auto [e, vehicle, internal, controllerComp] : view.each())
+    {
+        // Only debug player vehicle(s)
+        if (!registry.all_of<PlayerVehicle>(e))
+            continue;
+
+        Engine::EntityId eid{ static_cast<Engine::EntityId::ValueType>(e) };
+        auto rpmOpt = telemetry.GetRPM(eid);
+
+        std::string rpmStr = "N/A";
+        float rpmVal = 0.0f;
+        if (rpmOpt.has_value()) {
+            rpmVal = rpmOpt.value();
+            rpmStr = fmt::format("{:.1f}", rpmVal);
+        }
+
+        std::string speedStr = "N/A";
+        float speedVal = 0.0f;
+        if (internal.IsValid())
+        {
+            const JPH::BodyLockRead lock(physicsMgr.GetPhysicsSystem().GetBodyLockInterface(), internal.chassisBodyID);
+            if (lock.Succeeded())
+            {
+                const JPH::Body &body = lock.GetBody();
+                // Convert speed from m/s to km/h for debug display
+                JPH::Vec3 velocity = body.GetLinearVelocity();
+                velocity.SetY(0.0f);
+                JPH::Vec3 forward = body.GetRotation().RotateAxisZ();
+                forward.SetY(0.0f);
+                speedVal = velocity.Dot(forward) * 3.6f;
+                speedStr = fmt::format("{:.2f} km/h", speedVal);
+            }
+        }
+
+        std::string gearStr = "N/A";
+        if (internal.IsValid() && internal.vehicleConstraint != nullptr)
+        {
+            auto *ctrl = internal.vehicleConstraint->GetController();
+            if (ctrl != nullptr)
+            {
+                auto *wctrl = static_cast<JPH::WheeledVehicleController *>(ctrl);
+                gearStr = fmt::format("{}", wctrl->GetTransmission().GetCurrentGear());
+            }
+        }
+
+        Log::Debug(fmt::format("Vehicle Debug ({}): RPM: {}, Speed: {}, Gear: {}, Controller: Fwd {:.2f}, Steer {:.2f}, Brake {:.2f}, HandBrake {:.2f}",
+                               Engine::Entity{core, e}, rpmStr, speedStr, gearStr,
+                               controllerComp.forwardInput, controllerComp.steeringInput,
+                               controllerComp.brakeInput, controllerComp.handBrakeInput));
+    }
+}
+
+void Setup(Engine::Core &core)
+{
+    // Option to lock the cursor to the window
+    auto &window = core.GetResource<Window::Resource::Window>();
+    // window.MaskCursor();
 
   // CreateCheckeredFloor(core);
   LoadCourse(core);
@@ -60,9 +124,9 @@ void Setup(Engine::Core &core) {
 
   core.RegisterSystem(EscapeKeySystem);
 
-  core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
-  core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(
-      ChildFollowParentSystem);
+    core.RegisterSystem<Engine::Scheduler::Update>(VehicleDebugSystem);
+    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
+    core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(ChildFollowParentSystem);
 
   auto chaseBehavior =
       std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
