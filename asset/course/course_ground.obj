@@ -1,7 +1,7 @@
 # Blender 4.5.5 LTS
 # www.blender.org
 mtllib course_ground.mtl
-g ks_nurburgring_ground_Mesh
+g ks_nurburgring_ground_ks_nurburgring.001
 v 159.961334 11.558948 743.859436
 v 172.550690 10.714595 743.522766
 v 160.363068 11.515971 740.279236
