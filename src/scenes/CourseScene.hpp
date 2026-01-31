@@ -8,14 +8,14 @@
 #include "Physics.hpp"
 #include "resource/CameraControlSystemManager.hpp"
 #include "resource/VehicleTelemetry.hpp"
-#include "scenes/CreateVehicle.hpp"
 #include "scenes/CreateLight.hpp"
+#include "scenes/CreateVehicle.hpp"
 #include "scenes/LoadCourse.hpp"
-#include "system/VehicleInput.hpp"
 #include "system/ChildFollowParentSystem.hpp"
+#include "system/EngineAudioSystem.hpp"
+#include "system/VehicleInput.hpp"
 #include "utils/AScene.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
-#include "system/EngineAudioSystem.hpp"
 #include "utils/Timer.hpp"
 
 #include <RmlUi/Core/StringUtilities.h>
@@ -35,75 +35,75 @@ struct GameChrono {
 };
 
 class GraphicExampleError : public std::runtime_error {
-  public:
-    using std::runtime_error::runtime_error;
+public:
+  using std::runtime_error::runtime_error;
 };
 
-void VehicleDebugSystem(Engine::Core &core)
-{
-    auto &registry = core.GetRegistry();
-    auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
-    auto &physicsMgr = core.GetResource<Physics::Resource::PhysicsManager>();
+void VehicleDebugSystem(Engine::Core &core) {
+  auto &registry = core.GetRegistry();
+  auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
+  auto &physicsMgr = core.GetResource<Physics::Resource::PhysicsManager>();
 
-    auto view = registry.view<Physics::Component::Vehicle, Physics::Component::VehicleInternal, Physics::Component::VehicleController>();
-    for (auto [e, vehicle, internal, controllerComp] : view.each())
-    {
-        // Only debug player vehicle(s)
-        if (!registry.all_of<PlayerVehicle>(e))
-            continue;
+  auto view = registry.view<Physics::Component::Vehicle,
+                            Physics::Component::VehicleInternal,
+                            Physics::Component::VehicleController>();
+  for (auto [e, vehicle, internal, controllerComp] : view.each()) {
+    // Only debug player vehicle(s)
+    if (!registry.all_of<PlayerVehicle>(e))
+      continue;
 
-        Engine::EntityId eid{ static_cast<Engine::EntityId::ValueType>(e) };
-        auto rpmOpt = telemetry.GetRPM(eid);
+    Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(e)};
+    auto rpmOpt = telemetry.GetRPM(eid);
 
-        std::string rpmStr = "N/A";
-        float rpmVal = 0.0f;
-        if (rpmOpt.has_value()) {
-            rpmVal = rpmOpt.value();
-            rpmStr = fmt::format("{:.1f}", rpmVal);
-        }
-
-        std::string speedStr = "N/A";
-        float speedVal = 0.0f;
-        if (internal.IsValid())
-        {
-            const JPH::BodyLockRead lock(physicsMgr.GetPhysicsSystem().GetBodyLockInterface(), internal.chassisBodyID);
-            if (lock.Succeeded())
-            {
-                const JPH::Body &body = lock.GetBody();
-                // Convert speed from m/s to km/h for debug display
-                JPH::Vec3 velocity = body.GetLinearVelocity();
-                velocity.SetY(0.0f);
-                JPH::Vec3 forward = body.GetRotation().RotateAxisZ();
-                forward.SetY(0.0f);
-                speedVal = velocity.Dot(forward) * 3.6f;
-                speedStr = fmt::format("{:.2f} km/h", speedVal);
-            }
-        }
-
-        std::string gearStr = "N/A";
-        if (internal.IsValid() && internal.vehicleConstraint != nullptr)
-        {
-            auto *ctrl = internal.vehicleConstraint->GetController();
-            if (ctrl != nullptr)
-            {
-                auto *wctrl = static_cast<JPH::WheeledVehicleController *>(ctrl);
-                gearStr = fmt::format("{}", wctrl->GetTransmission().GetCurrentGear());
-            }
-        }
-
-        Log::Debug(fmt::format("Vehicle Debug ({}): RPM: {}, Speed: {}, Gear: {}, Controller: Fwd {:.2f}, Steer {:.2f}, Brake {:.2f}, HandBrake {:.2f}",
-                               Engine::Entity{core, e}, rpmStr, speedStr, gearStr,
-                               controllerComp.forwardInput, controllerComp.steeringInput,
-                               controllerComp.brakeInput, controllerComp.handBrakeInput));
+    std::string rpmStr = "N/A";
+    float rpmVal = 0.0f;
+    if (rpmOpt.has_value()) {
+      rpmVal = rpmOpt.value();
+      rpmStr = fmt::format("{:.1f}", rpmVal);
     }
+
+    std::string speedStr = "N/A";
+    float speedVal = 0.0f;
+    if (internal.IsValid()) {
+      const JPH::BodyLockRead lock(
+          physicsMgr.GetPhysicsSystem().GetBodyLockInterface(),
+          internal.chassisBodyID);
+      if (lock.Succeeded()) {
+        const JPH::Body &body = lock.GetBody();
+        // Convert speed from m/s to km/h for debug display
+        JPH::Vec3 velocity = body.GetLinearVelocity();
+        velocity.SetY(0.0f);
+        JPH::Vec3 forward = body.GetRotation().RotateAxisZ();
+        forward.SetY(0.0f);
+        speedVal = velocity.Dot(forward) * 3.6f;
+        speedStr = fmt::format("{:.2f} km/h", speedVal);
+      }
+    }
+
+    std::string gearStr = "N/A";
+    if (internal.IsValid() && internal.vehicleConstraint != nullptr) {
+      auto *ctrl = internal.vehicleConstraint->GetController();
+      if (ctrl != nullptr) {
+        auto *wctrl = static_cast<JPH::WheeledVehicleController *>(ctrl);
+        gearStr = fmt::format("{}", wctrl->GetTransmission().GetCurrentGear());
+      }
+    }
+
+    Log::Debug(fmt::format(
+        "Vehicle Debug ({}): RPM: {}, Speed: {}, Gear: {}, Controller: Fwd "
+        "{:.2f}, Steer {:.2f}, Brake {:.2f}, HandBrake {:.2f}",
+        Engine::Entity{core, e}, rpmStr, speedStr, gearStr,
+        controllerComp.forwardInput, controllerComp.steeringInput,
+        controllerComp.brakeInput, controllerComp.handBrakeInput));
+  }
 }
 
 class CourseScene : public Scene::Utils::AScene {
 public:
-  CourseScene() :
-    _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))},
-    _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))},
-    _IsCountingDown(true) {};
+  CourseScene()
+      : _gameChrono{GameChrono(Timer(1.0f).SetInfinite(true))},
+        _startupCircuitChrono{StartupCircuitTimer(Timer(1.f).SetIterations(3))},
+        _IsCountingDown(true) {};
 
 protected:
   void _onCreate(Engine::Core &core) final {
@@ -162,30 +162,31 @@ protected:
       Engine::Entity playerVehicle{core, *view1.begin()};
       const auto &vehicleTransform =
           playerVehicle.GetComponents<Object::Component::Transform>();
-  
-      auto view2 = core.GetRegistry().view<Object::Component::DirectionalLight>();
+
+      auto view2 =
+          core.GetRegistry().view<Object::Component::DirectionalLight>();
       if (view2.begin() == view2.end()) {
-        throw GraphicExampleError(
-            "No entity with DirectionalLight found.");
+        throw GraphicExampleError("No entity with DirectionalLight found.");
       }
       Engine::Entity playerDirectionalLight{core, *view2.begin()};
       auto &directionalLightTransform =
           playerDirectionalLight.GetComponents<Object::Component::Transform>();
-  
+
       directionalLightTransform.SetPosition(vehicleTransform.GetPosition() +
                                             glm::vec3(3.35, 7.12, -5.14) * 5.f);
     });
 
     // Drive audio updates on regular Update scheduler
     core.RegisterSystem<Engine::Scheduler::Update>(EngineAudioSystem);
+    core.RegisterSystem<Engine::Scheduler::Update>([this](Engine::Core &core) { this->TogglePauseMenu(core); });
+    core.RegisterSystem<Engine::Scheduler::Update>([this](Engine::Core &core) { this->ToggleUiDebugContrast(core); });
 
     auto &uiContext = core.GetResource<Rmlui::Resource::UIContext>();
     uiContext.SetFont("asset/font/Tomorrow-Medium.ttf");
     uiContext.SetFont("asset/font/airborne.ttf");
     uiContext.EnableDebugger(true);
     uiContext.LoadDocument("asset/ui/race/game.rml");
-    //uiContext.LoadOverlayDocument("asset/ui/race/pause-menu.rml");
-    //auto pauseMenuDocument = uiContext.GetOverlayDocument("asset/ui/race/pause-menu.rml");
+    uiContext.LoadOverlayDocument("asset/ui/race/pause-menu.rml");
     auto *pauseMenu = uiContext.GetElementById("pause-menu");
     auto *resumeBtn = uiContext.GetElementById("resume-btn");
     auto *quitBtn = uiContext.GetElementById("quit-btn");
@@ -200,8 +201,7 @@ protected:
     }
     if (quitBtn != nullptr) {
       uiContext.RegisterEventListener(
-          *quitBtn, "click",
-          [&core](Rml::Event & event) { core.Stop(); });
+          *quitBtn, "click", [&core](Rml::Event &event) { core.Stop(); });
     }
     AddChronoDisplay(core);
     AddSpeedometerDisplay(core);
@@ -214,8 +214,7 @@ private:
   GameChrono _gameChrono;
   StartupCircuitTimer _startupCircuitChrono;
   bool _IsCountingDown;
-  mutable std::size_t _chronoSystemId =
-      std::numeric_limits<std::size_t>::max();
+  mutable std::size_t _chronoSystemId = std::numeric_limits<std::size_t>::max();
   mutable std::size_t _speedometerSystemId =
       std::numeric_limits<std::size_t>::max();
   mutable std::size_t _speedometerAnimSystemId =
@@ -223,6 +222,75 @@ private:
   glm::vec3 _lastVehiclePosition = glm::vec3(0.0f);
   bool _hasLastVehiclePosition = false;
   float _smoothedSpeedKmh = 0.0f;
+  bool _debugUiContrastEnabled = false;
+
+  void TogglePauseMenu(Engine::Core &core) {
+    auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
+    auto &soundManager = core.GetResource<Sound::Resource::SoundManager>();
+    static bool escapeWasPressed = false;
+
+    if (uiResource.GetTitle() == "game") {
+      const auto &visibility =
+          uiResource.GetElementById("pause-menu")->GetProperty("visibility");
+      bool escapeIsPressed =
+          core.GetResource<Input::Resource::InputManager>().IsKeyPressed(
+              GLFW_KEY_ESCAPE);
+
+      if (escapeIsPressed && !escapeWasPressed) {
+        if (visibility->Get<Rml::String>() == "1") {
+          uiResource.GetElementById("pause-menu")
+              ->SetProperty("animation", "0.2s quadratic-out 1 slide-in");
+          uiResource.GetElementById("pause-menu")
+              ->SetProperty("visibility", "visible");
+          uiResource.RequestLateUpdate();
+          if (soundManager.IsPlaying("pause-menu"))
+            soundManager.Stop("pause-menu");
+          soundManager.Play("pause-menu");
+        } else if (visibility->Get<Rml::String>() == "0") {
+          uiResource.GetElementById("pause-menu")
+              ->SetProperty("visibility", "hidden");
+          uiResource.RequestLateUpdate();
+        }
+      }
+      escapeWasPressed = escapeIsPressed;
+    }
+  }
+
+  void ToggleUiDebugContrast(Engine::Core &core) {
+    auto &input = core.GetResource<Input::Resource::InputManager>();
+    static bool f9WasPressed = false;
+    const bool f9IsPressed = input.IsKeyPressed(GLFW_KEY_F9);
+
+    if (f9IsPressed && !f9WasPressed) {
+      _debugUiContrastEnabled = !_debugUiContrastEnabled;
+      ApplyUiDebugContrast(core, _debugUiContrastEnabled);
+      Log::Info(fmt::format("UI debug contrast: {}", _debugUiContrastEnabled ? "on" : "off"));
+    }
+    f9WasPressed = f9IsPressed;
+  }
+
+  void ApplyUiDebugContrast(Engine::Core &core, bool enable) {
+    auto &ui = core.GetResource<Rmlui::Resource::UIContext>();
+    auto apply = [enable](Rml::Element *element, const char *baseColor) {
+      if (!element) {
+        return;
+      }
+      if (enable) {
+        element->SetProperty("color", "rgb(255, 255, 255)");
+        element->SetProperty("background-color", "rgba(0, 0, 0, 0.9)");
+        element->SetProperty("padding", "4px 6px");
+      } else {
+        element->SetProperty("color", baseColor);
+        element->SetProperty("background-color", "transparent");
+        element->SetProperty("padding", "0px");
+      }
+    };
+
+    apply(ui.GetElementById("time-value"), "rgb(214, 214, 214)");
+    apply(ui.GetElementById("value"), "inherit");
+    apply(ui.GetElementById("gear-current"), "inherit");
+    ui.RequestLateUpdate();
+  }
 
   void StartupCircuitTimerUpdate(Engine::Core &core) {
     auto dt = core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
@@ -258,6 +326,7 @@ private:
   void UpdateTextTime(Engine::Core &core) {
     auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
 
+    Log::Info(fmt::format("uiResource.GetTitle(): {}", uiResource.GetTitle()));
     if (uiResource.GetTitle() == "game") {
       if (IsPauseMenuHidden(uiResource)) {
         auto dt = core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
@@ -275,8 +344,10 @@ private:
                    << milliseconds;
 
         if (auto *timeValue = uiResource.GetElementById("time-value")) {
+          Log::Info(fmt::format("time value: {}", timeValue->GetInnerRML()));
           timeValue->SetInnerRML(
               Rml::StringUtilities::EncodeRml(timeStream.str()));
+          uiResource.RequestLateUpdate();
         }
       }
     }
@@ -293,8 +364,9 @@ private:
     if (_speedometerAnimSystemId == std::numeric_limits<std::size_t>::max())
       _speedometerAnimSystemId =
           std::get<0>(core.RegisterSystem<Engine::Scheduler::Update>(
-              [this](Engine::Core &core) { this->UpdateSpeedometerRPM(core);
-  }));
+              [this](Engine::Core &core) {
+                this->UpdateSpeedometerRPM(core);
+              }));
   }
 
   void UpdateSpeedometer(Engine::Core &core) {
@@ -305,9 +377,10 @@ private:
     auto speedValue = uiResource.GetElementById("value");
     auto gearValue = uiResource.GetElementById("gear-current");
     auto speedPointer = uiResource.GetElementById("speed-counter-pointer");
-    Log::Info(fmt::format("speed value: {}", speedValue->GetInnerRML()));
+ 
+    /* Log::Info(fmt::format("speed value: {}", speedValue->GetInnerRML()));
     Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML()));
-    Log::Info(fmt::format("speed pointer: {}", speedPointer->GetInnerRML()));
+    Log::Info(fmt::format("speed pointer: {}", speedPointer->GetInnerRML())); */
     if (!speedValue || !speedPointer) {
       Log::Error("speed value or speed pointer not found");
       return;
@@ -315,7 +388,7 @@ private:
 
     auto &registry = core.GetRegistry();
     auto view = registry.view<PlayerVehicle, Physics::Component::Vehicle,
-                               Object::Component::Transform>();
+                              Object::Component::Transform>();
     if (view.begin() == view.end()) {
       Log::Error("No player vehicle found");
       return;
@@ -344,20 +417,21 @@ private:
       _smoothedSpeedKmh =
           std::lerp(_smoothedSpeedKmh, instantSpeedKmh, smoothingAlpha);
 
-      const int speedRounded =
-          static_cast<int>(std::round(_smoothedSpeedKmh));
-      Log::Info(fmt::format("Speed value: {}", speedRounded));
+      const int speedRounded = static_cast<int>(std::round(_smoothedSpeedKmh));
+      /* Log::Info(fmt::format("Speed value: {}", speedRounded)); */
       speedValue->SetInnerRML(std::to_string(speedRounded));
+      uiResource.RequestLateUpdate();
       if (gearValue != nullptr) {
-        Log::Info(fmt::format("Gear value: {}", gearValue->GetInnerRML()));
-        Log::Info(fmt::format("current gear: {}", vehicle.gearbox.currentGear));
+       /*  Log::Info(fmt::format("Gear value: {}", gearValue->GetInnerRML()));
+        Log::Info(fmt::format("current gear: {}", vehicle.gearbox.currentGear)); */
         if (vehicle.gearbox.currentGear <= 0)
           gearValue->SetInnerRML("R");
         else
           gearValue->SetInnerRML(std::to_string(vehicle.gearbox.currentGear));
+        uiResource.RequestLateUpdate();
       }
 
-      Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML()));
+      /* Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML())); */
 
       constexpr float kMinNeedleAngle = 0.0f;
       constexpr float kMaxNeedleAngle = 230.0f;
@@ -368,22 +442,30 @@ private:
       const float angle = std::lerp(kMinNeedleAngle, kMaxNeedleAngle, t);
       speedPointer->SetProperty("transform",
                                 fmt::format("rotate({:.1f}deg)", angle));
+      uiResource.RequestLateUpdate();
       break;
     }
   }
 
-  void UpdateSpeedometerRPM(Engine::Core &core) {
+  void UpdateSpeedometerRPM(Engine::Core &core) noexcept {
+    Log::Info(fmt::format("UpdateSpeedometerRPM"));
     auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
-    if (uiResource.GetTitle() != "game" || !IsPauseMenuHidden(uiResource))
+    Log::Info(fmt::format("uiResource.GetTitle(): {}", uiResource.GetTitle()));
+    Log::Info(fmt::format("IsPauseMenuHidden: {}", IsPauseMenuHidden(uiResource)));
+    if (uiResource.GetTitle() != "game" || !IsPauseMenuHidden(uiResource)) {
+      Log::Info(fmt::format("UpdateSpeedometerRPM not in game or pause menu"));
       return;
+    }
 
     auto &registry = core.GetRegistry();
     auto view = registry.view<PlayerVehicle>();
     if (view.begin() == view.end())
+    {
+      Log::Info(fmt::format("UpdateSpeedometerRPM no player vehicle found"));
       return;
+    }
 
-    auto &telemetry =
-        core.GetResource<Physics::Resource::VehicleTelemetry>();
+    auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
     constexpr int kLedCount = 41;
 
     for (auto entity : view) {
@@ -391,8 +473,7 @@ private:
         continue;
       auto &vehicle = registry.get<Physics::Component::Vehicle>(entity);
 
-      Engine::EntityId eid{
-          static_cast<Engine::EntityId::ValueType>(entity)};
+      Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(entity)};
       float rpm = telemetry.GetRPM(eid).value_or(0.0f);
       float maxRpm = vehicle.engine.maxRPM;
       float ratio = (maxRpm > 0.0f) ? rpm / maxRpm : 0.0f;
@@ -407,12 +488,14 @@ private:
           continue;
         led->SetProperty("opacity", (i <= activeLeds) ? "1" : "0");
       }
+      uiResource.RequestLateUpdate();
       break;
     }
   }
 
   bool IsPauseMenuHidden(Rmlui::Resource::UIContext &uiResource) const {
-    auto pauseMenuDocument = uiResource.GetOverlayDocument("asset/ui/race/pause-menu.rml");
+    auto pauseMenuDocument =
+        uiResource.GetOverlayDocument("asset/ui/race/pause-menu.rml");
     if (pauseMenuDocument == nullptr)
       return true;
     auto *pauseMenu = pauseMenuDocument->GetElementById("pause-menu");
@@ -421,7 +504,7 @@ private:
 
     if (auto *visibilityProp = pauseMenu->GetProperty("visibility")) {
       auto visibility = visibilityProp->Get<Rml::String>();
-      return visibility == "hidden";
+      return visibility == "1";
     }
     return true;
   }

@@ -51,7 +51,7 @@ void Setup(Engine::Core &core) {
   auto &window = core.GetResource<Window::Resource::Window>();
   window.SetSize(1280, 720);
 
-  core.RegisterSystem(EscapeKeySystem);
+  //core.RegisterSystem(EscapeKeySystem);
 
   auto camera = core.CreateEntity();
 

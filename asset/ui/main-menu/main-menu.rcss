@@ -13,7 +13,7 @@
 
 @keyframes title-flag-animator {
 	0% {
-		transform: translateX(-130px)
+		transform: translateX(-43px)
 	}
 	to {
 		transform: translateX(0px)
@@ -133,9 +133,9 @@ body
     position: absolute;
     top: -91px;
     left: 0;
-    width: 200%;
+    width: 400%;
     height: 179px;
-    animation: 5s linear-inOut infinite title-flag-animator;
+    animation: 3s linear-inOut infinite title-flag-animator;
 }
 
 #flag-footer-image-bottom
@@ -144,9 +144,9 @@ body
     position: absolute;
     bottom: -91px;
     left: 0;
-    width: 200%;
+    width: 400%;
     height: 179px;
-    animation: 5s linear-inOut infinite title-flag-animator;
+    animation: 3s linear-inOut infinite title-flag-animator;
 }
 
 #footer-credits
