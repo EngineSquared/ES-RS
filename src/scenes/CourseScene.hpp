@@ -391,6 +391,8 @@ private:
 
     for (auto entity : view) {
       auto &vehicle = view.get<Physics::Component::Vehicle>(entity);
+      auto internal = registry.get<Physics::Component::VehicleInternal>(entity);
+      auto controller = reinterpret_cast<JPH::WheeledVehicleController *>(internal.vehicleConstraint->GetController());
       auto &transform = view.get<Object::Component::Transform>(entity);
 
       const float dt =
@@ -416,19 +418,19 @@ private:
       speedValue->SetInnerRML(std::to_string(speedRounded));
       uiResource.RequestLateUpdate();
       if (gearValue != nullptr) {
-        if (vehicle.gearbox.currentGear <= 0)
+        if (controller->GetTransmission().GetCurrentGear() <= 0)
           gearValue->SetInnerRML("R");
         else
-          gearValue->SetInnerRML(std::to_string(vehicle.gearbox.currentGear));
+          gearValue->SetInnerRML(std::to_string(controller->GetTransmission().GetCurrentGear()));
         uiResource.RequestLateUpdate();
       }
 
       constexpr float kMinNeedleAngle = 0.0f;
       constexpr float kMaxNeedleAngle = 230.0f;
-      constexpr float kMaxSpeedKmh = 260.0f;
-      const float clampedSpeed =
-          std::clamp(_smoothedSpeedKmh, 0.0f, kMaxSpeedKmh);
-      const float t = clampedSpeed / kMaxSpeedKmh;
+      const float rpm = controller->GetEngine().GetCurrentRPM();
+      const float maxRpm = vehicle.engine.maxRPM;
+      const float t =
+          (maxRpm > 0.0f) ? std::clamp(rpm / maxRpm, 0.0f, 1.0f) : 0.0f;
       const float angle = std::lerp(kMinNeedleAngle, kMaxNeedleAngle, t);
       speedPointer->SetProperty("transform",
                                 fmt::format("rotate({:.1f}deg)", angle));
@@ -457,9 +459,11 @@ private:
       if (!registry.all_of<Physics::Component::Vehicle>(entity))
         continue;
       auto &vehicle = registry.get<Physics::Component::Vehicle>(entity);
+      auto internal = registry.get<Physics::Component::VehicleInternal>(entity);
+      auto controller = reinterpret_cast<JPH::WheeledVehicleController *>(internal.vehicleConstraint->GetController());
 
       Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(entity)};
-      float rpm = telemetry.GetRPM(eid).value_or(0.0f);
+      float rpm = controller->GetEngine().GetCurrentRPM();
       float maxRpm = vehicle.engine.maxRPM;
       float ratio = (maxRpm > 0.0f) ? rpm / maxRpm : 0.0f;
       ratio = std::clamp(ratio, 0.0f, 1.0f);
