@@ -9,6 +9,7 @@
 #include "Physics.hpp"
 #include "Relationship.hpp"
 #include "builder/VehicleBuilder.hpp"
+#include "component/SoftBodyChassis.hpp"
 #include "component/Transform.hpp"
 #include "component/VehicleController.hpp"
 
@@ -22,8 +23,10 @@
  * Loads all shapes from the car OBJ file. The main body shape is used for
  * physics, while other shapes are created as child entities that follow the
  * main body.
+ *
+ * @param useSoftBodyChassis If true, enables deformable SoftBody chassis
  */
-Engine::Entity CreateVehicle(Engine::Core &core) {
+Engine::Entity CreateVehicle(Engine::Core &core, bool useSoftBodyChassis) {
   using enum Physics::Component::WheelIndex;
   using enum Physics::Component::DrivetrainType;
 
@@ -183,27 +186,37 @@ Engine::Entity CreateVehicle(Engine::Core &core) {
   };
 
   Physics::Builder::VehicleBuilder<4> builder;
-  auto vehicleEntity =
-      builder.SetChassisMesh(chassisMesh, chassisPos)
-          .SetWheelMesh(FrontLeft, wheelMesh)
-          .SetWheelMesh(FrontRight, wheelMesh)
-          .SetWheelMesh(RearLeft, wheelMesh)
-          .SetWheelMesh(RearRight, wheelMesh)
-          .SetWheelSettings(FrontLeft, frontWheel)
-          .SetWheelSettings(FrontRight, frontWheel)
-          .SetWheelSettings(RearLeft, rearWheel)
-          .SetWheelSettings(RearRight, rearWheel)
-          .SetDrivetrain(RWD)
-          .SetWheelPositions(frontLeftWheelPos, frontRightWheelPos,
-                             rearLeftWheelPos, rearRightWheelPos)
-          .SetCollisionTesterType(
-              Physics::Component::CollisionTesterType::CastCylinder)
-          .SetConvexRadiusFraction(
-              0.1f) // Lower value = smoother terrain transitions
-          .SetChassisMass(chassisMass)
-          .SetEngine(engineSettings)
-          .SetGearbox(gearboxSettings)
-          .Build(core);
+
+  // Configure basic vehicle
+  builder.SetChassisMesh(chassisMesh, chassisPos)
+      .SetWheelMesh(FrontLeft, wheelMesh)
+      .SetWheelMesh(FrontRight, wheelMesh)
+      .SetWheelMesh(RearLeft, wheelMesh)
+      .SetWheelMesh(RearRight, wheelMesh)
+      .SetWheelSettings(FrontLeft, frontWheel)
+      .SetWheelSettings(FrontRight, frontWheel)
+      .SetWheelSettings(RearLeft, rearWheel)
+      .SetWheelSettings(RearRight, rearWheel)
+      .SetDrivetrain(RWD)
+      .SetWheelPositions(frontLeftWheelPos, frontRightWheelPos, rearLeftWheelPos,
+                         rearRightWheelPos)
+      .SetCollisionTesterType(Physics::Component::CollisionTesterType::CastCylinder)
+      .SetConvexRadiusFraction(0.1f)
+      .SetChassisMass(chassisMass)
+      .SetEngine(engineSettings)
+      .SetGearbox(gearboxSettings);
+
+  // Enable SoftBody chassis if requested
+  if (useSoftBodyChassis) {
+    Log::Info("Creating vehicle with SoftBody deformable chassis");
+    // Use performance preset for better FPS in WSL environment
+    builder.SetSoftBodyChassis(
+        Physics::Component::SoftBodyChassisSettings::Performance());
+  } else {
+    Log::Info("Creating vehicle with standard RigidBody chassis");
+  }
+
+  auto vehicleEntity = builder.Build(core);
 
   vehicleEntity.AddComponent<Object::Component::Material>(chassisMaterial);
   vehicleEntity.AddComponent<PlayerVehicle>();
