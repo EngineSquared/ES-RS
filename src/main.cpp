@@ -6,6 +6,7 @@
  **************************************************************************/
 
 #include "Engine.hpp"
+#include <memory>
 
 #include "CameraMovement.hpp"
 #include "DefaultPipeline.hpp"
@@ -31,6 +32,9 @@
 #include <Jolt/Physics/Vehicle/WheeledVehicleController.h>
 #include "system/VehicleInput.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
+#include "utils/ChaseCameraBehavior.hpp"
+#include "utils/FirstPersonCameraBehavior.hpp"
+#include "utils/FirstPersonOrbitalCameraBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core) {
   auto &inputManager = core.GetResource<Input::Resource::InputManager>();
@@ -101,9 +105,6 @@ void VehicleDebugSystem(Engine::Core &core)
 
 void Setup(Engine::Core &core)
 {
-    // Option to lock the cursor to the window
-    auto &window = core.GetResource<Window::Resource::Window>();
-    // window.MaskCursor();
 
   // CreateCheckeredFloor(core);
   LoadCourse(core);
@@ -128,9 +129,35 @@ void Setup(Engine::Core &core)
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(VehicleInput);
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(ChildFollowParentSystem);
 
-  auto chaseBehavior =
-      std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
+  // Create behaviors and default to orbital chase
+  auto orbitalBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
+  auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
+  auto firstPersonBehavior = std::make_shared<FirstPersonCameraBehavior>(core, vehicle);
+  auto firstPersonOrbitalBehavior = std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle);
   cameraManager.SetBehavior(chaseBehavior);
+
+  // Cycle camera behavior when pressing 'C' (Orbital -> Chase -> FirstPerson -> Orbital)
+  if (core.HasResource<Input::Resource::InputManager>()) {
+    auto &inputManager = core.GetResource<Input::Resource::InputManager>();
+    inputManager.RegisterKeyCallback([orbitalBehavior, chaseBehavior, firstPersonBehavior, firstPersonOrbitalBehavior, &cameraManager](Engine::Core & /*core*/, int key, int /*scancode*/, int action, int /*mods*/) {
+      if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        auto current = cameraManager.GetBehavior();
+        if (std::dynamic_pointer_cast<OrbitalChaseCameraBehavior>(current)) {
+          cameraManager.SetBehavior(chaseBehavior);
+          Log::Info("Camera behavior switched to: Chase");
+        } else if (std::dynamic_pointer_cast<ChaseCameraBehavior>(current)) {
+          cameraManager.SetBehavior(firstPersonBehavior);
+          Log::Info("Camera behavior switched to: FirstPerson");
+        } else if (std::dynamic_pointer_cast<FirstPersonOrbitalCameraBehavior>(current)) {
+          cameraManager.SetBehavior(orbitalBehavior);
+          Log::Info("Camera behavior switched to: OrbitalChase");
+        } else {
+          cameraManager.SetBehavior(firstPersonOrbitalBehavior);
+          Log::Info("Camera behavior switched to: FirstPersonOrbital");
+        }
+      }
+    });
+  }
 
   auto &fixedTimeScheduler =
       core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();

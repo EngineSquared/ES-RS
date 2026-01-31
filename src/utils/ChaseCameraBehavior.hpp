@@ -11,6 +11,7 @@
 #include "core/Core.hpp"
 #include "resource/CameraManager.hpp"
 #include "resource/InputManager.hpp"
+#include "resource/Window.hpp"
 #include "utils/CameraBehavior.hpp"
 #include "utils/CameraUtils.hpp"
 
@@ -25,6 +26,12 @@ class ChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior {
     void Update(Engine::Core &core, CameraMovement::Resource::CameraManager &manager,
                 Object::Component::Transform &transform, Object::Component::Camera &camera, float deltaTime) override
     {
+        auto &window = core.GetResource<Window::Resource::Window>();
+        if (window.IsCursorMasked())
+        {
+            window.ShowCursor();
+        }
+
         auto &registry = core.GetRegistry();
 
         auto &vehicleTransform = registry.get<Object::Component::Transform>(GetVehicleEntity());
