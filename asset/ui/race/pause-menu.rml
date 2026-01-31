@@ -1,6 +1,7 @@
 <rml>
 	<head>
 		<link type="text/rcss" href="pause-menu.rcss"/>
+        <link type="text/rcss" href="../esrs-btn.rcss" />
 	</head>
 	<body>
         <div id="pause-menu" class="pause-menu">

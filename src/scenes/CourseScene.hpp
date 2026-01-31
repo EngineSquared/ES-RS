@@ -205,7 +205,7 @@ protected:
     if (quitBtn != nullptr) {
       uiContext.RegisterEventListener(
           *quitBtn, "click", [&core](Rml::Event &event) {
-            core.GetResource<Scene::Resource::SceneManager>().SetNextScene("MainMenu");
+            core.Stop();
           });
     }
     AddChronoDisplay(core);
