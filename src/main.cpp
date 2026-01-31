@@ -32,6 +32,10 @@
 #include "scenes/MainMenu.hpp"
 #include "system/ChildFollowParentSystem.hpp"
 #include "system/EngineAudioSystem.hpp"
+#include "resource/VehicleTelemetry.hpp"
+#include "resource/PhysicsManager.hpp"
+#include "component/VehicleInternal.hpp"
+#include <Jolt/Physics/Vehicle/WheeledVehicleController.h>
 #include "system/VehicleInput.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
 
