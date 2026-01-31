@@ -50,14 +50,13 @@ void LoadCourse(Engine::Core &core) {
 
   Log::Info(fmt::format("Creating course collider"));
   auto colliderEntity = core.CreateEntity();
-  colliderEntity.AddComponent<Object::Component::Mesh>(
-      courseCollider.GetMesh());
   colliderEntity.AddComponent<Object::Component::Transform>(
       courseOffset, courseScale, courseRotation);
 
   Physics::Component::MeshCollider meshCollider;
   meshCollider.activeEdgeCosThresholdAngle =
       0.9397f; // cos(20°) for much smoother sliding across terrain
+  meshCollider.mesh = courseCollider.GetMesh();
   colliderEntity.AddComponent<Physics::Component::MeshCollider>(meshCollider);
 
   colliderEntity.AddComponent<Physics::Component::RigidBody>(
