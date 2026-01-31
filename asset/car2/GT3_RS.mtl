@@ -1,4 +1,4 @@
-# Blender 5.0.1 MTL File: 'GT3 RS.blend'
+# Blender 5.0.1 MTL File: 'GT3 RS1.blend'
 # www.blender.org
 
 newmtl CSR2_Global_Texture_Coloured
@@ -730,16 +730,6 @@ Ks 0.000000 0.000000 0.000000
 Ke 0.000000 0.000000 0.000000
 Ni 1.450000
 d 0.110236
-illum 1
-
-newmtl TwiXeR_992_glass_int.001
-Ns 0.000000
-Ka 1.000000 1.000000 1.000000
-Kd 0.800000 0.800000 0.800000
-Ks 0.000000 0.000000 0.000000
-Ke 0.000000 0.000000 0.000000
-Ni 1.450000
-d 0.094488
 illum 1
 
 newmtl TwiXeR_992_gps_screen.003
