@@ -184,7 +184,7 @@ protected:
     auto &uiContext = core.GetResource<Rmlui::Resource::UIContext>();
     uiContext.SetFont("asset/font/Tomorrow-Medium.ttf");
     uiContext.SetFont("asset/font/airborne.ttf");
-    uiContext.EnableDebugger(true);
+    //uiContext.EnableDebugger(true);
     uiContext.LoadDocument("asset/ui/race/game.rml");
     uiContext.LoadOverlayDocument("asset/ui/race/pause-menu.rml");
     auto *pauseMenu = uiContext.GetElementById("pause-menu");
@@ -326,7 +326,6 @@ private:
   void UpdateTextTime(Engine::Core &core) {
     auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
 
-    Log::Info(fmt::format("uiResource.GetTitle(): {}", uiResource.GetTitle()));
     if (uiResource.GetTitle() == "game") {
       if (IsPauseMenuHidden(uiResource)) {
         auto dt = core.GetScheduler<Engine::Scheduler::Update>().GetDeltaTime();
@@ -344,7 +343,6 @@ private:
                    << milliseconds;
 
         if (auto *timeValue = uiResource.GetElementById("time-value")) {
-          Log::Info(fmt::format("time value: {}", timeValue->GetInnerRML()));
           timeValue->SetInnerRML(
               Rml::StringUtilities::EncodeRml(timeStream.str()));
           uiResource.RequestLateUpdate();
@@ -378,9 +376,6 @@ private:
     auto gearValue = uiResource.GetElementById("gear-current");
     auto speedPointer = uiResource.GetElementById("speed-counter-pointer");
  
-    /* Log::Info(fmt::format("speed value: {}", speedValue->GetInnerRML()));
-    Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML()));
-    Log::Info(fmt::format("speed pointer: {}", speedPointer->GetInnerRML())); */
     if (!speedValue || !speedPointer) {
       Log::Error("speed value or speed pointer not found");
       return;
@@ -418,20 +413,15 @@ private:
           std::lerp(_smoothedSpeedKmh, instantSpeedKmh, smoothingAlpha);
 
       const int speedRounded = static_cast<int>(std::round(_smoothedSpeedKmh));
-      /* Log::Info(fmt::format("Speed value: {}", speedRounded)); */
       speedValue->SetInnerRML(std::to_string(speedRounded));
       uiResource.RequestLateUpdate();
       if (gearValue != nullptr) {
-       /*  Log::Info(fmt::format("Gear value: {}", gearValue->GetInnerRML()));
-        Log::Info(fmt::format("current gear: {}", vehicle.gearbox.currentGear)); */
         if (vehicle.gearbox.currentGear <= 0)
           gearValue->SetInnerRML("R");
         else
           gearValue->SetInnerRML(std::to_string(vehicle.gearbox.currentGear));
         uiResource.RequestLateUpdate();
       }
-
-      /* Log::Info(fmt::format("gear value: {}", gearValue->GetInnerRML())); */
 
       constexpr float kMinNeedleAngle = 0.0f;
       constexpr float kMaxNeedleAngle = 230.0f;
@@ -448,12 +438,8 @@ private:
   }
 
   void UpdateSpeedometerRPM(Engine::Core &core) noexcept {
-    Log::Info(fmt::format("UpdateSpeedometerRPM"));
     auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
-    Log::Info(fmt::format("uiResource.GetTitle(): {}", uiResource.GetTitle()));
-    Log::Info(fmt::format("IsPauseMenuHidden: {}", IsPauseMenuHidden(uiResource)));
     if (uiResource.GetTitle() != "game" || !IsPauseMenuHidden(uiResource)) {
-      Log::Info(fmt::format("UpdateSpeedometerRPM not in game or pause menu"));
       return;
     }
 
@@ -461,7 +447,6 @@ private:
     auto view = registry.view<PlayerVehicle>();
     if (view.begin() == view.end())
     {
-      Log::Info(fmt::format("UpdateSpeedometerRPM no player vehicle found"));
       return;
     }
 

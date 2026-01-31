@@ -55,11 +55,6 @@ void LoadCourse(Engine::Core &core) {
   colliderEntity.AddComponent<Object::Component::Transform>(
       courseOffset, courseScale, courseRotation);
 
-  Physics::Component::MeshCollider meshCollider;
-  meshCollider.activeEdgeCosThresholdAngle =
-      0.9397f; // cos(20°) for much smoother sliding across terrain
-  colliderEntity.AddComponent<Physics::Component::MeshCollider>(meshCollider);
-
   colliderEntity.AddComponent<Physics::Component::RigidBody>(
       Physics::Component::RigidBody::CreateStatic());
 }
