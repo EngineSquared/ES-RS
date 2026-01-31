@@ -2,6 +2,7 @@
 
 #include "component/PlayerVehicle.hpp"
 #include "component/Transform.hpp"
+#include "resource/SceneManager.hpp"
 #include "resource/SoundManager.hpp"
 #include "resource/UIContext.hpp"
 
@@ -17,6 +18,7 @@
 #include "utils/AScene.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
 #include "utils/Timer.hpp"
+#include "CallableFunction.hpp"
 
 #include <RmlUi/Core/StringUtilities.h>
 #include <algorithm>
@@ -192,16 +194,19 @@ protected:
     auto *quitBtn = uiContext.GetElementById("quit-btn");
     if (pauseMenu != nullptr && resumeBtn != nullptr) {
       uiContext.RegisterEventListener(
-          *resumeBtn, "click", [pauseMenu, this](Rml::Event &event) {
+          *resumeBtn, "click", [pauseMenu, this, &core](Rml::Event &event) {
             pauseMenu->SetProperty("visibility", "hidden");
             pauseMenu->SetProperty("animation", "none");
             _hasLastVehiclePosition = false;
             _smoothedSpeedKmh = 0.0f;
+            SetFixedUpdateSystemsEnabled(core, true);
           });
     }
     if (quitBtn != nullptr) {
       uiContext.RegisterEventListener(
-          *quitBtn, "click", [&core](Rml::Event &event) { core.Stop(); });
+          *quitBtn, "click", [&core](Rml::Event &event) {
+            core.GetResource<Scene::Resource::SceneManager>().SetNextScene("MainMenu");
+          });
     }
     AddChronoDisplay(core);
     AddSpeedometerDisplay(core);
@@ -224,6 +229,35 @@ private:
   float _smoothedSpeedKmh = 0.0f;
   bool _debugUiContrastEnabled = false;
 
+  template <typename TCallable>
+  static FunctionUtils::FunctionID GetSystemId(TCallable callable) {
+    return FunctionUtils::CallableFunction<TCallable, void, Engine::Core &>::
+        GetCallableID(callable);
+  }
+
+  void SetFixedUpdateSystemsEnabled(Engine::Core &core, bool enable) {
+    auto &fixedScheduler = core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
+    if (enable) {
+      fixedScheduler.Enable(GetSystemId(VehicleInput));
+      fixedScheduler.Enable(GetSystemId(ChildFollowParentSystem));
+      fixedScheduler.Enable(GetSystemId(Physics::System::PhysicsUpdate));
+      fixedScheduler.Enable(GetSystemId(Physics::System::VehicleControlSystem));
+      fixedScheduler.Enable(GetSystemId(Physics::System::VehicleRPMUpdate));
+      fixedScheduler.Enable(GetSystemId(Physics::System::SyncTransformWithPhysics));
+      fixedScheduler.Enable(GetSystemId(Physics::System::SyncSoftBodyVertices));
+      fixedScheduler.Enable(GetSystemId(Physics::System::WheelTransformSyncSystem));
+    } else {
+      fixedScheduler.Disable(GetSystemId(VehicleInput));
+      fixedScheduler.Disable(GetSystemId(ChildFollowParentSystem));
+      fixedScheduler.Disable(GetSystemId(Physics::System::PhysicsUpdate));
+      fixedScheduler.Disable(GetSystemId(Physics::System::VehicleControlSystem));
+      fixedScheduler.Disable(GetSystemId(Physics::System::VehicleRPMUpdate));
+      fixedScheduler.Disable(GetSystemId(Physics::System::SyncTransformWithPhysics));
+      fixedScheduler.Disable(GetSystemId(Physics::System::SyncSoftBodyVertices));
+      fixedScheduler.Disable(GetSystemId(Physics::System::WheelTransformSyncSystem));
+    }
+  }
+
   void TogglePauseMenu(Engine::Core &core) {
     auto &uiResource = core.GetResource<Rmlui::Resource::UIContext>();
     auto &soundManager = core.GetResource<Sound::Resource::SoundManager>();
@@ -238,6 +272,7 @@ private:
 
       if (escapeIsPressed && !escapeWasPressed) {
         if (visibility->Get<Rml::String>() == "1") {
+          SetFixedUpdateSystemsEnabled(core, false);
           uiResource.GetElementById("pause-menu")
               ->SetProperty("animation", "0.2s quadratic-out 1 slide-in");
           uiResource.GetElementById("pause-menu")
@@ -247,6 +282,7 @@ private:
             soundManager.Stop("pause-menu");
           soundManager.Play("pause-menu");
         } else if (visibility->Get<Rml::String>() == "0") {
+          SetFixedUpdateSystemsEnabled(core, true);
           uiResource.GetElementById("pause-menu")
               ->SetProperty("visibility", "hidden");
           uiResource.RequestLateUpdate();
