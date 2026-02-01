@@ -454,8 +454,10 @@ private:
       speedValue->SetInnerRML(std::to_string(speedRounded));
       uiResource.RequestLateUpdate();
       if (gearValue != nullptr) {
-        if (controller->GetTransmission().GetCurrentGear() <= 0)
+        if (controller->GetTransmission().GetCurrentGear() < 0)
           gearValue->SetInnerRML("R");
+        else if (controller->GetTransmission().GetCurrentGear() == 0)
+          gearValue->SetInnerRML("N");
         else
           gearValue->SetInnerRML(std::to_string(controller->GetTransmission().GetCurrentGear()));
         uiResource.RequestLateUpdate();
