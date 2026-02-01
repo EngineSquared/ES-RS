@@ -16,6 +16,9 @@
 #include "system/EngineAudioSystem.hpp"
 #include "system/VehicleInput.hpp"
 #include "utils/AScene.hpp"
+#include "utils/ChaseCameraBehavior.hpp"
+#include "utils/FirstPersonCameraBehavior.hpp"
+#include "utils/FirstPersonOrbitalCameraBehavior.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
 #include "utils/Timer.hpp"
 #include "CallableFunction.hpp"
@@ -46,57 +49,56 @@ void VehicleDebugSystem(Engine::Core &core) {
   auto &telemetry = core.GetResource<Physics::Resource::VehicleTelemetry>();
   auto &physicsMgr = core.GetResource<Physics::Resource::PhysicsManager>();
 
-  auto view = registry.view<Physics::Component::Vehicle,
-                            Physics::Component::VehicleInternal,
-                            Physics::Component::VehicleController>();
-  for (auto [e, vehicle, internal, controllerComp] : view.each()) {
-    // Only debug player vehicle(s)
-    if (!registry.all_of<PlayerVehicle>(e))
-      continue;
+  auto view = registry.view<Physics::Component::Vehicle, Physics::Component::VehicleInternal, Physics::Component::VehicleController>();
+    for (auto [e, vehicle, internal, controllerComp] : view.each())
+    {
+        // Only debug player vehicle(s)
+        if (!registry.all_of<PlayerVehicle>(e))
+            continue;
 
-    Engine::EntityId eid{static_cast<Engine::EntityId::ValueType>(e)};
-    auto rpmOpt = telemetry.GetRPM(eid);
+        Engine::EntityId eid{ static_cast<Engine::EntityId::ValueType>(e) };
+        auto rpmOpt = telemetry.GetRPM(eid);
 
-    std::string rpmStr = "N/A";
-    float rpmVal = 0.0f;
-    if (rpmOpt.has_value()) {
-      rpmVal = rpmOpt.value();
-      rpmStr = fmt::format("{:.1f}", rpmVal);
-    }
+        std::string rpmStr = "N/A";
+        float rpmVal = 0.0f;
+        if (rpmOpt.has_value()) {
+            rpmVal = rpmOpt.value();
+            rpmStr = fmt::format("{:.1f}", rpmVal);
+        }
 
-    std::string speedStr = "N/A";
-    float speedVal = 0.0f;
-    if (internal.IsValid()) {
-      const JPH::BodyLockRead lock(
-          physicsMgr.GetPhysicsSystem().GetBodyLockInterface(),
-          internal.chassisBodyID);
-      if (lock.Succeeded()) {
-        const JPH::Body &body = lock.GetBody();
-        // Convert speed from m/s to km/h for debug display
-        JPH::Vec3 velocity = body.GetLinearVelocity();
-        velocity.SetY(0.0f);
-        JPH::Vec3 forward = body.GetRotation().RotateAxisZ();
-        forward.SetY(0.0f);
-        speedVal = velocity.Dot(forward) * 3.6f;
-        speedStr = fmt::format("{:.2f} km/h", speedVal);
-      }
-    }
+        std::string speedStr = "N/A";
+        float speedVal = 0.0f;
+        if (internal.IsValid())
+        {
+            const JPH::BodyLockRead lock(physicsMgr.GetPhysicsSystem().GetBodyLockInterface(), internal.chassisBodyID);
+            if (lock.Succeeded())
+            {
+                const JPH::Body &body = lock.GetBody();
+                // Convert speed from m/s to km/h for debug display
+                JPH::Vec3 velocity = body.GetLinearVelocity();
+                velocity.SetY(0.0f);
+                JPH::Vec3 forward = body.GetRotation().RotateAxisZ();
+                forward.SetY(0.0f);
+                speedVal = velocity.Dot(forward) * 3.6f;
+                speedStr = fmt::format("{:.2f} km/h", speedVal);
+            }
+        }
 
-    std::string gearStr = "N/A";
-    if (internal.IsValid() && internal.vehicleConstraint != nullptr) {
-      auto *ctrl = internal.vehicleConstraint->GetController();
-      if (ctrl != nullptr) {
-        auto *wctrl = static_cast<JPH::WheeledVehicleController *>(ctrl);
-        gearStr = fmt::format("{}", wctrl->GetTransmission().GetCurrentGear());
-      }
-    }
+        std::string gearStr = "N/A";
+        if (internal.IsValid() && internal.vehicleConstraint != nullptr)
+        {
+            auto *ctrl = internal.vehicleConstraint->GetController();
+            if (ctrl != nullptr)
+            {
+                auto *wctrl = static_cast<JPH::WheeledVehicleController *>(ctrl);
+                gearStr = fmt::format("{}", wctrl->GetTransmission().GetCurrentGear());
+            }
+        }
 
-    Log::Debug(fmt::format(
-        "Vehicle Debug ({}): RPM: {}, Speed: {}, Gear: {}, Controller: Fwd "
-        "{:.2f}, Steer {:.2f}, Brake {:.2f}, HandBrake {:.2f}",
-        Engine::Entity{core, e}, rpmStr, speedStr, gearStr,
-        controllerComp.forwardInput, controllerComp.steeringInput,
-        controllerComp.brakeInput, controllerComp.handBrakeInput));
+        Log::Debug(fmt::format("Vehicle Debug ({}): RPM: {}, Speed: {}, Gear: {}, Controller: Fwd {:.2f}, Steer {:.2f}, Brake {:.2f}, HandBrake {:.2f}",
+                               Engine::Entity{core, e}, rpmStr, speedStr, gearStr,
+                               controllerComp.forwardInput, controllerComp.steeringInput,
+                               controllerComp.brakeInput, controllerComp.handBrakeInput));
   }
 }
 
@@ -130,9 +132,35 @@ protected:
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(
         ChildFollowParentSystem);
 
-    auto chaseBehavior =
-        std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
+    // Create behaviors and default to orbital chase
+    auto orbitalBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
+    auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
+    auto firstPersonBehavior = std::make_shared<FirstPersonCameraBehavior>(core, vehicle);
+    auto firstPersonOrbitalBehavior = std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle);
     cameraManager.SetBehavior(chaseBehavior);
+
+    // Cycle camera behavior when pressing 'C' (Orbital -> Chase -> FirstPerson -> Orbital)
+    if (core.HasResource<Input::Resource::InputManager>()) {
+      auto &inputManager = core.GetResource<Input::Resource::InputManager>();
+      inputManager.RegisterKeyCallback([orbitalBehavior, chaseBehavior, firstPersonBehavior, firstPersonOrbitalBehavior, &cameraManager](Engine::Core & /*core*/, int key, int /*scancode*/, int action, int /*mods*/) {
+        if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+          auto current = cameraManager.GetBehavior();
+          if (std::dynamic_pointer_cast<OrbitalChaseCameraBehavior>(current)) {
+            cameraManager.SetBehavior(chaseBehavior);
+            Log::Info("Camera behavior switched to: Chase");
+          } else if (std::dynamic_pointer_cast<ChaseCameraBehavior>(current)) {
+            cameraManager.SetBehavior(firstPersonBehavior);
+            Log::Info("Camera behavior switched to: FirstPerson");
+          } else if (std::dynamic_pointer_cast<FirstPersonOrbitalCameraBehavior>(current)) {
+            cameraManager.SetBehavior(orbitalBehavior);
+            Log::Info("Camera behavior switched to: OrbitalChase");
+          } else {
+            cameraManager.SetBehavior(firstPersonOrbitalBehavior);
+            Log::Info("Camera behavior switched to: FirstPersonOrbital");
+          }
+        }
+      });
+    }
 
     auto &fixedTimeScheduler =
         core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();

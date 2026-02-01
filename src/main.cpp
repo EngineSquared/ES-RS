@@ -6,6 +6,7 @@
  **************************************************************************/
 
 #include "Engine.hpp"
+#include <memory>
 
 #include "CameraMovement.hpp"
 #include "DefaultPipeline.hpp"
@@ -38,6 +39,9 @@
 #include <Jolt/Physics/Vehicle/WheeledVehicleController.h>
 #include "system/VehicleInput.hpp"
 #include "utils/OrbitalChaseCameraBehavior.hpp"
+#include "utils/ChaseCameraBehavior.hpp"
+#include "utils/FirstPersonCameraBehavior.hpp"
+#include "utils/FirstPersonOrbitalCameraBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core) {
   auto &inputManager = core.GetResource<Input::Resource::InputManager>();
@@ -50,8 +54,6 @@ void EscapeKeySystem(Engine::Core &core) {
 void Setup(Engine::Core &core) {
   auto &window = core.GetResource<Window::Resource::Window>();
   window.SetSize(1280, 720);
-
-  //core.RegisterSystem(EscapeKeySystem);
 
   auto camera = core.CreateEntity();
 
