@@ -133,8 +133,14 @@ protected:
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(
         ChildFollowParentSystem);
 
+    // Create camera behaviors
+    auto orbitalBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
+    auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
+    auto firstPersonBehavior = std::make_shared<FirstPersonCameraBehavior>(core, vehicle);
+    auto firstPersonOrbitalBehavior = std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle);
+
     // Create initial behavior
-    cameraManager.SetBehavior(std::make_shared<ChaseCameraBehavior>(vehicle));
+    cameraManager.SetBehavior(chaseBehavior);
 
     // Register camera switching system
     core.RegisterSystem<Engine::Scheduler::Update>(
