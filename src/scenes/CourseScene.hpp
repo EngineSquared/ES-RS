@@ -171,9 +171,13 @@ protected:
     // Register engine sound and attach audio component to vehicle entity
     auto &soundMgr = core.GetResource<Sound::Resource::SoundManager>();
     soundMgr.RegisterSound("engine_low",
-                           "asset/sounds/911_RSR30_1_in_on_high.wav", true);
+                          "asset/sounds/911_RSR30_1_in_on_low.wav", true);
+    soundMgr.RegisterSound("engine_mid",
+                          "asset/sounds/911_RSR30_1_in_on_mid3.wav", true);
+    soundMgr.RegisterSound("engine_high",
+                          "asset/sounds/911_RSR30_1_in_on_high.wav", true);
     soundMgr.SetVolume("engine_low", 0.1f);
-    Log::Info("Engine sound registered: engine_low");
+    Log::Info("Engine sounds registered: engine_low, engine_mid, engine_high");
 
     vehicle.AddComponent<Game::Component::EngineAudioComponent>();
     Log::Info("EngineAudioComponent added to vehicle");
