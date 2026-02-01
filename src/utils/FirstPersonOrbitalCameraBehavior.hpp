@@ -14,14 +14,15 @@
 #include "resource/InputManager.hpp"
 #include "resource/Window.hpp"
 #include "utils/CameraBehavior.hpp"
-#include "utils/CameraUtils.hpp"
 
 /**
- * @brief Chase camera behavior that allows orbital movement around the vehicle using the mouse.
+ * @brief First-person orbital camera behavior: places the camera inside the vehicle (driver's
+ * perspective) but allows the user to rotate the view with the mouse just like
+ * OrbitalChaseCameraBehavior (yaw/pitch drag + cursor masking).
  */
-class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior {
+class FirstPersonOrbitalCameraBehavior : public CameraMovement::Utils::ICameraBehavior {
   public:
-    explicit OrbitalChaseCameraBehavior(Engine::Core &core, Engine::Entity vehicleEntity)
+    explicit FirstPersonOrbitalCameraBehavior(Engine::Core &core, Engine::Entity vehicleEntity)
         : _core(&core), _vehicleEntity(vehicleEntity)
     {
         if (!core.HasResource<Input::Resource::InputManager>())
@@ -40,13 +41,12 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
         _scrollCallbackId = inputManager.RegisterScrollCallback(
             [this](Engine::Core &core, double xoffset, double yoffset) { HandleScroll(core, xoffset, yoffset); });
 
-        // Initialize mouse position to avoid large jumps on first move
         auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
         _lastMouseX = cameraManager.GetLastMouseX();
         _lastMouseY = cameraManager.GetLastMouseY();
     }
 
-    ~OrbitalChaseCameraBehavior() override
+    ~FirstPersonOrbitalCameraBehavior() override
     {
         if (!_core)
             return;
@@ -77,7 +77,7 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
     }
 
     /**
-     * @brief Update the camera position and rotation based on vehicle position and orbital offsets.
+     * @brief Update the camera position and rotation based on vehicle position and local yaw/pitch.
      */
     void Update(Engine::Core &core, CameraMovement::Resource::CameraManager &manager,
                 Object::Component::Transform &transform, Object::Component::Camera & /*camera*/, float /*deltaTime*/) override
@@ -100,22 +100,17 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
         glm::vec3 vehiclePos = vehicleTransform.GetPosition();
         glm::quat vehicleRot = vehicleTransform.GetRotation();
 
-        glm::vec3 targetPos = vehiclePos + glm::vec3(0.0f, 1.0f, 0.0f);
-
-        float horizontalDistance = _distance * std::cos(_pitch);
-        glm::vec3 localOffset;
-        localOffset.x = horizontalDistance * std::sin(_yaw);
-        localOffset.y = _distance * std::sin(_pitch);
-        localOffset.z = -horizontalDistance * std::cos(_yaw);
-
-        glm::vec3 horizontalOffset = vehicleRot * glm::vec3(localOffset.x, 0.0f, localOffset.z);
-        glm::vec3 cameraPosition = targetPos + horizontalOffset + glm::vec3(0.0f, localOffset.y, 0.0f);
+        glm::vec3 localOffset = _localOffset;
+        glm::vec3 cameraPosition = vehiclePos + vehicleRot * localOffset;
 
         transform.SetPosition(cameraPosition);
 
-        glm::quat lookRotation =
-            CameraMovement::Utils::ComputeLookAtQuaternion(cameraPosition, targetPos, glm::vec3(0.0f, 1.0f, 0.0f));
-        transform.SetRotation(lookRotation);
+        glm::quat yawQuat = glm::angleAxis(_yaw, glm::vec3(0.0f, -1.0f, 0.0f));
+        glm::quat pitchQuat = glm::angleAxis(_pitch, glm::vec3(1.0f, 0.0f, 0.0f));
+        glm::quat localRot = yawQuat * pitchQuat;
+
+        glm::quat finalRot = vehicleRot * localRot;
+        transform.SetRotation(finalRot);
     }
 
     Engine::Entity GetVehicleEntity() const { return _vehicleEntity; }
@@ -135,7 +130,7 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
     }
 
     /**
-     * @brief Handle cursor movement to update orbital rotation.
+     * @brief Handle cursor movement to update yaw/pitch.
      */
     void HandleCursorPos(Engine::Core &core, double xpos, double ypos)
     {
@@ -155,11 +150,10 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
             _yaw -= dx * sensitivity;
             _pitch += dy * sensitivity;
 
-            // Clamp pitch to avoid gimbal lock and looking from directly above/below
-            // TODO: reactivate
-            // constexpr float maxPitch = 1.48f; // ~85 degrees
-            // constexpr float minPitch = -0.1f; // ~-5.7 degrees (slightly below horizon)
-            // _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
+            // Clamp pitch to avoid flipping
+            constexpr float maxPitch = 1.48f; // ~85 degrees
+            constexpr float minPitch = -1.48f; // ~-85 degrees
+            _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
         }
 
         _lastMouseX = xpos;
@@ -167,24 +161,26 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
     }
 
     /**
-     * @brief Handle mouse wheel scrolling for zooming.
+     * @brief Handle mouse wheel. For first-person we use scroll to adjust a small vertical offset
+     * to simulate sitting/leaning; it's clamped to reasonable values.
      */
     void HandleScroll(Engine::Core & /*core*/, double /*xoffset*/, double yoffset)
     {
-        _distance -= static_cast<float>(yoffset) * 1.1f;
-        _distance = std::max(0.001f, std::min(50.0f, _distance));
+        _localOffset.y += static_cast<float>(yoffset) * 0.02f;
+        _localOffset.y = std::max(-0.5f, std::min(1.0f, _localOffset.y));
     }
 
-    Engine::Core *_core;
+    Engine::Core *_core = nullptr;
     Engine::Entity _vehicleEntity;
 
     float _yaw = 0.0f;
-    float _pitch = 0.35f; // Initial angle (looking slightly down)
-    float _distance = 8.0f;
+    float _pitch = 0.0f; // start level with vehicle's forward
 
     bool _isDragging = false;
     double _lastMouseX = 0.0;
     double _lastMouseY = 0.0;
+
+    glm::vec3 _localOffset = glm::vec3(-0.35f, 0.42f, -0.25f);
 
     FunctionUtils::FunctionID _mouseButtonCallbackId = 0;
     FunctionUtils::FunctionID _cursorPosCallbackId = 0;
