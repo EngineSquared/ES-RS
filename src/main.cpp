@@ -21,6 +21,8 @@
 #include "plugin/PluginSound.hpp"
 #include "plugin/PluginWindow.hpp"
 
+#include "resource/InputManager.hpp"
+#include "resource/CameraControlSystemManager.hpp"
 #include "resource/SceneManager.hpp"
 #include "resource/Window.hpp"
 
@@ -42,11 +44,15 @@
 #include "utils/ChaseCameraBehavior.hpp"
 #include "utils/FirstPersonCameraBehavior.hpp"
 #include "utils/FirstPersonOrbitalCameraBehavior.hpp"
+#include "utils/DontMoveBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core) {
   auto &inputManager = core.GetResource<Input::Resource::InputManager>();
 
   if (inputManager.IsKeyPressed(GLFW_KEY_ESCAPE)) {
+    auto &cameraManager =
+        core.GetResource<CameraMovement::Resource::CameraManager>();
+    cameraManager.SetBehavior(std::make_shared<CameraMovement::Utils::DontMoveBehavior>());
     core.Stop();
   }
 }
