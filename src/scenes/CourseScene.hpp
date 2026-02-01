@@ -132,30 +132,26 @@ protected:
     core.RegisterSystem<Engine::Scheduler::FixedTimeUpdate>(
         ChildFollowParentSystem);
 
-    // Create behaviors and default to orbital chase
-    auto orbitalBehavior = std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle);
-    auto chaseBehavior = std::make_shared<ChaseCameraBehavior>(vehicle);
-    auto firstPersonBehavior = std::make_shared<FirstPersonCameraBehavior>(core, vehicle);
-    auto firstPersonOrbitalBehavior = std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle);
-    cameraManager.SetBehavior(chaseBehavior);
+    // Create initial behavior
+    cameraManager.SetBehavior(std::make_shared<ChaseCameraBehavior>(vehicle));
 
     // Cycle camera behavior when pressing 'C' (Orbital -> Chase -> FirstPerson -> Orbital)
     if (core.HasResource<Input::Resource::InputManager>()) {
       auto &inputManager = core.GetResource<Input::Resource::InputManager>();
-      inputManager.RegisterKeyCallback([orbitalBehavior, chaseBehavior, firstPersonBehavior, firstPersonOrbitalBehavior, &cameraManager](Engine::Core & /*core*/, int key, int /*scancode*/, int action, int /*mods*/) {
+      inputManager.RegisterKeyCallback([&core, vehicle, &cameraManager](Engine::Core & /*core*/, int key, int /*scancode*/, int action, int /*mods*/) {
         if (key == GLFW_KEY_C && action == GLFW_PRESS) {
           auto current = cameraManager.GetBehavior();
           if (std::dynamic_pointer_cast<OrbitalChaseCameraBehavior>(current)) {
-            cameraManager.SetBehavior(chaseBehavior);
+            cameraManager.SetBehavior(std::make_shared<ChaseCameraBehavior>(vehicle));
             Log::Info("Camera behavior switched to: Chase");
           } else if (std::dynamic_pointer_cast<ChaseCameraBehavior>(current)) {
-            cameraManager.SetBehavior(firstPersonBehavior);
+            cameraManager.SetBehavior(std::make_shared<FirstPersonCameraBehavior>(core, vehicle));
             Log::Info("Camera behavior switched to: FirstPerson");
           } else if (std::dynamic_pointer_cast<FirstPersonOrbitalCameraBehavior>(current)) {
-            cameraManager.SetBehavior(orbitalBehavior);
+            cameraManager.SetBehavior(std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle));
             Log::Info("Camera behavior switched to: OrbitalChase");
           } else {
-            cameraManager.SetBehavior(firstPersonOrbitalBehavior);
+            cameraManager.SetBehavior(std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle));
             Log::Info("Camera behavior switched to: FirstPersonOrbital");
           }
         }
