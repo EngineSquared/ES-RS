@@ -14,6 +14,7 @@
 #include "resource/InputManager.hpp"
 #include "resource/Window.hpp"
 #include "utils/CameraBehavior.hpp"
+#include "utils/InputUtils.hpp"
 
 /**
  * @brief First-person orbital camera behavior: places the camera inside the vehicle (driver's
@@ -80,7 +81,7 @@ class FirstPersonOrbitalCameraBehavior : public CameraMovement::Utils::ICameraBe
      * @brief Update the camera position and rotation based on vehicle position and local yaw/pitch.
      */
     void Update(Engine::Core &core, CameraMovement::Resource::CameraManager &manager,
-                Object::Component::Transform &transform, Object::Component::Camera & /*camera*/, float /*deltaTime*/) override
+                Object::Component::Transform &transform, Object::Component::Camera & /*camera*/, float deltaTime) override
     {
         auto &window = core.GetResource<Window::Resource::Window>();
         if (!window.IsCursorMasked())
@@ -95,6 +96,9 @@ class FirstPersonOrbitalCameraBehavior : public CameraMovement::Utils::ICameraBe
         }
 
         manager.SetWasCursorMasked(window.IsCursorMasked());
+
+        // Handle joystick input for camera rotation
+        HandleJoystickInput(deltaTime);
 
         auto &vehicleTransform = registry.get<Object::Component::Transform>(_vehicleEntity);
         glm::vec3 vehiclePos = vehicleTransform.GetPosition();
@@ -168,6 +172,60 @@ class FirstPersonOrbitalCameraBehavior : public CameraMovement::Utils::ICameraBe
     {
         _localOffset.y += static_cast<float>(yoffset) * 0.02f;
         _localOffset.y = std::max(-0.5f, std::min(1.0f, _localOffset.y));
+    }
+
+    /**
+     * @brief Handle joystick input for camera rotation (right stick).
+     */
+    void HandleJoystickInput(float deltaTime)
+    {
+        constexpr int PS5_R3_LR_AXIS = 2;
+        constexpr int PS5_R3_UD_AXIS = 5;
+        constexpr float JOYSTICK_DEADZONE = 0.15f;
+        constexpr float JOYSTICK_LOOK_SENSITIVITY = 2.5f;
+        constexpr int JOYSTICK_ID = GLFW_JOYSTICK_1;
+
+        if (!Input::Utils::IsJoystickPresent(JOYSTICK_ID))
+        {
+            return;
+        }
+
+        try
+        {
+            auto axes = Input::Utils::GetJoystickAxes(JOYSTICK_ID);
+
+            if (axes.size() < 6)
+            {
+                return;
+            }
+
+            float lookHorizontal = axes[PS5_R3_LR_AXIS];
+            float lookVertical = axes[PS5_R3_UD_AXIS];
+
+            if (std::abs(lookHorizontal) <= JOYSTICK_DEADZONE)
+            {
+                lookHorizontal = 0.0f;
+            }
+            if (std::abs(lookVertical) <= JOYSTICK_DEADZONE)
+            {
+                lookVertical = 0.0f;
+            }
+
+            if (lookHorizontal != 0.0f || lookVertical != 0.0f)
+            {
+                _yaw -= lookHorizontal * JOYSTICK_LOOK_SENSITIVITY * deltaTime;
+                _pitch += lookVertical * JOYSTICK_LOOK_SENSITIVITY * deltaTime;
+
+                // Clamp pitch to avoid flipping
+                constexpr float maxPitch = 1.48f; // ~85 degrees
+                constexpr float minPitch = -1.48f; // ~-85 degrees
+                _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
+            }
+        }
+        catch (const std::exception &)
+        {
+            // Ignore joystick errors
+        }
     }
 
     Engine::Core *_core = nullptr;

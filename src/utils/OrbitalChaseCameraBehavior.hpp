@@ -15,6 +15,7 @@
 #include "resource/Window.hpp"
 #include "utils/CameraBehavior.hpp"
 #include "utils/CameraUtils.hpp"
+#include "utils/InputUtils.hpp"
 
 /**
  * @brief Chase camera behavior that allows orbital movement around the vehicle using the mouse.
@@ -80,7 +81,7 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
      * @brief Update the camera position and rotation based on vehicle position and orbital offsets.
      */
     void Update(Engine::Core &core, CameraMovement::Resource::CameraManager &manager,
-                Object::Component::Transform &transform, Object::Component::Camera & /*camera*/, float /*deltaTime*/) override
+                Object::Component::Transform &transform, Object::Component::Camera & /*camera*/, float deltaTime) override
     {
         auto &window = core.GetResource<Window::Resource::Window>();
         if (!window.IsCursorMasked())
@@ -95,6 +96,9 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
         }
 
         manager.SetWasCursorMasked(window.IsCursorMasked());
+
+        // Handle joystick input for camera rotation
+        HandleJoystickInput(deltaTime);
 
         auto &vehicleTransform = registry.get<Object::Component::Transform>(_vehicleEntity);
         glm::vec3 vehiclePos = vehicleTransform.GetPosition();
@@ -123,6 +127,60 @@ class OrbitalChaseCameraBehavior : public CameraMovement::Utils::ICameraBehavior
     void SetVehicleEntity(Engine::Entity vehicleEntity) { _vehicleEntity = vehicleEntity; }
 
   private:
+    /**
+     * @brief Handle joystick input for camera rotation and zoom (right stick).
+     */
+    void HandleJoystickInput(float deltaTime)
+    {
+        constexpr int PS5_R3_LR_AXIS = 2;
+        constexpr int PS5_R3_UD_AXIS = 5;
+        constexpr float JOYSTICK_DEADZONE = 0.15f;
+        constexpr float JOYSTICK_LOOK_SENSITIVITY = 2.5f;
+        constexpr int JOYSTICK_ID = GLFW_JOYSTICK_1;
+
+        if (!Input::Utils::IsJoystickPresent(JOYSTICK_ID))
+        {
+            return;
+        }
+
+        try
+        {
+            auto axes = Input::Utils::GetJoystickAxes(JOYSTICK_ID);
+
+            if (axes.size() < 6)
+            {
+                return;
+            }
+
+            float lookHorizontal = axes[PS5_R3_LR_AXIS];
+            float lookVertical = axes[PS5_R3_UD_AXIS];
+
+            if (std::abs(lookHorizontal) <= JOYSTICK_DEADZONE)
+            {
+                lookHorizontal = 0.0f;
+            }
+            if (std::abs(lookVertical) <= JOYSTICK_DEADZONE)
+            {
+                lookVertical = 0.0f;
+            }
+
+            if (lookHorizontal != 0.0f || lookVertical != 0.0f)
+            {
+                _yaw -= lookHorizontal * JOYSTICK_LOOK_SENSITIVITY * deltaTime;
+                _pitch += lookVertical * JOYSTICK_LOOK_SENSITIVITY * deltaTime;
+
+                // Clamp pitch if needed (currently commented out in mouse handling)
+                // constexpr float maxPitch = 1.48f;
+                // constexpr float minPitch = -0.1f;
+                // _pitch = std::max(minPitch, std::min(maxPitch, _pitch));
+            }
+        }
+        catch (const std::exception &)
+        {
+            // Ignore joystick errors
+        }
+    }
+
     /**
      * @brief Handle mouse button presses for dragging the camera.
      */

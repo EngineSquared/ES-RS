@@ -16,6 +16,7 @@
 #include "system/EngineAudioSystem.hpp"
 #include "system/VehicleInput.hpp"
 #include "utils/AScene.hpp"
+#include "utils/InputUtils.hpp"
 #include "utils/ChaseCameraBehavior.hpp"
 #include "utils/FirstPersonCameraBehavior.hpp"
 #include "utils/FirstPersonOrbitalCameraBehavior.hpp"
@@ -135,28 +136,57 @@ protected:
     // Create initial behavior
     cameraManager.SetBehavior(std::make_shared<ChaseCameraBehavior>(vehicle));
 
-    // Cycle camera behavior when pressing 'C' (Orbital -> Chase -> FirstPerson -> Orbital)
-    if (core.HasResource<Input::Resource::InputManager>()) {
-      auto &inputManager = core.GetResource<Input::Resource::InputManager>();
-      inputManager.RegisterKeyCallback([&core, vehicle, &cameraManager](Engine::Core & /*core*/, int key, int /*scancode*/, int action, int /*mods*/) {
-        if (key == GLFW_KEY_C && action == GLFW_PRESS) {
-          auto current = cameraManager.GetBehavior();
-          if (std::dynamic_pointer_cast<OrbitalChaseCameraBehavior>(current)) {
-            cameraManager.SetBehavior(std::make_shared<ChaseCameraBehavior>(vehicle));
-            Log::Info("Camera behavior switched to: Chase");
-          } else if (std::dynamic_pointer_cast<ChaseCameraBehavior>(current)) {
-            cameraManager.SetBehavior(std::make_shared<FirstPersonCameraBehavior>(core, vehicle));
-            Log::Info("Camera behavior switched to: FirstPerson");
-          } else if (std::dynamic_pointer_cast<FirstPersonOrbitalCameraBehavior>(current)) {
-            cameraManager.SetBehavior(std::make_shared<OrbitalChaseCameraBehavior>(core, vehicle));
-            Log::Info("Camera behavior switched to: OrbitalChase");
-          } else {
-            cameraManager.SetBehavior(std::make_shared<FirstPersonOrbitalCameraBehavior>(core, vehicle));
-            Log::Info("Camera behavior switched to: FirstPersonOrbital");
+    // Register camera switching system
+    core.RegisterSystem<Engine::Scheduler::Update>(
+        [orbitalBehavior, chaseBehavior, firstPersonBehavior, firstPersonOrbitalBehavior](Engine::Core &core) {
+          auto &inputManager = core.GetResource<Input::Resource::InputManager>();
+          auto &cameraManager = core.GetResource<CameraMovement::Resource::CameraManager>();
+          
+          static bool cKeyWasPressed = false;
+          static bool triangleWasPressed = false;
+          
+          bool cKeyIsPressed = inputManager.IsKeyPressed(GLFW_KEY_C);
+          bool triangleIsPressed = false;
+          
+          // Check for Triangle/Y button on controller (PS5 Triangle = button 2)
+          constexpr int PS5_TRIANGLE_BUTTON = 2;
+          constexpr int JOYSTICK_ID = GLFW_JOYSTICK_1;
+          
+          if (Input::Utils::IsJoystickPresent(JOYSTICK_ID)) {
+            try {
+              auto buttons = Input::Utils::GetJoystickButtons(JOYSTICK_ID);
+              if (buttons.size() > PS5_TRIANGLE_BUTTON) {
+                triangleIsPressed = (buttons[PS5_TRIANGLE_BUTTON] == GLFW_PRESS);
+              }
+            } catch (const std::exception &) {
+              // Ignore joystick errors
+            }
           }
-        }
-      });
-    }
+          
+          // Trigger camera switch on rising edge of either input
+          bool shouldSwitch = (cKeyIsPressed && !cKeyWasPressed) || 
+                             (triangleIsPressed && !triangleWasPressed);
+          
+          if (shouldSwitch) {
+            auto current = cameraManager.GetBehavior();
+            if (std::dynamic_pointer_cast<OrbitalChaseCameraBehavior>(current)) {
+              cameraManager.SetBehavior(chaseBehavior);
+              Log::Info("Camera behavior switched to: Chase");
+            } else if (std::dynamic_pointer_cast<ChaseCameraBehavior>(current)) {
+              cameraManager.SetBehavior(firstPersonBehavior);
+              Log::Info("Camera behavior switched to: FirstPerson");
+            } else if (std::dynamic_pointer_cast<FirstPersonOrbitalCameraBehavior>(current)) {
+              cameraManager.SetBehavior(orbitalBehavior);
+              Log::Info("Camera behavior switched to: OrbitalChase");
+            } else {
+              cameraManager.SetBehavior(firstPersonOrbitalBehavior);
+              Log::Info("Camera behavior switched to: FirstPersonOrbital");
+            }
+          }
+          
+          cKeyWasPressed = cKeyIsPressed;
+          triangleWasPressed = triangleIsPressed;
+        });
 
     auto &fixedTimeScheduler =
         core.GetScheduler<Engine::Scheduler::FixedTimeUpdate>();
