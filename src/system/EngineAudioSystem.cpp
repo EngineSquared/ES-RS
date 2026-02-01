@@ -36,7 +36,7 @@ void EngineAudioSystem(Engine::Core &core)
         float alpha = audio.smoothingAlpha;
         audio.currentPitch = alpha * targetPitch + (1.0f - alpha) * audio.currentPitch;
 
-        Log::Info(fmt::format("Engine RPM: {:.1f}, Pitch: {:.2f}", rpm, audio.currentPitch));
+        /* Log::Info(fmt::format("Engine RPM: {:.1f}, Pitch: {:.2f}", rpm, audio.currentPitch)); */
 
         sound.SetPitch(audio.soundName, audio.currentPitch);
 

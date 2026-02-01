@@ -18,7 +18,7 @@ target("ES-RS")
 
     add_includedirs("$(projectdir)/src/")
 
-    add_packages("entt", "glm", "glfw", "spdlog", "fmt", "joltphysics", "stb", "tinyobjloader", "wgpu-native", "glfw3webgpu", "lodepng", "miniaudio")
+    add_packages("entt", "glm", "glfw", "spdlog", "fmt", "joltphysics", "stb", "tinyobjloader", "wgpu-native", "glfw3webgpu", "lodepng", "rmlui", "miniaudio")
 
     set_rundir("$(projectdir)")
 
