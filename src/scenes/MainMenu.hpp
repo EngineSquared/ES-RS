@@ -20,7 +20,7 @@ protected:
         auto &uiContext = core.GetResource<Rmlui::Resource::UIContext>();
         auto &soundManager = core.GetResource<Sound::Resource::SoundManager>();
 
-        soundManager.RegisterSound("start-menu", "asset/sounds/start-menu.mp3");
+        soundManager.RegisterSound("start-menu", "asset/sounds/start-menu.wav");
         soundManager.RegisterSound("button_hover", "asset/sounds/btn-hover.mp3");
         soundManager.RegisterSound("button_click", "asset/sounds/btn-click.mp3");
         soundManager.RegisterSound("main-menu", "asset/sounds/main-menu.mp3", true);
@@ -70,27 +70,27 @@ protected:
                 }
 
                 uiContext.RegisterEventListener(*startGameBtn, "click", [fadeOutMask, &uiContext, &core, &soundManager](Rml::Event &event) {
-                    //soundManager.Play("button_click");
+                    soundManager.Play("button_click");
                     fadeOutMask->SetProperty("visibility", "visible");
                     fadeOutMask->SetProperty("animation", "0.6s linear-in-out 1 fade-out");
                 });
                 uiContext.RegisterEventListener(*fadeOutMask, "animationend", [&uiContext, &core, &soundManager](Rml::Event &event) {
-                    //soundManager.Stop("main-menu");
+                    soundManager.Stop("main-menu");
                     core.GetResource<Scene::Resource::SceneManager>().SetNextScene("CourseScene");
                 });
                 uiContext.RegisterEventListener(*startGameBtn, "mouseover", [&uiContext, &core, &soundManager](Rml::Event &event) {
-                    //if (soundManager.IsPlaying("button_hover"))
-                    //    soundManager.Stop("button_hover");
-                    //soundManager.Play("button_hover");
+                    if (soundManager.IsPlaying("button_hover"))
+                        soundManager.Stop("button_hover");
+                    soundManager.Play("button_hover");
                 });
                 uiContext.RegisterEventListener(*quitGameBtn, "click", [&uiContext, &core, &soundManager](Rml::Event &event) {
-                    //soundManager.Play("button_click");
+                    soundManager.Play("button_click");
                     core.Stop();
                 });
                 uiContext.RegisterEventListener(*quitGameBtn, "mouseover", [&uiContext, &core, &soundManager](Rml::Event &event) {
-                    //if (soundManager.IsPlaying("button_hover"))
-                    //    soundManager.Stop("button_hover");
-                    //soundManager.Play("button_hover");
+                    if (soundManager.IsPlaying("button_hover"))
+                        soundManager.Stop("button_hover");
+                    soundManager.Play("button_hover");
                 });
             });
 
@@ -99,10 +99,10 @@ protected:
                 *loadMainMenuRequested = true;
             });
         uiContext.RegisterEventListener(*interactionArea, "click", [&uiContext, &core, &soundManager](Rml::Event &event) {
-            //soundManager.Play("start-menu");
+            soundManager.Play("start-menu");
             event.GetTargetElement()->SetProperty("animation", "0.6s linear-in-out 1 fade-out");
         });
-        //soundManager.Play("main-menu");
+        soundManager.Play("main-menu");
     }
 
     void _onDestroy(Engine::Core &core) final
