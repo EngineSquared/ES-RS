@@ -30,6 +30,8 @@ void LoadCourse(Engine::Core &core) {
   for (auto &loader : courseLoaders) {
     auto shapes = loader.GetShapes();
     for (auto &shape : shapes) {
+      auto mesh = InvertMeshX(shape.GetMesh());
+      InvertMeshUVs(mesh, true, false);
       auto coursePart = core.CreateEntity();
       Object::Component::Material shapeMaterial(shape.GetMaterial());
       if (!shapeMaterial.diffuseTexName.empty()) {
@@ -41,7 +43,7 @@ void LoadCourse(Engine::Core &core) {
         shapeMaterial.diffuseTexName = Graphic::Utils::DEFAULT_TEXTURE_NAME;
       }
 
-      coursePart.AddComponent<Object::Component::Mesh>(shape.GetMesh());
+      coursePart.AddComponent<Object::Component::Mesh>(mesh);
       coursePart.AddComponent<Object::Component::Material>(shapeMaterial);
       coursePart.AddComponent<Object::Component::Transform>(
           courseOffset, courseScale, courseRotation);
@@ -56,7 +58,7 @@ void LoadCourse(Engine::Core &core) {
   Physics::Component::MeshCollider meshCollider;
   meshCollider.activeEdgeCosThresholdAngle =
       0.9397f; // cos(20°) for much smoother sliding across terrain
-  meshCollider.mesh = courseCollider.GetMesh();
+  meshCollider.mesh = InvertMeshX(courseCollider.GetMesh());
   colliderEntity.AddComponent<Physics::Component::MeshCollider>(meshCollider);
 
   colliderEntity.AddComponent<Physics::Component::RigidBody>(

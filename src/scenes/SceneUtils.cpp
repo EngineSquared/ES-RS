@@ -14,6 +14,17 @@ Object::Component::Mesh InvertMeshX(const Object::Component::Mesh &mesh)
     {
         invertedMesh.SetVertexAt(i, glm::vec3(-vertices[i].x, vertices[i].y, vertices[i].z));
     }
+    const auto &normals = invertedMesh.GetNormals();
+    for (size_t i = 0; i < normals.size(); ++i)
+    {
+        invertedMesh.SetNormalAt(i, glm::vec3(-normals[i].x, normals[i].y, normals[i].z));
+    }
+    auto indices = invertedMesh.GetIndices();
+    for (size_t i = 0; i + 2 < indices.size(); i += 3)
+    {
+        std::swap(indices[i + 1], indices[i + 2]);
+    }
+    invertedMesh.SetIndices(indices);
     return invertedMesh;
 }
 
