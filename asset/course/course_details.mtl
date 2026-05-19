@@ -1,0 +1,788 @@
+# Blender 4.5.5 LTS MTL File: 'Untitled.blend'
+# www.blender.org
+
+newmtl Gazebo_Tent
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Gazebo_Tent_D.png
+map_Bump ../textures/Gazebo_Tent_NM.png
+
+newmtl MB_Sprinter_2014
+Ns 150.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.900000 0.900000 0.900000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/amb.png
+map_Bump ../textures/flat_NM.png
+
+newmtl MB_Sprinter_2014.001
+Ns 150.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.900000 0.900000 0.900000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/amb.png
+map_Bump ../textures/flat_NM.png
+
+newmtl Material_#0
+Ns 8.000002
+Ka 1.000000 1.000000 1.000000
+Ks 0.020000 0.020000 0.020000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/BBgrass8.png
+map_d ../textures/BBgrass8.png
+
+newmtl Material_#1
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.090000 0.090000 0.090000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/groove.png
+map_d ../textures/groove.png
+
+newmtl Material_#1.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.090000 0.090000 0.090000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/groove.png
+map_d ../textures/groove.png
+
+newmtl Material_#1.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.090000 0.090000 0.090000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/groove.png
+map_d ../textures/groove.png
+
+newmtl SAND_new
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/trap_detail.png
+map_Ks ../textures/sand_base.png
+map_Bump ../textures/sand_base_NM.png
+
+newmtl TV_Stuff
+Ns 180.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.900000 0.900000 0.900000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/TV_Stuff_D.png
+map_Bump ../textures/flat_NM.png
+
+newmtl Vehicles
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Vehicles_D.png
+map_Bump ../textures/Vehicles_D_NM.png
+
+newmtl add
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/add.png
+
+newmtl adv
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/adv.png
+
+newmtl armco
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/metal-detail.png
+map_Ks ../textures/armco.png
+map_Bump ../textures/armco_nm.png
+
+newmtl armco.001
+Ns 100.000015
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/metal-detail.png
+map_Ks ../textures/armco.png
+map_Bump ../textures/armco_nm.png
+
+newmtl asph_ext
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/tarmac-detail5.png
+map_Ks ../textures/asph_ext_D.png
+map_Bump ../textures/flat_NM.png
+
+newmtl asph_ext_2
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/terrain_ext2.png
+
+newmtl asph_green
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/curb2015_det.png
+map_Ks ../textures/asph-green-b.png
+map_Bump ../textures/flat_NM.png
+
+newmtl asphalt-
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/asph.png
+
+newmtl asphalt-.001
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/asph.png
+
+newmtl asphalt-.002
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/asph.png
+
+newmtl bbgrass-b
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/BBgrass-b.png
+map_d ../textures/BBgrass-b.png
+
+newmtl bord_add
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/bord_add1.png
+
+newmtl box
+Ns 255.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.250000 0.250000 0.250000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/box-ext.png
+map_Bump ../textures/box-ext-nm.png
+
+newmtl box-alpha-spec
+Ns 255.000015
+Ka 1.000000 1.000000 1.000000
+Ks 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/box-ext.png
+
+newmtl cameraman
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.020000 0.020000 0.020000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/VideoCAMERA.png
+
+newmtl carpet
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/carpet.png
+
+newmtl castle_D
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/castle_D.png
+
+newmtl curb-new
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/curb2015_det.png
+map_Ks ../textures/curb2015.png
+map_Bump ../textures/curb2015_NM.png
+
+newmtl curb_misc_new
+Ns 70.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.400000 0.400000 0.400000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/curbs_misc_new.png
+map_Bump ../textures/curbs_misc_new_NM.png
+
+newmtl envirbase
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/envir-base.png
+
+newmtl external
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/external3.png
+
+newmtl fence
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/fence.png
+map_d ../textures/fence.png
+
+newmtl fence.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/fence.png
+
+newmtl flag7
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/flag_7.png
+map_d ../textures/flag_7.png
+
+newmtl flag8
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/flag_8b.png
+map_d ../textures/flag_8b.png
+
+newmtl flag9
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/flag_9.png
+map_d ../textures/flag_9.png
+
+newmtl grass
+Ns 8.000002
+Ka 1.000000 1.000000 1.000000
+Ks 1.200000 1.200000 1.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/grass1.png
+
+newmtl grs_brd
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/grass-brd3-F.png
+map_d ../textures/grass-brd3-F.png
+
+newmtl gstands
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/gstands2.png
+map_Bump ../textures/gstands2_NM.png
+
+newmtl gstands-alpha
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/gstands2.png
+map_d ../textures/gstands2.png
+
+newmtl gstands-alpha_blend
+Ns 365.999969
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/gstands2.png
+
+newmtl jersey
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Fiberglass_detail.png
+map_Ks ../textures/jersey.png
+map_Bump ../textures/jersey_nm.png
+
+newmtl jersey.001
+Ns 50.000011
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Fiberglass_detail.png
+map_Ks ../textures/jersey.png
+map_Bump ../textures/jersey_nm.png
+
+newmtl marshall
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.020000 0.020000 0.020000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/commissario_NEW.png
+
+newmtl marshall.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.020000 0.020000 0.020000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/commissario_NEW.png
+
+newmtl misc
+Ns 29.999998
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/misc.png
+map_Bump ../textures/misc_nm.png
+
+newmtl misc-alpha
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/misc.png
+map_d ../textures/misc.png
+
+newmtl misc-alpha.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/misc.png
+map_d ../textures/misc.png
+
+newmtl misc.001
+Ns 29.999998
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/misc.png
+map_Bump ../textures/misc_nm.png
+
+newmtl misc_add
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/misc_add.png
+
+newmtl objects
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/objects1.png
+
+newmtl objects.001
+Ns 19.999990
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/objects1.png
+
+newmtl panel_new
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/panel_new.png
+
+newmtl people_stand
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/people_stand.png
+map_d ../textures/people_stand.png
+
+newmtl pines_new
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/trees2G.png
+map_d ../textures/trees2G.png
+
+newmtl pitlane-alpha
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/pitlane.png
+
+newmtl pitlane-alphaTS
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 2
+map_Kd ../textures/pitlane.png
+map_d ../textures/pitlane.png
+
+newmtl pitlane-multilayer
+Ns 8.000002
+Ka 1.000000 1.000000 1.000000
+Ks 0.400000 0.400000 0.400000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/pitlane2.png
+
+newmtl pitlane-multimap
+Ns 255.000015
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/pitlane2.png
+map_Bump ../textures/pitlane_nm.png
+
+newmtl pitlane-multimap2
+Ns 6.000004
+Ka 1.000000 1.000000 1.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/concrete_detail4.png
+map_Ks ../textures/pitlane.png
+map_Bump ../textures/pitlane_nm.png
+
+newmtl posiz
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/pos.png
+map_d ../textures/pos.png
+
+newmtl sbanc_c
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/grass1.png
+
+newmtl structures
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.050000 0.050000 0.050000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/structures.png
+map_d ../textures/structures.png
+
+newmtl top2
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 1
+map_Kd ../textures/top4.png
+map_Bump ../textures/top4_NM2.png
+
+newmtl tractor
+Ns 150.000000
+Ka 1.000000 1.000000 1.000000
+Ks 0.900000 0.900000 0.900000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/Tractor_D.png
+map_Bump ../textures/flat_NM.png
+
+newmtl travr
+Ns 29.999998
+Ka 1.000000 1.000000 1.000000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/travr.png
+map_Bump ../textures/travr_NM.png
+
+newmtl trees
+Ns 0.999999
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/treesline_B.png
+map_d ../textures/treesline_B.png
+
+newmtl trees_new
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.000000 0.000000 0.000000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 1
+map_Kd ../textures/trees1_K.png
+map_d ../textures/trees1_K.png
+
+newmtl tyres
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/tyres.png
+map_Bump ../textures/tyres_NM.png
+
+newmtl tyres.001
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/tyres.png
+map_Bump ../textures/tyres_NM.png
+
+newmtl tyres.002
+Ns 39.999996
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/tyres.png
+map_Bump ../textures/tyres_NM.png
+
+newmtl tyres_add
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/tyres_add1.png
+map_d ../textures/tyres_add1.png
+
+newmtl tyres_add.001
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/tyres_add1.png
+map_d ../textures/tyres_add1.png
+
+newmtl tyres_add.002
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.150000 0.150000 0.150000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/tyres_add1.png
+map_d ../textures/tyres_add1.png
+
+newmtl tyres_add2
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+illum 9
+map_Kd ../textures/tyres_add2.png
+map_d ../textures/tyres_add2.png
+
+newmtl window_nw
+Ns 10.000005
+Ka 1.000000 1.000000 1.000000
+Ks 0.100000 0.100000 0.100000
+Ke 0.000000 0.000000 0.000000
+Ni 1.500000
+d 1.000000
+illum 2
+map_Kd ../textures/window1.png

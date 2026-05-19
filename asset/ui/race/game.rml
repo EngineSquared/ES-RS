@@ -6,14 +6,10 @@
 		<link type="text/template" href="speed-counter.rml" />
 		<link type="text/template" href="lap-counter.rml" />
 		<link type="text/template" href="time-elapsed.rml" />
-		<link type="text/template" href="pause-menu.rml" />
 		<link type="text/rcss" href="game.rcss" />
 	</head>
 	<body>
 		<div id="fade-out-mask"></div>
-		<div id="pause-menu" template="pause-menu">
-			<template content="pause-menu" src="pause-menu"></template>
-		</div>
 		<div template="speed-o-meter">
 			<template content="speed-o-meter" src="speed-o-meter"></template>
 		</div>
