@@ -68,7 +68,7 @@ Engine::Entity CreateVehicle(Engine::Core &core) {
     }
 
     if (!foundShape) {
-      Log::Warn(fmt::format("Vehicle body shape '{}' not found in OBJ file, "
+      Log::Warning(fmt::format("Vehicle body shape '{}' not found in OBJ file, "
                             "using entire mesh as chassis",
                             shapeName));
       chassisMesh = loader.GetMesh();

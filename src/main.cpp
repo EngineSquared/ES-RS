@@ -44,7 +44,7 @@
 #include "utils/ChaseCameraBehavior.hpp"
 #include "utils/FirstPersonCameraBehavior.hpp"
 #include "utils/FirstPersonOrbitalCameraBehavior.hpp"
-#include "utils/DontMoveBehavior.hpp"
+#include "utils/cameraBehavior/DontMoveBehavior.hpp"
 
 void EscapeKeySystem(Engine::Core &core) {
   auto &inputManager = core.GetResource<Input::Resource::InputManager>();
@@ -90,7 +90,7 @@ int main(void) {
 
   core.RegisterSystem<Engine::Scheduler::Startup>(Setup);
 
-  core.RunCore();
+  core.Run();
 
   return 0;
 }
