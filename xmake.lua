@@ -10,7 +10,7 @@ end
 
 add_repositories("EngineSquaredrepo https://github.com/EngineSquared/xrepo.git")
 
-add_requires("enginesquared ab1b71caa1110642a5e4ee3a56205ce428fb8cd0", { debug = is_mode("debug") })
+add_requires("enginesquared 0.3.3", { debug = is_mode("debug") })
 
 add_rules("plugin.compile_commands.autoupdate", {outputdir = ".vscode"})
 target("ES-RS")
